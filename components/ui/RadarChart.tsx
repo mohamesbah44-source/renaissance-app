@@ -1,18 +1,25 @@
-const SIZE = 300;
-const CENTER = SIZE / 2;
-const RADIUS = 100;
-const LEVELS = 5;
+const SIZE = 480;
+const CENTER = 240;
+const RADIUS = 170;
+const GRID_LEVELS = [0.25, 0.5, 0.75, 1] as const;
 
-interface RadarChartSeries {
-  label: string;
+export interface RadarChartSeries {
   values: number[];
   color: string;
+  /** Tracé en pointillés (ex : bilan précédent). */
+  dashed?: boolean;
+  /** Désactive le remplissage du polygone (par défaut rempli légèrement). */
+  fill?: boolean;
 }
 
 interface RadarChartProps {
+  /** Labels courts, un par axe (8 piliers du Radar Renaissance™). */
   axes: string[];
   series: RadarChartSeries[];
-  max?: number;
+  /** Couleur du point de chaque axe (ex : or pour survie, vert pour alignement). */
+  pointColors?: string[];
+  gridColor?: string;
+  textColor?: string;
 }
 
 function pointAt(index: number, total: number, ratio: number) {
@@ -23,47 +30,64 @@ function pointAt(index: number, total: number, ratio: number) {
   };
 }
 
-function polygonPoints(axesCount: number, ratio: number) {
-  return Array.from({ length: axesCount }, (_, i) => {
-    const { x, y } = pointAt(i, axesCount, ratio);
-    return `${x},${y}`;
-  }).join(" ");
+function polygonPoints(values: number[]) {
+  return values
+    .map((value, i) => {
+      const ratio = Math.min(Math.max(value, 0), 1);
+      const { x, y } = pointAt(i, values.length, ratio);
+      return `${x},${y}`;
+    })
+    .join(" ");
 }
 
-/** Radar SVG à 8 axes, sans dépendance, pour visualiser les scores du Radar Renaissance™. */
-export function RadarChart({ axes, series, max = 10 }: RadarChartProps) {
-  const gridLevels = Array.from({ length: LEVELS }, (_, i) => (i + 1) / LEVELS);
-
+/**
+ * Radar SVG octogonal (8 piliers du Radar Renaissance™).
+ * viewBox 0 0 480 480, centre 240/240, rayon 170, 4 grilles (25/50/75/100%).
+ */
+export function RadarChart({
+  axes,
+  series,
+  pointColors,
+  gridColor = "rgba(237,230,214,0.14)",
+  textColor = "#ede6d6",
+}: RadarChartProps) {
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full" role="img" aria-label="Radar Renaissance">
-      {gridLevels.map((ratio) => (
-        <polygon key={ratio} points={polygonPoints(axes.length, ratio)} fill="none" stroke="rgba(255,255,255,0.08)" />
-      ))}
-
-      {axes.map((axis, i) => {
-        const { x, y } = pointAt(i, axes.length, 1);
-        return <line key={axis} x1={CENTER} y1={CENTER} x2={x} y2={y} stroke="rgba(255,255,255,0.08)" />;
-      })}
-
-      {series.map((s) => (
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full" role="img" aria-label="Radar Renaissance™">
+      {GRID_LEVELS.map((ratio) => (
         <polygon
-          key={s.label}
-          points={axes
-            .map((_, i) => {
-              const ratio = Math.min(Math.max(s.values[i], 0), max) / max;
-              const { x, y } = pointAt(i, axes.length, ratio);
-              return `${x},${y}`;
-            })
-            .join(" ")}
-          fill={s.color}
-          fillOpacity={0.18}
-          stroke={s.color}
-          strokeWidth={2}
+          key={ratio}
+          points={polygonPoints(axes.map(() => ratio))}
+          fill="none"
+          stroke={gridColor}
         />
       ))}
 
       {axes.map((axis, i) => {
-        const { x, y } = pointAt(i, axes.length, 1.26);
+        const { x, y } = pointAt(i, axes.length, 1);
+        return <line key={axis} x1={CENTER} y1={CENTER} x2={x} y2={y} stroke={gridColor} />;
+      })}
+
+      {series.map((s, i) => (
+        <polygon
+          key={i}
+          points={polygonPoints(s.values)}
+          fill={s.fill === false ? "none" : s.color}
+          fillOpacity={s.fill === false ? 0 : 0.16}
+          stroke={s.color}
+          strokeWidth={2}
+          strokeDasharray={s.dashed ? "6 6" : undefined}
+        />
+      ))}
+
+      {pointColors &&
+        series[0]?.values.map((value, i) => {
+          const ratio = Math.min(Math.max(value, 0), 1);
+          const { x, y } = pointAt(i, axes.length, ratio);
+          return <circle key={axes[i]} cx={x} cy={y} r={4.5} fill={pointColors[i]} />;
+        })}
+
+      {axes.map((axis, i) => {
+        const { x, y } = pointAt(i, axes.length, 1.16);
         const dx = x - CENTER;
         const dy = y - CENTER;
         const textAnchor = Math.abs(dx) < 4 ? "middle" : dx > 0 ? "start" : "end";
@@ -74,8 +98,8 @@ export function RadarChart({ axes, series, max = 10 }: RadarChartProps) {
             key={axis}
             x={x}
             y={y}
-            fontSize={9.5}
-            fill="rgba(255,255,255,0.5)"
+            fontSize={13}
+            fill={textColor}
             textAnchor={textAnchor}
             dominantBaseline={dominantBaseline}
           >

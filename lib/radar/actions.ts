@@ -2,59 +2,81 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { RADAR_DIMENSIONS, type RadarDimensionKey } from "@/lib/radar/constants";
-import type { RadarPhase } from "@/lib/types/database.types";
+import { PILIERS, EVOLUTION_STATES, questionFieldName } from "@/lib/radar/constants";
+import {
+  computePillarScores,
+  computeEtatDominant,
+  computeFenetreTransformation,
+  computeScoreAlignement,
+  computeScoreGlobal,
+  computeScoreSurvie,
+  computeTopPriorities,
+} from "@/lib/radar/scoring";
+import type { Json } from "@/lib/types/database.types";
 
-export type RadarFormState = { success?: boolean; error?: string } | undefined;
+export type RadarBilanFormState =
+  | { success: true; id: string }
+  | { success: false; error: string }
+  | undefined;
 
-const VALID_PHASES: RadarPhase[] = ["before", "week4", "week8"];
-
-/** Enregistre (ou met à jour) une réponse au Radar Renaissance™ pour une étape donnée. */
-export async function saveRadarAssessment(
-  _prevState: RadarFormState,
+/**
+ * Lit les 40 réponses (1 à 5) du formulaire de session, recalcule l'intégralité
+ * du bilan côté serveur (scoring.ts) et l'enregistre dans `radar_bilans`.
+ */
+export async function saveRadarBilan(
+  _prevState: RadarBilanFormState,
   formData: FormData
-): Promise<RadarFormState> {
+): Promise<RadarBilanFormState> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { error: "Tu dois être connecté·e." };
+    return { success: false, error: "Tu dois être connecté·e." };
   }
 
-  const phase = formData.get("phase");
-  if (typeof phase !== "string" || !VALID_PHASES.includes(phase as RadarPhase)) {
-    return { error: "Étape invalide." };
-  }
+  const answers: Record<string, number> = {};
 
-  const scores = {} as Record<RadarDimensionKey, number>;
-  for (const dimension of RADAR_DIMENSIONS) {
-    const raw = formData.get(dimension.key);
-    const value = Number(raw);
+  for (const pilier of PILIERS) {
+    for (const question of pilier.questions) {
+      const raw = formData.get(questionFieldName(question));
+      const value = Number(raw);
 
-    if (typeof raw !== "string" || Number.isNaN(value) || value < 1 || value > 10) {
-      return { error: "Merci de répondre à chaque question entre 1 et 10." };
+      if (typeof raw !== "string" || Number.isNaN(value) || value < 1 || value > 5) {
+        return { success: false, error: "Merci de répondre à toutes les questions (de 1 à 5)." };
+      }
+
+      answers[question.id] = value;
     }
-
-    scores[dimension.key] = value;
   }
 
-  const { error } = await supabase.from("radar_assessments").upsert(
-    {
-      user_id: user.id,
-      phase: phase as RadarPhase,
-      ...scores,
-    },
-    { onConflict: "user_id,phase" }
-  );
+  const pillarScores = computePillarScores(answers);
+  const etat = computeEtatDominant(pillarScores);
+  const topPriorities = computeTopPriorities(pillarScores);
 
-  if (error) {
-    return { error: "Une erreur est survenue. Réessaie dans un instant." };
+  const { data, error } = await supabase
+    .from("radar_bilans")
+    .insert({
+      user_id: user.id,
+      etat,
+      lune: EVOLUTION_STATES[etat].lune,
+      fenetre_transformation: computeFenetreTransformation(pillarScores),
+      score_survie: computeScoreSurvie(pillarScores),
+      score_alignement: computeScoreAlignement(pillarScores),
+      score_global: computeScoreGlobal(pillarScores),
+      raw_answers: answers,
+      pillar_scores: pillarScores as unknown as Json,
+      top_priorities: topPriorities as unknown as Json,
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) {
+    return { success: false, error: "Une erreur est survenue. Réessaie dans un instant." };
   }
 
   revalidatePath("/radar");
-  revalidatePath("/dashboard");
 
-  return { success: true };
+  return { success: true, id: data.id };
 }

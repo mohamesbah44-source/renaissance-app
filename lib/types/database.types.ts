@@ -1,6 +1,7 @@
 /**
  * Types de la base Supabase de Renaissance.
- * Tenus à jour manuellement en miroir de supabase/migrations/0001_init.sql.
+ * Tenus à jour manuellement en miroir de supabase/migrations/0001_init.sql
+ * et supabase/migrations/0002_radar_bilans.sql.
  * Si vous régénérez via `supabase gen types`, ce fichier peut être remplacé.
  */
 
@@ -24,7 +25,7 @@ export type ResourceType =
 
 export type ProgressStatus = "not_started" | "in_progress" | "completed";
 
-export type RadarPhase = "before" | "week4" | "week8";
+export type EtatDominant = "SURVIE" | "ADAPTATION" | "ALIGNEMENT" | "EXPANSION";
 
 export type AppointmentStatus = "upcoming" | "completed" | "cancelled";
 
@@ -193,48 +194,48 @@ export type Database = {
         };
         Relationships: [];
       };
-      radar_assessments: {
+      radar_bilans: {
         Row: {
           id: string;
           user_id: string;
-          phase: RadarPhase;
-          securite_physique: number;
-          securite_financiere: number;
-          securite_relationnelle: number;
-          securite_identitaire: number;
-          besoin_controle: number;
-          hypervigilance: number;
-          capacite_recevoir: number;
-          capacite_etre: number;
           created_at: string;
+          etat: EtatDominant;
+          lune: string;
+          fenetre_transformation: number;
+          score_survie: number;
+          score_alignement: number;
+          score_global: number;
+          raw_answers: Json;
+          pillar_scores: Json;
+          top_priorities: Json;
         };
         Insert: {
           id?: string;
           user_id: string;
-          phase: RadarPhase;
-          securite_physique: number;
-          securite_financiere: number;
-          securite_relationnelle: number;
-          securite_identitaire: number;
-          besoin_controle: number;
-          hypervigilance: number;
-          capacite_recevoir: number;
-          capacite_etre: number;
           created_at?: string;
+          etat: EtatDominant;
+          lune: string;
+          fenetre_transformation: number;
+          score_survie: number;
+          score_alignement: number;
+          score_global: number;
+          raw_answers: Json;
+          pillar_scores: Json;
+          top_priorities: Json;
         };
         Update: {
           id?: string;
           user_id?: string;
-          phase?: RadarPhase;
-          securite_physique?: number;
-          securite_financiere?: number;
-          securite_relationnelle?: number;
-          securite_identitaire?: number;
-          besoin_controle?: number;
-          hypervigilance?: number;
-          capacite_recevoir?: number;
-          capacite_etre?: number;
           created_at?: string;
+          etat?: EtatDominant;
+          lune?: string;
+          fenetre_transformation?: number;
+          score_survie?: number;
+          score_alignement?: number;
+          score_global?: number;
+          raw_answers?: Json;
+          pillar_scores?: Json;
+          top_priorities?: Json;
         };
         Relationships: [];
       };
@@ -348,7 +349,7 @@ export type Profile = Tables<"profiles">;
 export type Week = Tables<"weeks">;
 export type Resource = Tables<"resources">;
 export type UserProgress = Tables<"user_progress">;
-export type RadarAssessment = Tables<"radar_assessments">;
+export type RadarBilan = Tables<"radar_bilans">;
 export type JournalEntry = Tables<"journal_entries">;
 export type Appointment = Tables<"appointments">;
 export type Message = Tables<"messages">;

@@ -13,7 +13,6 @@ import { MessageThread } from "@/components/features/messages/MessageThread";
 import { MessageComposer } from "@/components/features/messages/MessageComposer";
 import { MarkMessagesRead } from "@/components/features/messages/MarkMessagesRead";
 import { formatDate } from "@/lib/utils";
-import type { RadarAssessment, RadarPhase } from "@/lib/types/database.types";
 
 export default async function AdminClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -36,7 +35,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
     await Promise.all([
       supabase.from("weeks").select("*").order("week_number", { ascending: true }),
       supabase.from("user_progress").select("*").eq("user_id", id),
-      supabase.from("radar_assessments").select("*").eq("user_id", id),
+      supabase.from("radar_bilans").select("*").eq("user_id", id).order("created_at", { ascending: false }),
       supabase.from("journal_entries").select("*").eq("user_id", id).order("entry_date", { ascending: false }),
       supabase.from("appointments").select("*").eq("user_id", id).order("scheduled_at", { ascending: false }),
       supabase
@@ -47,7 +46,6 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
     ]);
 
   const progressByWeekId = new Map((progressRows ?? []).map((progress) => [progress.week_id, progress]));
-  const radarByPhase = new Map((radarRows ?? []).map((radar) => [radar.phase as RadarPhase, radar as RadarAssessment]));
   const weekTitleById = Object.fromEntries(
     (weeks ?? []).map((week) => [week.id, `Semaine ${week.week_number} — ${week.title}`])
   );
@@ -77,7 +75,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
 
       {weeks && <ClientProgressPanel weeks={weeks} progressByWeekId={progressByWeekId} />}
 
-      <ClientRadarPanel assessments={radarByPhase} />
+      <ClientRadarPanel bilans={radarRows ?? []} />
 
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-white/40">Journal</p>
