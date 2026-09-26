@@ -2,12 +2,19 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import type { AppointmentStatus, JournalingPrompt, ResourceType, WeekPdf } from "@/lib/types/database.types";
+import type {
+  AppointmentStatus,
+  JournalingPrompt,
+  ResourceType,
+  SessionType,
+  WeekPdf,
+} from "@/lib/types/database.types";
 
 export type AdminFormState = { success?: boolean; error?: string } | undefined;
 
 const RESOURCE_TYPES: ResourceType[] = ["breathwork", "meditation", "visualization", "pdf", "exercise", "replay"];
 const APPOINTMENT_STATUSES: AppointmentStatus[] = ["upcoming", "completed", "cancelled"];
+const SESSION_TYPES: SessionType[] = ["breathwork", "courte", "theme_natal", "autre"];
 
 /** Met à jour la semaine courante et la date de démarrage d'un·e participant·e. */
 export async function updateClientSettings(_prevState: AdminFormState, formData: FormData): Promise<AdminFormState> {
@@ -54,6 +61,7 @@ export async function saveAppointment(_prevState: AdminFormState, formData: Form
   const title = formData.get("title");
   const meetingUrl = formData.get("meetingUrl");
   const notes = formData.get("notes");
+  const sessionType = formData.get("sessionType");
 
   if (typeof clientId !== "string" || !clientId) {
     return { error: "Participant·e introuvable." };
@@ -69,6 +77,9 @@ export async function saveAppointment(_prevState: AdminFormState, formData: Form
     title: typeof title === "string" && title ? title : null,
     meeting_url: typeof meetingUrl === "string" && meetingUrl ? meetingUrl : null,
     notes: typeof notes === "string" && notes ? notes : null,
+    session_type: (typeof sessionType === "string" && SESSION_TYPES.includes(sessionType as SessionType)
+      ? sessionType
+      : "autre") as SessionType,
   };
 
   const { error } =

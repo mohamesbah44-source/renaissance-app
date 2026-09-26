@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { AppointmentCard } from "@/components/features/calendrier/AppointmentCard";
+import { SessionProgressPanel } from "@/components/features/calendrier/SessionProgressPanel";
 
 export default async function CalendrierPage() {
   const supabase = await createClient();
@@ -40,6 +41,10 @@ export default async function CalendrierPage() {
           Le fil de tes échanges avec ton accompagnateur·rice, semaine après semaine.
         </p>
       </header>
+
+      <div className="mt-8">
+        <SessionProgressPanel appointments={all} />
+      </div>
 
       <div className="mt-8 flex flex-col gap-4">
         <p className="text-xs uppercase tracking-[0.3em] text-white/40">Prochain rendez-vous</p>

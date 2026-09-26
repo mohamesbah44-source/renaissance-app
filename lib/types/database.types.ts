@@ -29,6 +29,13 @@ export type EtatDominant = "SURVIE" | "ADAPTATION" | "ALIGNEMENT" | "EXPANSION";
 
 export type AppointmentStatus = "upcoming" | "completed" | "cancelled";
 
+/**
+ * Type de séance de l'accompagnement 8 semaines : 2 breathwork (1h30/mois) +
+ * 6 courtes (30 min/mois : méditation, visualisation ou EFT) + le rendez-vous
+ * thème natal / Human Design avec Emmanuel.
+ */
+export type SessionType = "breathwork" | "courte" | "theme_natal" | "autre";
+
 /** Forme attendue du jsonb `weeks.journaling_prompts` */
 export type JournalingPrompt = {
   id: string;
@@ -325,6 +332,7 @@ export type Database = {
           title: string | null;
           meeting_url: string | null;
           status: AppointmentStatus;
+          session_type: SessionType;
           notes: string | null;
           created_at: string;
         };
@@ -335,6 +343,7 @@ export type Database = {
           title?: string | null;
           meeting_url?: string | null;
           status?: AppointmentStatus;
+          session_type?: SessionType;
           notes?: string | null;
           created_at?: string;
         };
@@ -345,8 +354,39 @@ export type Database = {
           title?: string | null;
           meeting_url?: string | null;
           status?: AppointmentStatus;
+          session_type?: SessionType;
           notes?: string | null;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      client_songs: {
+        Row: {
+          id: string;
+          user_id: string;
+          created_at: string;
+          titre: string;
+          message: string | null;
+          media_url: string;
+          published_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          created_at?: string;
+          titre: string;
+          message?: string | null;
+          media_url: string;
+          published_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          created_at?: string;
+          titre?: string;
+          message?: string | null;
+          media_url?: string;
+          published_by?: string | null;
         };
         Relationships: [];
       };
@@ -399,3 +439,4 @@ export type JournalEntry = Tables<"journal_entries">;
 export type Appointment = Tables<"appointments">;
 export type Message = Tables<"messages">;
 export type CarnetEntry = Tables<"carnet_entries">;
+export type ClientSong = Tables<"client_songs">;

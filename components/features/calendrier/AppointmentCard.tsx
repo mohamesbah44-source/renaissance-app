@@ -1,6 +1,7 @@
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge, type BadgeProps } from "@/components/ui/Badge";
 import { cn, formatDateTime } from "@/lib/utils";
+import { SESSION_TYPE_LABEL } from "@/lib/parcours/sessions";
 import type { Appointment, AppointmentStatus } from "@/lib/types/database.types";
 
 const STATUS_LABEL: Record<AppointmentStatus, string> = {
@@ -22,6 +23,10 @@ export function AppointmentCard({ appointment, highlight }: { appointment: Appoi
         <p className="font-display text-lg text-white">{formatDateTime(appointment.scheduled_at)}</p>
         <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
       </div>
+
+      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-rr-or/60">
+        {SESSION_TYPE_LABEL[appointment.session_type]}
+      </p>
 
       {appointment.title && <p className="mt-2 text-sm text-white/70">{appointment.title}</p>}
 

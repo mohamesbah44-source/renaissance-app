@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { LogOut, MessageCircle } from "lucide-react";
+import { LifeBuoy, LogOut, MessageCircle } from "lucide-react";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { signOut } from "@/lib/auth/actions";
 
@@ -16,6 +16,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </span>
         </Link>
         <div className="flex items-center gap-4">
+          <Link
+            href="/sos"
+            aria-label="Protocole SOS Re-Naissance™"
+            className="text-rr-orange/70 transition-colors hover:text-rr-orange"
+          >
+            <LifeBuoy className="h-5 w-5" strokeWidth={1.75} />
+          </Link>
           <Link
             href="/messages"
             aria-label="Messages"
