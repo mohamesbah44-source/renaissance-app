@@ -13,7 +13,7 @@ export interface RadarChartSeries {
 }
 
 interface RadarChartProps {
-  /** Labels courts, un par axe (8 piliers du Radar Renaissance™). */
+  /** Labels courts, un par axe (12 piliers du Renaissance Radar™). */
   axes: string[];
   series: RadarChartSeries[];
   /** Couleur du point de chaque axe (ex : or pour survie, vert pour alignement). */
@@ -41,7 +41,7 @@ function polygonPoints(values: number[]) {
 }
 
 /**
- * Radar SVG octogonal (8 piliers du Radar Renaissance™).
+ * Radar SVG à N axes (12 piliers du Renaissance Radar™).
  * viewBox 0 0 480 480, centre 240/240, rayon 170, 4 grilles (25/50/75/100%).
  */
 export function RadarChart({
@@ -52,7 +52,7 @@ export function RadarChart({
   textColor = "#ede6d6",
 }: RadarChartProps) {
   return (
-    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full" role="img" aria-label="Radar Renaissance™">
+    <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="w-full" role="img" aria-label="Renaissance Radar™">
       {GRID_LEVELS.map((ratio) => (
         <polygon
           key={ratio}

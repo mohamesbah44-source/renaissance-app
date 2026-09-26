@@ -31,7 +31,7 @@ export function WeeklyActionsList({ week, progress }: WeeklyActionsListProps) {
                 className="flex items-start gap-3 text-sm text-white/70 transition-colors hover:text-white"
               >
                 {done ? (
-                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-300" />
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-rr-or-clair" />
                 ) : (
                   <Circle className="mt-0.5 h-4 w-4 shrink-0 text-white/25" />
                 )}

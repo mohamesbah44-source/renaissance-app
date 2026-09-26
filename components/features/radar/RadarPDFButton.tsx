@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { EVOLUTION_STATES, PILIERS } from "@/lib/radar/constants";
+import { EVOLUTION_STATES, PILIERS, CERCLES, type CercleId } from "@/lib/radar/constants";
 import { MICRO_PROTOCOLS } from "@/lib/radar/protocols";
 import { ETAT_MESSAGES, PRIORITY_REASONS } from "@/lib/radar/messages";
 import { fenetreInterpretation, type PillarScore, type TopPriority } from "@/lib/radar/scoring";
@@ -12,7 +12,11 @@ const NOIR: [number, number, number] = [12, 11, 10];
 const IVOIRE: [number, number, number] = [245, 240, 232];
 const OR: [number, number, number] = [201, 169, 110];
 const GRIS: [number, number, number] = [138, 130, 120];
-const VERT: [number, number, number] = [90, 138, 110];
+const CERCLE_RGB: Record<CercleId, [number, number, number]> = {
+  moi: [201, 169, 110],
+  nous: [90, 138, 110],
+  monde: [155, 107, 58],
+};
 
 const MARGIN_X = 18;
 const MARGIN_TOP = 20;
@@ -69,7 +73,7 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       doc.setTextColor(...OR);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(20);
-      doc.text("Rapport Radar Renaissance™", MARGIN_X, y);
+      doc.text("Rapport Renaissance Radar™", MARGIN_X, y);
       y += 7;
 
       doc.setTextColor(...GRIS);
@@ -116,14 +120,16 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
 
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10.5);
-      for (const pilier of PILIERS) {
-        const score = pillarScores.find((s) => s.pilierId === pilier.id);
-        const pct = score ? Math.round(score.ratio * 100) : 0;
-        doc.setTextColor(...IVOIRE);
-        doc.text(`${pilier.nom} (${pilier.court})`, MARGIN_X, y);
-        doc.setTextColor(...(pilier.type === "survie" ? OR : VERT));
-        doc.text(`${pct}%`, pageWidth - MARGIN_X, y, { align: "right" });
-        y += 6.5;
+      for (const cercle of CERCLES) {
+        for (const pilier of PILIERS.filter((p) => p.cercle === cercle.id)) {
+          const score = pillarScores.find((s) => s.pilierId === pilier.id);
+          const pct = score ? Math.round(score.ratio * 100) : 0;
+          doc.setTextColor(...IVOIRE);
+          doc.text(`${pilier.nom} (${cercle.nom})`, MARGIN_X, y);
+          doc.setTextColor(...CERCLE_RGB[pilier.cercle]);
+          doc.text(`${pct}%`, pageWidth - MARGIN_X, y, { align: "right" });
+          y += 6.5;
+        }
       }
       y += 6;
 

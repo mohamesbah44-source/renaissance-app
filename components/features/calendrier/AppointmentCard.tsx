@@ -17,7 +17,7 @@ const STATUS_VARIANT: Record<AppointmentStatus, BadgeProps["variant"]> = {
 
 export function AppointmentCard({ appointment, highlight }: { appointment: Appointment; highlight?: boolean }) {
   return (
-    <GlassCard className={cn("p-6", highlight && "border-violet-400/30")}>
+    <GlassCard className={cn("p-6", highlight && "border-rr-or/30")}>
       <div className="flex items-center justify-between gap-3">
         <p className="font-display text-lg text-white">{formatDateTime(appointment.scheduled_at)}</p>
         <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
@@ -32,7 +32,7 @@ export function AppointmentCard({ appointment, highlight }: { appointment: Appoi
           href={appointment.meeting_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-block text-sm text-violet-300 hover:text-violet-200"
+          className="mt-3 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair"
         >
           Rejoindre la visio
         </a>

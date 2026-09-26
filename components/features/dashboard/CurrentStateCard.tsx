@@ -23,7 +23,7 @@ export function CurrentStateCard({ entry }: { entry: JournalEntry | null }) {
         </p>
       )}
 
-      <Link href="/journal" className="mt-4 inline-block text-sm text-violet-300 hover:text-violet-200">
+      <Link href="/journal" className="mt-4 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair">
         {entry ? "Ouvrir mon journal" : "Écrire dans mon journal"}
       </Link>
     </GlassCard>

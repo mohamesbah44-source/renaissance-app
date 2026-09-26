@@ -33,7 +33,7 @@ export function WeekDetailHeader({ week, status }: { week: Week; status: Progres
 
       <h1 className="mt-2 font-display text-3xl text-white">{week.title}</h1>
 
-      {week.intention && <p className="mt-3 text-base italic text-violet-200/80">{week.intention}</p>}
+      {week.intention && <p className="mt-3 text-base italic text-rr-or-clair/80">{week.intention}</p>}
 
       {week.description && <p className="mt-4 text-sm leading-relaxed text-white/60">{week.description}</p>}
     </header>

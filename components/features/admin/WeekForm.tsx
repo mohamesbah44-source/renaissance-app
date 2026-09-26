@@ -90,8 +90,8 @@ export function WeekForm({ week }: { week: Week }) {
         />
       </Field>
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-      {state?.success && <p className="text-sm text-violet-300">Semaine mise à jour.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && <p className="text-sm text-rr-or-clair">Semaine mise à jour.</p>}
 
       <SubmitButton className="w-auto self-start px-8">Enregistrer</SubmitButton>
     </form>

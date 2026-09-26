@@ -19,7 +19,7 @@ export function WeekEditCard({ week }: { week: Week }) {
           <p className="text-xs uppercase tracking-[0.3em] text-white/40">Semaine {week.week_number}</p>
           <p className="mt-1 truncate font-display text-lg text-white">{week.title}</p>
         </div>
-        <span className="shrink-0 text-xs text-violet-300">{open ? "Réduire" : "Modifier"}</span>
+        <span className="shrink-0 text-xs text-rr-or-clair">{open ? "Réduire" : "Modifier"}</span>
       </button>
 
       {open && (

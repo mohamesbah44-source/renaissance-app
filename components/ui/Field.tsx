@@ -14,7 +14,7 @@ export function Field({ label, htmlFor, error, children }: FieldProps) {
         {label}
       </label>
       {children}
-      {error && <p className="text-sm text-rose-400">{error}</p>}
+      {error && <p className="text-sm text-rr-rouge">{error}</p>}
     </div>
   );
 }

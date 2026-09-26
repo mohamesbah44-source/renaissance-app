@@ -21,7 +21,7 @@ export function MessageComposer({ recipientId }: { recipientId: string }) {
 
       <Textarea name="content" rows={3} placeholder="Écris ton message..." required />
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
 
       <SubmitButton className="w-auto self-end px-8">Envoyer</SubmitButton>
     </form>

@@ -33,7 +33,7 @@ export function AppointmentRow({ appointment }: { appointment: Appointment }) {
             <input type="hidden" name="id" value={appointment.id} />
             <input type="hidden" name="clientId" value={appointment.user_id} />
             <input type="hidden" name="status" value="completed" />
-            <button type="submit" className="text-xs text-violet-300 transition-colors hover:text-violet-200">
+            <button type="submit" className="text-xs text-rr-or-clair transition-colors hover:text-rr-or-clair">
               Marquer comme terminé
             </button>
           </form>
@@ -41,7 +41,7 @@ export function AppointmentRow({ appointment }: { appointment: Appointment }) {
             <input type="hidden" name="id" value={appointment.id} />
             <input type="hidden" name="clientId" value={appointment.user_id} />
             <input type="hidden" name="status" value="cancelled" />
-            <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rose-300">
+            <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rr-rouge">
               Annuler
             </button>
           </form>

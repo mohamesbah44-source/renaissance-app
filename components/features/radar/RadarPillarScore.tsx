@@ -1,9 +1,15 @@
 import type { Pilier } from "@/lib/radar/constants";
 import type { PillarScore } from "@/lib/radar/scoring";
 
+const CERCLE_COLOR: Record<Pilier["cercle"], string> = {
+  moi: "bg-rr-or",
+  nous: "bg-rr-vert",
+  monde: "bg-rr-orange",
+};
+
 export function RadarPillarScore({ pilier, score }: { pilier: Pilier; score: PillarScore }) {
   const pct = Math.round(score.ratio * 100);
-  const barColor = pilier.type === "survie" ? "bg-rr-or" : "bg-rr-vert";
+  const barColor = CERCLE_COLOR[pilier.cercle];
 
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-rr-or/10 bg-rr-encre p-4">

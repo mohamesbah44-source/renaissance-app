@@ -17,7 +17,7 @@ export function NextAppointmentCard({ appointment }: { appointment: Appointment 
               href={appointment.meeting_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-3 inline-block text-sm text-violet-300 hover:text-violet-200"
+              className="mt-3 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair"
             >
               Rejoindre la visio
             </a>
@@ -27,7 +27,7 @@ export function NextAppointmentCard({ appointment }: { appointment: Appointment 
         <p className="mt-3 text-sm text-white/60">Aucun rendez-vous prévu pour le moment.</p>
       )}
 
-      <Link href="/calendrier" className="mt-4 inline-block text-sm text-violet-300 hover:text-violet-200">
+      <Link href="/calendrier" className="mt-4 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair">
         Voir le calendrier
       </Link>
     </GlassCard>

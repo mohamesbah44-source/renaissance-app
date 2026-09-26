@@ -39,8 +39,8 @@ export function JournalingPromptForm({ weekId, prompts, responses }: JournalingP
           </Field>
         ))}
 
-        {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-        {state?.success && <p className="text-sm text-violet-300">Tes réflexions ont été enregistrées.</p>}
+        {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+        {state?.success && <p className="text-sm text-rr-or-clair">Tes réflexions ont été enregistrées.</p>}
 
         <SubmitButton variant="outline">Enregistrer mes réflexions</SubmitButton>
       </form>

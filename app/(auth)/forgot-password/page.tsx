@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
       </p>
 
       {state?.success ? (
-        <p className="mt-8 text-sm text-violet-200">{state.success}</p>
+        <p className="mt-8 text-sm text-rr-or-clair">{state.success}</p>
       ) : (
         <form action={formAction} className="mt-8 flex flex-col gap-5">
           <Field label="Email" htmlFor="email">
@@ -33,14 +33,14 @@ export default function ForgotPasswordPage() {
             />
           </Field>
 
-          {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
+          {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
 
           <SubmitButton>Envoyer le lien</SubmitButton>
         </form>
       )}
 
       <p className="mt-6 text-center text-sm text-white/50">
-        <Link href="/login" className="text-violet-300 hover:text-violet-200">
+        <Link href="/login" className="text-rr-or-clair hover:text-rr-or-clair">
           Retour à la connexion
         </Link>
       </p>

@@ -30,7 +30,7 @@ export default async function ProfilPage() {
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-8 pb-8">
       <header className="flex items-center gap-4 pt-2">
-        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500/30 to-rose-400/20 font-display text-xl text-white">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-500/30 to-gold-400/20 font-display text-xl text-white">
           {initials}
         </div>
         <div className="min-w-0">
@@ -68,7 +68,7 @@ export default async function ProfilPage() {
         <Link href="/admin">
           <GlassCard className="flex items-center justify-between gap-3 p-6 transition-colors hover:bg-white/[0.06]">
             <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-violet-300" strokeWidth={1.75} />
+              <Shield className="h-5 w-5 text-rr-or-clair" strokeWidth={1.75} />
               <p className="text-sm text-white/80">Espace admin</p>
             </div>
             <span className="text-xs text-white/40">→</span>

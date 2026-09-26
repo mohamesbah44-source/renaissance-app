@@ -37,8 +37,8 @@ export function AppointmentForm({ clientId }: { clientId: string }) {
         <Textarea id="notes" name="notes" rows={2} />
       </Field>
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-      {state?.success && <p className="text-sm text-violet-300">Rendez-vous enregistré.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && <p className="text-sm text-rr-or-clair">Rendez-vous enregistré.</p>}
 
       <SubmitButton className="w-auto self-start px-8">Ajouter le rendez-vous</SubmitButton>
     </form>

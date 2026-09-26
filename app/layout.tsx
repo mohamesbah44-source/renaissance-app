@@ -16,7 +16,7 @@ const outfit = Outfit({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-// Charte dédiée au Radar Renaissance™ (scopée à /radar/*)
+// Charte dédiée au Renaissance Radar™ (scopée à /radar/*)
 const cinzel = Cinzel({
   variable: "--font-rr-display",
   subsets: ["latin"],
@@ -37,9 +37,13 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "Renaissance — Plus qu'un accompagnement, une rencontre avec vous-même",
+  title: "Le Programme Re-Naissance™ — Plus qu'un accompagnement, une rencontre avec vous-même",
   description:
-    "Renaissance est un accompagnement transformationnel de 8 semaines pour les entrepreneurs qui veulent retrouver sécurité intérieure, clarté et vitalité.",
+    "Le Programme Re-Naissance™ est un accompagnement transformationnel de 8 semaines pour les entrepreneurs qui veulent retrouver sécurité intérieure, clarté et vitalité.",
+  icons: {
+    icon: "/favicon-32.png",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

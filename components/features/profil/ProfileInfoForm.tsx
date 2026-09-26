@@ -22,8 +22,8 @@ export function ProfileInfoForm({ profile }: { profile: Profile }) {
         </Field>
       </div>
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-      {state?.success && <p className="text-sm text-violet-300">Tes informations ont été mises à jour.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && <p className="text-sm text-rr-or-clair">Tes informations ont été mises à jour.</p>}
 
       <SubmitButton className="w-auto self-start px-8">Enregistrer</SubmitButton>
     </form>

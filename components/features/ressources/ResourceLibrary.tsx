@@ -56,7 +56,7 @@ function FilterButton({
       className={cn(
         "shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-colors",
         active
-          ? "border-violet-400/40 bg-violet-500/15 text-violet-200"
+          ? "border-rr-or/40 bg-rr-or/15 text-rr-or-clair"
           : "border-white/10 bg-white/[0.03] text-white/50 hover:text-white/80"
       )}
     >

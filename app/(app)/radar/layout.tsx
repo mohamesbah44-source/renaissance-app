@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Charte dédiée au Radar Renaissance™ (noir / or / ivoire, Cinzel /
+ * Charte dédiée au Renaissance Radar™ (noir / or / ivoire, Cinzel /
  * Cormorant Garamond / Montserrat), scopée à /radar/*. Le header et le
  * BottomNav (AppShell) restent dans le thème cosmique actuel.
  */

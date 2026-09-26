@@ -40,8 +40,8 @@ export function PasswordForm() {
         />
       </Field>
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-      {state?.success && <p className="text-sm text-violet-300">Ton mot de passe a été mis à jour.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && <p className="text-sm text-rr-or-clair">Ton mot de passe a été mis à jour.</p>}
 
       <SubmitButton className="w-auto self-start px-8">Mettre à jour le mot de passe</SubmitButton>
     </form>
