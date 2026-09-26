@@ -78,8 +78,8 @@ export function ResourceForm({ resource, weeks, onSaved, onCancel }: ResourceFor
         </Field>
       )}
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-      {state?.success && !resource && <p className="text-sm text-violet-300">Ressource ajoutée.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && !resource && <p className="text-sm text-rr-or-clair">Ressource ajoutée.</p>}
 
       <div className="flex gap-3">
         <SubmitButton className="flex-1">{resource ? "Mettre à jour" : "Ajouter la ressource"}</SubmitButton>

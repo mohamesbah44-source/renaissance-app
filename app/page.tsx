@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { buttonVariants } from "@/components/ui/Button";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
@@ -21,8 +22,10 @@ export default function Home() {
     <div className="flex flex-col">
       {/* Header */}
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-8">
-        <span className="font-display text-xl italic tracking-wide text-white/90">
-          Renaissance
+        <span className="flex items-center gap-2 font-rr-display text-sm uppercase tracking-[0.14em] text-white/90">
+          <Image src="/logo-icon.png" alt="" width={24} height={24} className="rounded-full" priority />
+          Le Programme <span className="text-rr-or">Re-Naissance</span>
+          <sup className="text-[8px]">™</sup>
         </span>
         <Link
           href="/login"
@@ -34,18 +37,31 @@ export default function Home() {
 
       {/* Hero */}
       <section className="mx-auto flex w-full max-w-3xl flex-col items-center px-6 pb-24 pt-16 text-center sm:pt-24">
-        <p className="text-xs uppercase tracking-[0.3em] text-violet-300/80">
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-or/80">
           Un accompagnement transformationnel · 8 semaines
         </p>
-        <h1 className="mt-6 font-display text-5xl font-medium text-white sm:text-6xl">
-          Renaissance
-        </h1>
+        <div className="mt-8 flex flex-col items-center">
+          <Image
+            src="/logo-icon.png"
+            alt="Le Programme Re-Naissance™"
+            width={132}
+            height={132}
+            className="rounded-full"
+            priority
+          />
+          <p className="mt-6 font-rr-display text-sm uppercase tracking-[0.35em] text-rr-or-clair">
+            Le Programme
+          </p>
+          <h1 className="mt-2 font-display text-5xl font-medium text-white sm:text-6xl">
+            Re-Naissance<sup className="ml-1 text-lg align-super">™</sup>
+          </h1>
+        </div>
         <p className="mt-6 font-display text-xl italic text-white/80 sm:text-2xl">
           Plus qu&apos;un accompagnement : une rencontre avec vous-même.
         </p>
         <p className="mt-6 max-w-xl text-balance text-base leading-relaxed text-white/60">
           Tu as bâti, prouvé, tenu. Et pourtant, une fatigue de fond persiste, comme un
-          signal que tu n&apos;écoutes plus. Renaissance est un espace pour ralentir, te
+          signal que tu n&apos;écoutes plus. Le Programme Re-Naissance™ est un espace pour ralentir, te
           réaligner et retrouver, en toi, une sécurité que rien ne pourra plus ébranler.
         </p>
         <div className="mt-10 flex flex-col gap-4 sm:flex-row">
@@ -63,14 +79,14 @@ export default function Home() {
 
       {/* Pour qui */}
       <section className="mx-auto w-full max-w-3xl px-6 py-16 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-rose-300/80">Pour qui</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-or/80">Pour qui</p>
         <h2 className="mt-4 font-display text-3xl text-white sm:text-4xl">
           Pour les entrepreneurs qui n&apos;ont plus rien à prouver
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-balance text-base leading-relaxed text-white/60">
           Tu diriges, tu portes, tu avances — souvent pour les autres avant toi-même. Mais
           sous la réussite visible, l&apos;anxiété, l&apos;hypervigilance ou
-          l&apos;épuisement se sont installés. Renaissance ne te demande pas d&apos;en
+          l&apos;épuisement se sont installés. Le Programme Re-Naissance™ ne te demande pas d&apos;en
           faire plus. Seulement de revenir, doucement, à toi.
         </p>
       </section>
@@ -78,7 +94,7 @@ export default function Home() {
       {/* Le parcours */}
       <section className="mx-auto w-full max-w-3xl px-6 py-16">
         <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-gold-300/80">Le parcours</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-rr-or/80">Le parcours</p>
           <h2 className="mt-4 font-display text-3xl text-white sm:text-4xl">
             8 semaines, 8 rencontres avec toi-même
           </h2>
@@ -87,25 +103,25 @@ export default function Home() {
         <div className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {WEEKS.map((week) => (
             <GlassCard key={week.number} className="flex items-center gap-4 px-5 py-4">
-              <span className="font-display text-2xl text-violet-300/70">{week.number}</span>
+              <span className="font-display text-2xl text-rr-or/70">{week.number}</span>
               <span className="text-sm text-white/80">{week.title}</span>
             </GlassCard>
           ))}
         </div>
       </section>
 
-      {/* Radar Renaissance */}
+      {/* Radar Re-Naissance */}
       <section className="mx-auto w-full max-w-3xl px-6 py-16 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-violet-300/80">
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-or/80">
           Ton évolution, visible
         </p>
         <h2 className="mt-4 font-display text-3xl text-white sm:text-4xl">
-          Le Radar Renaissance™
+          Le Radar Re-Naissance™
         </h2>
         <p className="mx-auto mt-6 max-w-2xl text-balance text-base leading-relaxed text-white/60">
-          Avant de commencer, à mi-parcours et à la fin, tu fais le point sur 8 dimensions
-          clés de ta sécurité intérieure. Semaine après semaine, tu vois ton chemin se
-          dessiner.
+          Avant de commencer, à mi-parcours et à la fin, tu fais le point sur 3 cercles — Moi,
+          Nous, Monde — et 12 piliers clés de ta sécurité intérieure. Semaine après semaine, tu
+          vois ton chemin se dessiner.
         </p>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
@@ -115,7 +131,7 @@ export default function Home() {
                 {phase}
               </span>
               {i < RADAR_PHASES.length - 1 && (
-                <span className="text-violet-300/50">→</span>
+                <span className="text-rr-or/60">→</span>
               )}
             </div>
           ))}
@@ -138,7 +154,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="mx-auto w-full max-w-5xl px-6 py-10 text-center text-xs text-white/30">
-        <p>Renaissance — Plus qu&apos;un accompagnement : une rencontre avec vous-même.</p>
+        <p>Le Programme Re-Naissance™ — Plus qu&apos;un accompagnement : une rencontre avec vous-même.</p>
       </footer>
     </div>
   );

@@ -37,7 +37,7 @@ export default function ResetPasswordPage() {
           />
         </Field>
 
-        {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
+        {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
 
         <SubmitButton>Mettre à jour mon mot de passe</SubmitButton>
       </form>

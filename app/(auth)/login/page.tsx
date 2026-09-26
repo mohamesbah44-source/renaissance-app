@@ -40,7 +40,7 @@ export default function LoginPage() {
           />
         </Field>
 
-        {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
+        {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
 
         <SubmitButton>Entrer dans mon espace</SubmitButton>
       </form>
@@ -51,7 +51,7 @@ export default function LoginPage() {
         </Link>
         <p>
           Pas encore de compte ?{" "}
-          <Link href="/register" className="text-violet-300 hover:text-violet-200">
+          <Link href="/register" className="text-rr-or-clair hover:text-rr-or-clair">
             Commencer le parcours
           </Link>
         </p>

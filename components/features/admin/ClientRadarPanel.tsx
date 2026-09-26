@@ -6,20 +6,20 @@ import { formatDate } from "@/lib/utils";
 import type { PillarScore } from "@/lib/radar/scoring";
 import type { RadarBilan } from "@/lib/types/database.types";
 
-const CURRENT_COLOR = "#a78bfa"; // violet-400
-const PREVIOUS_COLOR = "#fbc382"; // gold-400
+const CURRENT_COLOR = "#c9a96e"; // rr-or
+const PREVIOUS_COLOR = "#ede6d6"; // rr-creme
 
 function ratioFor(bilan: RadarBilan, pilierId: number): number {
   const scores = bilan.pillar_scores as unknown as PillarScore[];
   return scores.find((s) => s.pilierId === pilierId)?.ratio ?? 0;
 }
 
-/** Bilans Radar Renaissance™ d'un client, dans le thème admin existant (violet/or). */
+/** Bilans Renaissance Radar™ d'un client, dans la charte noir/or. */
 export function ClientRadarPanel({ bilans }: { bilans: RadarBilan[] }) {
   if (bilans.length === 0) {
     return (
       <GlassCard className="p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Radar Renaissance™</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Renaissance Radar™</p>
         <p className="mt-4 text-sm text-white/60">Aucun bilan enregistré pour le moment.</p>
       </GlassCard>
     );
@@ -40,7 +40,7 @@ export function ClientRadarPanel({ bilans }: { bilans: RadarBilan[] }) {
 
   return (
     <GlassCard className="p-6">
-      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Radar Renaissance™</p>
+      <p className="text-xs uppercase tracking-[0.3em] text-white/40">Renaissance Radar™</p>
 
       <div className="mt-4">
         <RadarChart

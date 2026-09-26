@@ -50,13 +50,13 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-xs text-violet-300 transition-colors hover:text-violet-200"
+          className="text-xs text-rr-or-clair transition-colors hover:text-rr-or-clair"
         >
           Modifier
         </button>
         <form action={deleteJournalEntry}>
           <input type="hidden" name="id" value={entry.id} />
-          <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rose-300">
+          <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rr-rouge">
             Supprimer
           </button>
         </form>

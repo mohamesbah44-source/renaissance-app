@@ -1,6 +1,7 @@
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge, type BadgeProps } from "@/components/ui/Badge";
 import { cn, formatDateTime } from "@/lib/utils";
+import { SESSION_TYPE_LABEL } from "@/lib/parcours/sessions";
 import type { Appointment, AppointmentStatus } from "@/lib/types/database.types";
 
 const STATUS_LABEL: Record<AppointmentStatus, string> = {
@@ -17,11 +18,15 @@ const STATUS_VARIANT: Record<AppointmentStatus, BadgeProps["variant"]> = {
 
 export function AppointmentCard({ appointment, highlight }: { appointment: Appointment; highlight?: boolean }) {
   return (
-    <GlassCard className={cn("p-6", highlight && "border-violet-400/30")}>
+    <GlassCard className={cn("p-6", highlight && "border-rr-or/30")}>
       <div className="flex items-center justify-between gap-3">
         <p className="font-display text-lg text-white">{formatDateTime(appointment.scheduled_at)}</p>
         <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
       </div>
+
+      <p className="mt-1 text-xs uppercase tracking-[0.2em] text-rr-or/60">
+        {SESSION_TYPE_LABEL[appointment.session_type]}
+      </p>
 
       {appointment.title && <p className="mt-2 text-sm text-white/70">{appointment.title}</p>}
 
@@ -32,7 +37,7 @@ export function AppointmentCard({ appointment, highlight }: { appointment: Appoi
           href={appointment.meeting_url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-block text-sm text-violet-300 hover:text-violet-200"
+          className="mt-3 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair"
         >
           Rejoindre la visio
         </a>

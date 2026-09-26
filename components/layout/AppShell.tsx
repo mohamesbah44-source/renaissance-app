@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { LogOut, MessageCircle } from "lucide-react";
+import Image from "next/image";
+import { LifeBuoy, LogOut, MessageCircle } from "lucide-react";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { signOut } from "@/lib/auth/actions";
 
@@ -7,8 +8,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="flex items-center justify-between px-6 py-5">
-        <span className="font-display text-lg italic tracking-wide text-white/90">Renaissance</span>
+        <Link href="/dashboard" className="flex items-center gap-2.5">
+          <Image src="/logo-icon.png" alt="" width={28} height={28} className="rounded-full" priority />
+          <span className="font-rr-display text-[13px] uppercase tracking-[0.14em] text-rr-ivoire">
+            Le Programme <span className="text-rr-or">Re-Naissance</span>
+            <sup className="ml-0.5 text-[8px]">™</sup>
+          </span>
+        </Link>
         <div className="flex items-center gap-4">
+          <Link
+            href="/sos"
+            aria-label="Protocole SOS Re-Naissance™"
+            className="text-rr-orange/70 transition-colors hover:text-rr-orange"
+          >
+            <LifeBuoy className="h-5 w-5" strokeWidth={1.75} />
+          </Link>
           <Link
             href="/messages"
             aria-label="Messages"

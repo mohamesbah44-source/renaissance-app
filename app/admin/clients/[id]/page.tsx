@@ -7,8 +7,13 @@ import { ClientSettingsForm } from "@/components/features/admin/ClientSettingsFo
 import { ClientProgressPanel } from "@/components/features/admin/ClientProgressPanel";
 import { ClientRadarPanel } from "@/components/features/admin/ClientRadarPanel";
 import { AdminJournalEntryCard } from "@/components/features/admin/AdminJournalEntryCard";
+import { AdminCarnetEntryCard } from "@/components/features/admin/AdminCarnetEntryCard";
+import { CarnetEntryForm } from "@/components/features/admin/CarnetEntryForm";
+import { AdminClientSongCard } from "@/components/features/admin/AdminClientSongCard";
+import { ClientSongForm } from "@/components/features/admin/ClientSongForm";
 import { AppointmentForm } from "@/components/features/admin/AppointmentForm";
 import { AppointmentRow } from "@/components/features/admin/AppointmentRow";
+import { SessionProgressPanel } from "@/components/features/calendrier/SessionProgressPanel";
 import { MessageThread } from "@/components/features/messages/MessageThread";
 import { MessageComposer } from "@/components/features/messages/MessageComposer";
 import { MarkMessagesRead } from "@/components/features/messages/MarkMessagesRead";
@@ -31,19 +36,29 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
     notFound();
   }
 
-  const [{ data: weeks }, { data: progressRows }, { data: radarRows }, { data: journalEntries }, { data: appointments }, { data: messages }] =
-    await Promise.all([
-      supabase.from("weeks").select("*").order("week_number", { ascending: true }),
-      supabase.from("user_progress").select("*").eq("user_id", id),
-      supabase.from("radar_bilans").select("*").eq("user_id", id).order("created_at", { ascending: false }),
-      supabase.from("journal_entries").select("*").eq("user_id", id).order("entry_date", { ascending: false }),
-      supabase.from("appointments").select("*").eq("user_id", id).order("scheduled_at", { ascending: false }),
-      supabase
-        .from("messages")
-        .select("*")
-        .or(`and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id})`)
-        .order("created_at", { ascending: true }),
-    ]);
+  const [
+    { data: weeks },
+    { data: progressRows },
+    { data: radarRows },
+    { data: journalEntries },
+    { data: carnetEntries },
+    { data: songs },
+    { data: appointments },
+    { data: messages },
+  ] = await Promise.all([
+    supabase.from("weeks").select("*").order("week_number", { ascending: true }),
+    supabase.from("user_progress").select("*").eq("user_id", id),
+    supabase.from("radar_bilans").select("*").eq("user_id", id).order("created_at", { ascending: false }),
+    supabase.from("journal_entries").select("*").eq("user_id", id).order("entry_date", { ascending: false }),
+    supabase.from("carnet_entries").select("*").eq("user_id", id).order("created_at", { ascending: false }),
+    supabase.from("client_songs").select("*").eq("user_id", id).order("created_at", { ascending: false }),
+    supabase.from("appointments").select("*").eq("user_id", id).order("scheduled_at", { ascending: false }),
+    supabase
+      .from("messages")
+      .select("*")
+      .or(`and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id})`)
+      .order("created_at", { ascending: true }),
+  ]);
 
   const progressByWeekId = new Map((progressRows ?? []).map((progress) => [progress.week_id, progress]));
   const weekTitleById = Object.fromEntries(
@@ -93,8 +108,50 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       </div>
 
       <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Carnet Re-Naissance™</p>
+        <div className="mt-4 flex flex-col gap-4">
+          <GlassCard className="p-6">
+            <p className="mb-4 text-sm text-white/70">Publier une synthèse dans le Carnet</p>
+            <CarnetEntryForm clientId={id} />
+          </GlassCard>
+
+          {(carnetEntries ?? []).length === 0 && (
+            <GlassCard className="p-6">
+              <p className="text-sm text-white/60">Aucune entrée publiée pour le moment.</p>
+            </GlassCard>
+          )}
+
+          {(carnetEntries ?? []).map((entry) => (
+            <AdminCarnetEntryCard key={entry.id} entry={entry} />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Chansons personnalisées</p>
+        <div className="mt-4 flex flex-col gap-4">
+          <GlassCard className="p-6">
+            <p className="mb-4 text-sm text-white/70">Publier une nouvelle chanson</p>
+            <ClientSongForm clientId={id} />
+          </GlassCard>
+
+          {(songs ?? []).length === 0 && (
+            <GlassCard className="p-6">
+              <p className="text-sm text-white/60">Aucune chanson publiée pour le moment.</p>
+            </GlassCard>
+          )}
+
+          {(songs ?? []).map((song) => (
+            <AdminClientSongCard key={song.id} song={song} />
+          ))}
+        </div>
+      </div>
+
+      <div>
         <p className="text-xs uppercase tracking-[0.3em] text-white/40">Rendez-vous</p>
         <div className="mt-4 flex flex-col gap-4">
+          <SessionProgressPanel appointments={appointments ?? []} />
+
           {(appointments ?? []).map((appointment) => (
             <AppointmentRow key={appointment.id} appointment={appointment} />
           ))}

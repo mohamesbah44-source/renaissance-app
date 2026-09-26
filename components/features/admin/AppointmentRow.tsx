@@ -2,6 +2,7 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge, type BadgeProps } from "@/components/ui/Badge";
 import { formatDateTime } from "@/lib/utils";
 import { updateAppointmentStatus } from "@/lib/admin/actions";
+import { SESSION_TYPE_LABEL } from "@/lib/parcours/sessions";
 import type { Appointment, AppointmentStatus } from "@/lib/types/database.types";
 
 const STATUS_LABEL: Record<AppointmentStatus, string> = {
@@ -21,7 +22,10 @@ export function AppointmentRow({ appointment }: { appointment: Appointment }) {
     <GlassCard className="p-5">
       <div className="flex items-center justify-between gap-3">
         <p className="font-display text-base text-white">{formatDateTime(appointment.scheduled_at)}</p>
-        <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="neutral">{SESSION_TYPE_LABEL[appointment.session_type]}</Badge>
+          <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
+        </div>
       </div>
 
       {appointment.title && <p className="mt-2 text-sm text-white/70">{appointment.title}</p>}
@@ -33,7 +37,7 @@ export function AppointmentRow({ appointment }: { appointment: Appointment }) {
             <input type="hidden" name="id" value={appointment.id} />
             <input type="hidden" name="clientId" value={appointment.user_id} />
             <input type="hidden" name="status" value="completed" />
-            <button type="submit" className="text-xs text-violet-300 transition-colors hover:text-violet-200">
+            <button type="submit" className="text-xs text-rr-or-clair transition-colors hover:text-rr-or-clair">
               Marquer comme terminé
             </button>
           </form>
@@ -41,7 +45,7 @@ export function AppointmentRow({ appointment }: { appointment: Appointment }) {
             <input type="hidden" name="id" value={appointment.id} />
             <input type="hidden" name="clientId" value={appointment.user_id} />
             <input type="hidden" name="status" value="cancelled" />
-            <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rose-300">
+            <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rr-rouge">
               Annuler
             </button>
           </form>

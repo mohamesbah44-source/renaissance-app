@@ -37,8 +37,8 @@ export function ClientSettingsForm({ client }: { client: Profile }) {
         />
       </Field>
 
-      {state?.error && <p className="text-sm text-rose-400 sm:col-span-2">{state.error}</p>}
-      {state?.success && <p className="text-sm text-violet-300 sm:col-span-2">Mis à jour.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge sm:col-span-2">{state.error}</p>}
+      {state?.success && <p className="text-sm text-rr-or-clair sm:col-span-2">Mis à jour.</p>}
 
       <div className="sm:col-span-2">
         <SubmitButton className="w-auto px-8">Enregistrer</SubmitButton>

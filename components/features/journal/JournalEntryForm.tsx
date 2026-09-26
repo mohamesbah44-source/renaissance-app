@@ -98,8 +98,8 @@ export function JournalEntryForm({ entry, weeks, defaultDate, onSaved, onCancel 
         />
       </Field>
 
-      {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
-      {state?.success && !entry && <p className="text-sm text-violet-300">Ton entrée a été enregistrée.</p>}
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && !entry && <p className="text-sm text-rr-or-clair">Ton entrée a été enregistrée.</p>}
 
       <div className="flex gap-3">
         <SubmitButton className="flex-1">{entry ? "Mettre à jour" : "Ajouter au journal"}</SubmitButton>

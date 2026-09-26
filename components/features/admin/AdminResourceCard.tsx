@@ -39,13 +39,13 @@ export function AdminResourceCard({ resource, weeks }: { resource: Resource; wee
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-xs text-violet-300 transition-colors hover:text-violet-200"
+          className="text-xs text-rr-or-clair transition-colors hover:text-rr-or-clair"
         >
           Modifier
         </button>
         <form action={deleteResource}>
           <input type="hidden" name="id" value={resource.id} />
-          <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rose-300">
+          <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rr-rouge">
             Supprimer
           </button>
         </form>

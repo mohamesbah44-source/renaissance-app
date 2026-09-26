@@ -13,14 +13,14 @@ export function RadarIntro({ bilans }: { bilans: RadarBilan[] }) {
 
   return (
     <div className="pb-8 pt-2">
-      <p className="text-xs uppercase tracking-[0.35em] text-rr-or">Renaissance</p>
+      <p className="text-xs uppercase tracking-[0.35em] text-rr-or">Le Programme Re-Naissance™</p>
       <h1 className="mt-3 font-rr-display text-3xl uppercase tracking-[0.08em] text-rr-ivoire">
-        Radar Renaissance™
+        Renaissance Radar™
       </h1>
       <p className="mt-2 font-rr-serif text-lg italic text-rr-or-clair">Cartographie de ton état intérieur</p>
 
       <p className="mt-6 font-rr-serif text-lg italic leading-relaxed text-rr-creme">
-        Le Radar Renaissance™ n&apos;est pas un test de personnalité. C&apos;est un miroir. Il t&apos;aide à
+        Le Renaissance Radar™ n&apos;est pas un test de personnalité. C&apos;est un miroir. Il t&apos;aide à
         observer ton niveau actuel de survie, d&apos;adaptation, d&apos;alignement et d&apos;expansion.
       </p>
 
@@ -55,8 +55,9 @@ export function RadarIntro({ bilans }: { bilans: RadarBilan[] }) {
         {tab === "nouveau" ? (
           <div className="rounded-2xl border border-rr-or/15 bg-rr-encre p-6 text-center">
             <p className="font-rr-serif text-lg italic text-rr-creme">
-              Quarante questions, une question à la fois. Réponds en conscience, sans te juger : il
-              n&apos;y a pas de bonne réponse, seulement la tienne, à cet instant.
+              Soixante questions, une question à la fois, à travers 3 cercles et 12 piliers.
+              Réponds en conscience, sans te juger : il n&apos;y a pas de bonne réponse,
+              seulement la tienne, à cet instant.
             </p>
             <Link
               href="/radar/session"

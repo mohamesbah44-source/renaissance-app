@@ -29,7 +29,7 @@ export function WeekListItem({ week, status, isCurrent }: WeekListItemProps) {
       <GlassCard
         className={cn(
           "flex items-center gap-4 p-5 transition-colors hover:bg-white/[0.06]",
-          isCurrent && "border-violet-400/30"
+          isCurrent && "border-rr-or/30"
         )}
       >
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-sm text-white/60">

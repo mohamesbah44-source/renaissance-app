@@ -18,7 +18,7 @@ export default function RegisterPage() {
         <p className="mt-3 text-sm text-white/60">{state.success}</p>
         <Link
           href="/login"
-          className="mt-6 inline-block text-sm text-violet-300 hover:text-violet-200"
+          className="mt-6 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair"
         >
           Retour à la connexion
         </Link>
@@ -79,14 +79,14 @@ export default function RegisterPage() {
           />
         </Field>
 
-        {state?.error && <p className="text-sm text-rose-400">{state.error}</p>}
+        {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
 
         <SubmitButton>Créer mon espace</SubmitButton>
       </form>
 
       <p className="mt-6 text-center text-sm text-white/50">
         Déjà un compte ?{" "}
-        <Link href="/login" className="text-violet-300 hover:text-violet-200">
+        <Link href="/login" className="text-rr-or-clair hover:text-rr-or-clair">
           Te connecter
         </Link>
       </p>

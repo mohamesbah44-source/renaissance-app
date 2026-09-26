@@ -66,7 +66,7 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
               rel="noopener noreferrer"
               className="flex items-center gap-3 text-sm text-white/70 transition-colors hover:text-white"
             >
-              <FileText className="h-4 w-4 shrink-0 text-violet-300" />
+              <FileText className="h-4 w-4 shrink-0 text-rr-or-clair" />
               {pdf.title}
             </a>
           ))}
