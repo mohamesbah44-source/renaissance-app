@@ -42,17 +42,17 @@ export default async function CalendrierPage() {
         </p>
       </header>
 
-      <div className="mt-8">
+      <div className="mt-9">
         <SessionProgressPanel appointments={all} />
       </div>
 
-      <div className="mt-8 flex flex-col gap-4">
+      <div className="mt-9 flex flex-col gap-4">
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Prochain rendez-vous</p>
 
         {nextAppointment ? (
           <AppointmentCard appointment={nextAppointment} highlight />
         ) : (
-          <GlassCard className="p-6">
+          <GlassCard className="p-7">
             <p className="text-sm text-rr-gris-clair">Aucun rendez-vous prévu pour le moment.</p>
           </GlassCard>
         )}
@@ -63,9 +63,9 @@ export default async function CalendrierPage() {
       </div>
 
       {history.length > 0 && (
-        <div className="mt-10">
+        <div className="mt-11">
           <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Historique</p>
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="mt-5 flex flex-col gap-4">
             {history.map((appointment) => (
               <AppointmentCard key={appointment.id} appointment={appointment} />
             ))}

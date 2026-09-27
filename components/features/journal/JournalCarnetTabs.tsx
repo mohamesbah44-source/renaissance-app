@@ -34,7 +34,7 @@ export function JournalCarnetTabs({
           type="button"
           onClick={() => setTab("journal")}
           className={cn(
-            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-colors",
+            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-all duration-300",
             tab === "journal" ? "border-b-2 border-rr-or text-rr-or-clair" : "text-white/40 hover:text-white/70"
           )}
         >
@@ -44,7 +44,7 @@ export function JournalCarnetTabs({
           type="button"
           onClick={() => setTab("carnet")}
           className={cn(
-            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-colors",
+            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-all duration-300",
             tab === "carnet" ? "border-b-2 border-rr-or text-rr-or-clair" : "text-white/40 hover:text-white/70"
           )}
         >
@@ -53,15 +53,15 @@ export function JournalCarnetTabs({
       </div>
 
       {tab === "journal" ? (
-        <div className="mt-6">
-          <GlassCard className="p-6">
+        <div className="mt-7">
+          <GlassCard className="p-7">
             <p className="text-xs uppercase tracking-[0.3em] text-white/40">Nouvelle entrée</p>
-            <div className="mt-4">
+            <div className="mt-5">
               <JournalEntryForm weeks={weeks} defaultDate={defaultDate} />
             </div>
           </GlassCard>
 
-          <div className="mt-6 flex flex-col gap-4">
+          <div className="mt-7 flex flex-col gap-4">
             {entries.length > 0 ? (
               entries.map((entry) => (
                 <JournalEntryCard
@@ -80,12 +80,12 @@ export function JournalCarnetTabs({
           </div>
         </div>
       ) : (
-        <div className="mt-6">
+        <div className="mt-7">
           <p className="text-sm leading-relaxed text-white/60">
             Les synthèses que ton praticien te partage — issues du Re-Naissance Analyzer™ ou de vos échanges —
             atterrissent ici.
           </p>
-          <div className="mt-6 flex flex-col gap-4">
+          <div className="mt-7 flex flex-col gap-4">
             {carnetEntries.length > 0 ? (
               carnetEntries.map((entry) => <CarnetEntryCard key={entry.id} entry={entry} />)
             ) : (

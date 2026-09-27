@@ -72,7 +72,7 @@ export function RadarSessionFlow() {
           type="button"
           onClick={() => goToIndex(Math.max(0, index - 1))}
           disabled={index === 0}
-          className="rounded-full border border-rr-or/30 px-6 py-3 text-xs uppercase tracking-[0.25em] text-rr-creme transition-colors hover:border-rr-or/60 disabled:opacity-30"
+          className="rounded-full border border-rr-or/30 px-6 py-3 text-xs uppercase tracking-[0.25em] text-rr-creme transition-all duration-300 hover:border-rr-or/60 disabled:opacity-30"
         >
           Précédent
         </button>
@@ -81,7 +81,7 @@ export function RadarSessionFlow() {
           <button
             type="submit"
             disabled={currentValue === undefined || isPending}
-            className="rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-colors hover:bg-rr-or-clair disabled:opacity-40"
+            className="rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:-translate-y-0.5 hover:bg-rr-or-clair disabled:opacity-40"
           >
             {isPending ? "Un instant..." : "Voir mes résultats"}
           </button>
@@ -90,7 +90,7 @@ export function RadarSessionFlow() {
             type="button"
             onClick={() => goToIndex(Math.min(ALL_QUESTIONS.length - 1, index + 1))}
             disabled={currentValue === undefined}
-            className="rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-colors hover:bg-rr-or-clair disabled:opacity-40"
+            className="rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:-translate-y-0.5 hover:bg-rr-or-clair disabled:opacity-40"
           >
             Suivant
           </button>

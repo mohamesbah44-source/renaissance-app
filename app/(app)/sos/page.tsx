@@ -55,7 +55,7 @@ export default function SosPage() {
         </p>
         <Link
           href="/messages"
-          className="mt-4 inline-flex items-center justify-center rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-colors hover:bg-rr-or-clair"
+          className="mt-5 inline-flex items-center justify-center rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:-translate-y-0.5 hover:bg-rr-or-clair"
         >
           Écrire à mon praticien
         </Link>

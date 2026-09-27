@@ -28,11 +28,11 @@ export function WeekListItem({ week, status, isCurrent }: WeekListItemProps) {
     <Link href={`/parcours/semaine/${week.id}`}>
       <GlassCard
         className={cn(
-          "flex items-center gap-4 p-5 transition-colors hover:bg-white/[0.06]",
+          "flex items-center gap-4 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-rr-or/30 hover:bg-white/[0.06]",
           isCurrent && "border-rr-or/30"
         )}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-sm text-rr-gris-clair">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-sm text-rr-gris-clair transition-all duration-300">
           {status === "completed" ? (
             <Check className="h-4 w-4 text-gold-300" />
           ) : (

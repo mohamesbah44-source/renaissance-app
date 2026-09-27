@@ -20,7 +20,7 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
 
   if (editing) {
     return (
-      <GlassCard className="p-6">
+      <GlassCard className="p-7">
         <JournalEntryForm
           entry={entry}
           weeks={weeks}
@@ -33,7 +33,7 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
   }
 
   return (
-    <GlassCard className="p-6">
+    <GlassCard className="p-7">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-rr-gris">{formatDate(entry.entry_date)}</span>
         {entry.mood && <Badge variant="violet">{entry.mood}</Badge>}
@@ -42,21 +42,21 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
         )}
       </div>
 
-      {entry.title && <p className="mt-2 font-rr-display text-lg text-rr-ivoire">{entry.title}</p>}
+      {entry.title && <p className="mt-3 font-rr-display text-lg text-rr-ivoire">{entry.title}</p>}
 
       <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-rr-gris-clair">{entry.content}</p>
 
-      <div className="mt-4 flex items-center gap-4">
+      <div className="mt-5 flex items-center gap-4">
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="text-xs text-rr-or-clair transition-colors hover:text-rr-or-clair"
+          className="text-xs text-rr-or-clair transition-all duration-300 hover:text-rr-ivoire"
         >
           Modifier
         </button>
         <form action={deleteJournalEntry}>
           <input type="hidden" name="id" value={entry.id} />
-          <button type="submit" className="text-xs text-white/30 transition-colors hover:text-rr-rouge">
+          <button type="submit" className="text-xs text-white/30 transition-all duration-300 hover:text-rr-rouge">
             Supprimer
           </button>
         </form>

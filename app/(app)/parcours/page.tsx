@@ -34,7 +34,7 @@ export default async function ParcoursPage() {
         </p>
       </header>
 
-      <div className="mt-8 flex flex-col gap-3">
+      <div className="mt-9 flex flex-col gap-4">
         {weeks?.map((week) => {
           const status: ProgressStatus = progressByWeekId.get(week.id)?.status ?? "not_started";
 

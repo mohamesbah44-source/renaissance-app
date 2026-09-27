@@ -11,14 +11,14 @@ interface MarkCompleteButtonProps {
 export function MarkCompleteButton({ weekId, weekNumber, status }: MarkCompleteButtonProps) {
   if (status === "completed") {
     return (
-      <p className="mt-6 text-center text-sm text-white/50">
+      <p className="mt-7 text-center text-sm text-white/50">
         Tu as terminé cette semaine. Reviens-y aussi souvent que tu en ressens le besoin.
       </p>
     );
   }
 
   return (
-    <form action={markWeekComplete} className="mt-6">
+    <form action={markWeekComplete} className="mt-7">
       <input type="hidden" name="weekId" value={weekId} />
       <input type="hidden" name="weekNumber" value={weekNumber} />
       <SubmitButton size="lg">Marquer cette semaine comme terminée</SubmitButton>

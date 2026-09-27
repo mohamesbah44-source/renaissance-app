@@ -25,7 +25,7 @@ export default async function MessagesPage() {
           <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Ton espace d&apos;échange</h1>
         </header>
 
-        <GlassCard className="mt-8 p-6">
+        <GlassCard className="mt-9 p-7">
           <p className="text-sm text-rr-gris-clair">La messagerie sera bientôt disponible.</p>
         </GlassCard>
       </div>
@@ -58,11 +58,11 @@ export default async function MessagesPage() {
         </p>
       </header>
 
-      <div className="mt-8">
+      <div className="mt-9">
         <MessageThread messages={messages ?? []} currentUserId={user.id} />
       </div>
 
-      <div className="mt-6">
+      <div className="mt-7">
         <MessageComposer recipientId={practitioner.id} />
       </div>
     </div>

@@ -38,7 +38,7 @@ export default async function JournalPage() {
         </p>
       </header>
 
-      <div className="mt-8">
+      <div className="mt-9">
         <JournalCarnetTabs
           entries={entries ?? []}
           weeks={weekOptions}

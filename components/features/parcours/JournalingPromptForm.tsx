@@ -18,13 +18,13 @@ export function JournalingPromptForm({ weekId, prompts, responses }: JournalingP
   const [state, formAction] = useActionState(saveJournalingResponses, undefined);
 
   return (
-    <GlassCard className="mt-6 p-6">
+    <GlassCard className="mt-7 p-7">
       <p className="text-xs uppercase tracking-[0.3em] text-white/40">Ton espace de journalisation</p>
       <p className="mt-2 text-sm leading-relaxed text-white/60">
         Prends le temps qu&apos;il te faut. Il n&apos;y a pas de bonne réponse, seulement la tienne.
       </p>
 
-      <form action={formAction} className="mt-6 flex flex-col gap-5">
+      <form action={formAction} className="mt-7 flex flex-col gap-6">
         <input type="hidden" name="weekId" value={weekId} />
 
         {prompts.map((prompt) => (

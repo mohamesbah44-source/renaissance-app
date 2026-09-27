@@ -20,6 +20,8 @@
   --animate-drift-slow: drift 36s ease-in-out infinite alternate;
   --animate-drift-slower: drift 52s ease-in-out infinite alternate-reverse;
   --animate-glow: glow 6s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-breathe: breathe 8s ease-in-out infinite;
 
   /* Le Programme Re-Naissance™ — charte principale (noir / or / ivoire), utilisée dans toute l'application */
   --color-rr-noir: #0c0b0a;
@@ -56,6 +58,29 @@
   }
   50% {
     opacity: 0.9;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
   }
 }
 

@@ -23,7 +23,7 @@ export function RadarScale({ value, onChange }: RadarScaleProps) {
               aria-label={label}
               aria-pressed={selected}
               className={cn(
-                "flex h-12 w-12 shrink-0 items-center justify-center rounded-full border font-rr-display text-lg transition-colors",
+                "flex h-12 w-12 shrink-0 items-center justify-center rounded-full border font-rr-display text-lg transition-all duration-300",
                 selected
                   ? "border-rr-or bg-rr-or text-rr-noir"
                   : "border-rr-or/25 text-rr-creme hover:border-rr-or/60"

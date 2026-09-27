@@ -33,10 +33,10 @@ export function JournalEntryForm({ entry, weeks, defaultDate, onSaved, onCancel 
   }, [state, entry, onSaved]);
 
   return (
-    <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+    <form ref={formRef} action={formAction} className="flex flex-col gap-5">
       {entry && <input type="hidden" name="id" value={entry.id} />}
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-5">
         <Field label="Date" htmlFor="entryDate">
           <Input
             id="entryDate"
@@ -101,7 +101,7 @@ export function JournalEntryForm({ entry, weeks, defaultDate, onSaved, onCancel 
       {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
       {state?.success && !entry && <p className="text-sm text-rr-or-clair">Ton entrée a été enregistrée.</p>}
 
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         <SubmitButton className="flex-1">{entry ? "Mettre à jour" : "Ajouter au journal"}</SubmitButton>
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} className="flex-1">

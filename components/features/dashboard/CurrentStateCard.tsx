@@ -6,11 +6,11 @@ import type { JournalEntry } from "@/lib/types/database.types";
 
 export function CurrentStateCard({ entry }: { entry: JournalEntry | null }) {
   return (
-    <GlassCard className="mt-4 p-6">
+    <GlassCard className="mt-5 p-7">
       <p className="text-xs uppercase tracking-[0.3em] text-white/40">Ton état du moment</p>
 
       {entry ? (
-        <div className="mt-3">
+        <div className="mt-4">
           <div className="flex items-center gap-2">
             {entry.mood && <Badge variant="violet">{entry.mood}</Badge>}
             <span className="text-xs text-white/40">{formatDate(entry.entry_date)}</span>
@@ -18,12 +18,15 @@ export function CurrentStateCard({ entry }: { entry: JournalEntry | null }) {
           {entry.title && <p className="mt-3 text-sm text-white/80">{entry.title}</p>}
         </div>
       ) : (
-        <p className="mt-3 text-sm text-white/60">
+        <p className="mt-4 text-sm text-white/60">
           Tu n&apos;as pas encore posé de mots sur ton état. Prends un instant pour toi.
         </p>
       )}
 
-      <Link href="/journal" className="mt-4 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair">
+      <Link
+        href="/journal"
+        className="mt-5 inline-block text-sm text-rr-or-clair transition-all duration-300 hover:text-rr-ivoire"
+      >
         {entry ? "Ouvrir mon journal" : "Écrire dans mon journal"}
       </Link>
     </GlassCard>

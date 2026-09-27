@@ -26,9 +26,9 @@ export default async function RessourcesPage() {
       </header>
 
       {songs && songs.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-9">
           <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Tes chansons personnalisées</p>
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="mt-5 flex flex-col gap-4">
             {songs.map((song) => (
               <ClientSongCard key={song.id} song={song} />
             ))}
@@ -36,7 +36,7 @@ export default async function RessourcesPage() {
         </div>
       )}
 
-      <div className="mt-8">
+      <div className="mt-9">
         <ResourceLibrary resources={resources ?? []} />
       </div>
     </div>

@@ -29,7 +29,7 @@ export function RadarIntro({ bilans }: { bilans: RadarBilan[] }) {
           type="button"
           onClick={() => setTab("nouveau")}
           className={cn(
-            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-colors",
+            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-all duration-300",
             tab === "nouveau"
               ? "border-b-2 border-rr-or text-rr-or-clair"
               : "text-rr-gris hover:text-rr-gris-clair"
@@ -41,7 +41,7 @@ export function RadarIntro({ bilans }: { bilans: RadarBilan[] }) {
           type="button"
           onClick={() => setTab("historique")}
           className={cn(
-            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-colors",
+            "px-4 pb-3 text-xs uppercase tracking-[0.25em] transition-all duration-300",
             tab === "historique"
               ? "border-b-2 border-rr-or text-rr-or-clair"
               : "text-rr-gris hover:text-rr-gris-clair"
@@ -61,7 +61,7 @@ export function RadarIntro({ bilans }: { bilans: RadarBilan[] }) {
             </p>
             <Link
               href="/radar/session"
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-colors hover:bg-rr-or-clair"
+              className="mt-7 inline-flex items-center justify-center rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:-translate-y-0.5 hover:bg-rr-or-clair"
             >
               Commencer mon bilan
             </Link>

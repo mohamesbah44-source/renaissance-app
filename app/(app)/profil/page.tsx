@@ -40,9 +40,9 @@ export default async function ProfilPage() {
         </div>
       </header>
 
-      <GlassCard className="p-6">
+      <GlassCard className="p-7">
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Ton parcours</p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="mt-5 flex flex-wrap items-center gap-3">
           <Badge variant="violet">Semaine {profile.current_week} / 8</Badge>
           {profile.program_start_date && (
             <span className="text-sm text-rr-gris">Démarré le {formatDate(profile.program_start_date)}</span>
@@ -50,28 +50,30 @@ export default async function ProfilPage() {
         </div>
       </GlassCard>
 
-      <GlassCard className="p-6">
+      <GlassCard className="p-7">
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Informations</p>
-        <div className="mt-4">
+        <div className="mt-5">
           <ProfileInfoForm profile={profile} />
         </div>
       </GlassCard>
 
-      <GlassCard className="p-6">
+      <GlassCard className="p-7">
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Sécurité</p>
-        <div className="mt-4">
+        <div className="mt-5">
           <PasswordForm />
         </div>
       </GlassCard>
 
       {profile.role === "admin" && (
-        <Link href="/admin">
-          <GlassCard className="flex items-center justify-between gap-3 p-6 transition-colors hover:bg-white/[0.06]">
+        <Link href="/admin" className="group block">
+          <GlassCard className="flex items-center justify-between gap-3 p-7 transition-all duration-300 hover:-translate-y-0.5 hover:border-rr-or/30 hover:bg-white/[0.06]">
             <div className="flex items-center gap-3">
-              <Shield className="h-5 w-5 text-rr-or-clair" strokeWidth={1.75} />
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rr-or/[0.1] transition-all duration-300 group-hover:bg-rr-or/[0.18]">
+                <Shield className="h-5 w-5 text-rr-or-clair" strokeWidth={1.75} />
+              </span>
               <p className="text-sm text-rr-ivoire">Espace admin</p>
             </div>
-            <span className="text-xs text-rr-gris">→</span>
+            <span className="text-xs text-rr-gris transition-all duration-300 group-hover:text-rr-or-clair">→</span>
           </GlassCard>
         </Link>
       )}

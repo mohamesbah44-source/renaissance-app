@@ -25,7 +25,7 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
   }
 
   return (
-    <div className="mt-6 flex flex-col gap-4">
+    <div className="mt-7 flex flex-col gap-5">
       {week.video_url && (
         <GlassCard className="overflow-hidden p-0">
           {isVideoFile(week.video_url) ? (
@@ -44,7 +44,7 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
       )}
 
       {audios.length > 0 && (
-        <GlassCard className="flex flex-col gap-4 p-6">
+        <GlassCard className="flex flex-col gap-5 p-7">
           <p className="text-xs uppercase tracking-[0.3em] text-white/40">Pratiques audio</p>
           {audios.map((audio) => (
             <div key={audio.label}>
@@ -56,7 +56,7 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
       )}
 
       {pdfs.length > 0 && (
-        <GlassCard className="flex flex-col gap-3 p-6">
+        <GlassCard className="flex flex-col gap-3 p-7">
           <p className="text-xs uppercase tracking-[0.3em] text-white/40">Documents</p>
           {pdfs.map((pdf) => (
             <a
@@ -64,9 +64,11 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
               href={pdf.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-sm text-white/70 transition-colors hover:text-white"
+              className="group flex items-center gap-3 rounded-xl -mx-2 px-2 py-1.5 text-sm text-white/70 transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
             >
-              <FileText className="h-4 w-4 shrink-0 text-rr-or-clair" />
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rr-or/[0.1] transition-all duration-300 group-hover:bg-rr-or/[0.18]">
+                <FileText className="h-4 w-4 text-rr-or-clair" />
+              </span>
               {pdf.title}
             </a>
           ))}

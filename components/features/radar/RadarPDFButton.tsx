@@ -237,7 +237,7 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         type="button"
         onClick={handleClick}
         disabled={isGenerating}
-        className="rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-colors hover:bg-rr-or-clair disabled:opacity-50"
+        className="rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:-translate-y-0.5 hover:bg-rr-or-clair disabled:opacity-50"
       >
         {isGenerating ? "Génération..." : "Télécharger mon rapport PDF"}
       </button>

@@ -220,7 +220,7 @@ export function RadarResults({
         <RadarPDFButton bilan={bilan} pillarScores={pillarScores} topPriorities={topPriorities} />
         <Link
           href="/radar"
-          className="text-xs uppercase tracking-[0.25em] text-rr-gris-clair transition-colors hover:text-rr-or-clair"
+          className="text-xs uppercase tracking-[0.25em] text-rr-gris-clair transition-all duration-300 hover:text-rr-or-clair"
         >
           ← Retour à l&apos;accueil du Radar
         </Link>

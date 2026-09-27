@@ -29,7 +29,7 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
         ))}
       </div>
 
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-7 flex flex-col gap-4">
         {filtered.length > 0 ? (
           filtered.map((resource) => <ResourceCard key={resource.id} resource={resource} />)
         ) : (
@@ -54,10 +54,10 @@ function FilterButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-colors",
+        "shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-all duration-300",
         active
           ? "border-rr-or/40 bg-rr-or/15 text-rr-or-clair"
-          : "border-white/10 bg-white/[0.03] text-white/50 hover:text-white/80"
+          : "border-white/10 bg-white/[0.03] text-white/50 hover:border-white/20 hover:bg-white/[0.05] hover:text-white/80"
       )}
     >
       {children}

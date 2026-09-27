@@ -38,7 +38,7 @@ export function RadarHistoryList({ bilans }: { bilans: RadarBilan[] }) {
 
             <Link
               href={`/radar/resultats/${bilan.id}`}
-              className="shrink-0 rounded-full border border-rr-or/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-rr-or transition-colors hover:bg-rr-or/10"
+              className="shrink-0 rounded-full border border-rr-or/40 px-4 py-2 text-xs uppercase tracking-[0.2em] text-rr-or transition-all duration-300 hover:bg-rr-or/10"
             >
               Voir le bilan
             </Link>

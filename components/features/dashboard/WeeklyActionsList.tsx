@@ -17,10 +17,10 @@ export function WeeklyActionsList({ week, progress }: WeeklyActionsListProps) {
   }
 
   return (
-    <GlassCard className="mt-4 p-6">
+    <GlassCard className="mt-5 p-7">
       <p className="text-xs uppercase tracking-[0.3em] text-white/40">Actions de la semaine</p>
 
-      <ul className="mt-4 flex flex-col gap-3">
+      <ul className="mt-5 flex flex-col gap-4">
         {prompts.map((prompt) => {
           const done = Boolean(responses[prompt.id]?.trim());
 
@@ -28,7 +28,7 @@ export function WeeklyActionsList({ week, progress }: WeeklyActionsListProps) {
             <li key={prompt.id}>
               <Link
                 href={`/parcours/semaine/${week.id}`}
-                className="flex items-start gap-3 text-sm text-white/70 transition-colors hover:text-white"
+                className="group flex items-start gap-3 rounded-xl px-2 py-1.5 -mx-2 text-sm text-white/70 transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
               >
                 {done ? (
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-rr-or-clair" />

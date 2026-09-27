@@ -17,8 +17,8 @@ export function ResourceCard({ resource }: { resource: Resource }) {
   const Icon = RESOURCE_ICONS[resource.type];
 
   const card = (
-    <GlassCard className="flex items-start gap-4 p-5 transition-colors hover:bg-white/[0.06]">
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rr-or/15">
+    <GlassCard className="group flex items-start gap-4 p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-rr-or/30 hover:bg-white/[0.06]">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rr-or/15 transition-all duration-300 group-hover:bg-rr-or/25">
         <Icon className="h-5 w-5 text-rr-or-clair" strokeWidth={1.75} />
       </div>
 
