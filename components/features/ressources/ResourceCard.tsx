@@ -25,10 +25,10 @@ export function ResourceCard({ resource }: { resource: Resource }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant="neutral">{RESOURCE_TYPE_LABELS[resource.type]}</Badge>
-          {resource.duration && <span className="text-xs text-white/40">{resource.duration}</span>}
+          {resource.duration && <span className="text-xs text-rr-gris">{resource.duration}</span>}
         </div>
-        <p className="mt-2 font-display text-base text-white">{resource.title}</p>
-        {resource.description && <p className="mt-1 text-sm leading-relaxed text-white/50">{resource.description}</p>}
+        <p className="mt-2 font-rr-display text-base text-rr-ivoire">{resource.title}</p>
+        {resource.description && <p className="mt-1 text-sm leading-relaxed text-rr-gris">{resource.description}</p>}
       </div>
 
       {resource.media_url && <ExternalLink className="mt-1 h-4 w-4 shrink-0 text-white/30" />}

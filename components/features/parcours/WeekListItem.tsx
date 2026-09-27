@@ -32,7 +32,7 @@ export function WeekListItem({ week, status, isCurrent }: WeekListItemProps) {
           isCurrent && "border-rr-or/30"
         )}
       >
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-sm text-white/60">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 text-sm text-rr-gris-clair">
           {status === "completed" ? (
             <Check className="h-4 w-4 text-gold-300" />
           ) : (
@@ -41,8 +41,8 @@ export function WeekListItem({ week, status, isCurrent }: WeekListItemProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Semaine {week.week_number}</p>
-          <p className="mt-1 truncate font-display text-lg text-white">{week.title}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Semaine {week.week_number}</p>
+          <p className="mt-1 truncate font-rr-display text-lg text-rr-ivoire">{week.title}</p>
         </div>
 
         <Badge variant={STATUS_VARIANT[status]} className="shrink-0">

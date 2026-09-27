@@ -7,7 +7,7 @@ export function OfferSpotlight({ offer }: { offer: ProgramOffer }) {
     <GlassCard className="mt-8 border-rr-or/30 bg-gradient-to-br from-rr-or/[0.08] to-transparent p-8 text-center">
       <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Et après ?</p>
       <p className="mt-3 font-rr-display text-2xl uppercase tracking-[0.04em] text-rr-ivoire">{offer.title}</p>
-      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/70">{offer.description}</p>
+      <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-rr-gris-clair">{offer.description}</p>
       <div className="mt-6 flex flex-col items-center gap-2">
         <a
           href={offer.cta_url}
@@ -17,7 +17,7 @@ export function OfferSpotlight({ offer }: { offer: ProgramOffer }) {
         >
           {offer.cta_label}
         </a>
-        {offer.price_label && <span className="text-xs text-white/40">{offer.price_label}</span>}
+        {offer.price_label && <span className="text-xs text-rr-gris">{offer.price_label}</span>}
       </div>
     </GlassCard>
   );

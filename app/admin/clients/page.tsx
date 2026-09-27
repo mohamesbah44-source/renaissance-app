@@ -19,8 +19,8 @@ export default async function AdminClientsPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       <header>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Admin</p>
-        <h1 className="mt-2 font-display text-3xl text-white">Participant·e·s</h1>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Admin</p>
+        <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Participant·e·s</h1>
       </header>
 
       <div className="flex flex-col gap-3">
@@ -33,10 +33,10 @@ export default async function AdminClientsPage() {
               <GlassCard className="p-5 transition-colors hover:bg-white/[0.06]">
                 <div className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate font-display text-lg text-white">{fullName}</p>
-                    <p className="truncate text-sm text-white/50">{client.email}</p>
+                    <p className="truncate font-rr-display text-lg text-rr-ivoire">{fullName}</p>
+                    <p className="truncate text-sm text-rr-gris">{client.email}</p>
                   </div>
-                  <p className="shrink-0 text-xs text-white/40">Semaine {client.current_week} / 8</p>
+                  <p className="shrink-0 text-xs text-rr-gris">Semaine {client.current_week} / 8</p>
                 </div>
                 <ProgressBar value={(completed / 8) * 100} className="mt-4" />
               </GlassCard>
@@ -46,7 +46,7 @@ export default async function AdminClientsPage() {
 
         {(clients ?? []).length === 0 && (
           <GlassCard className="p-6">
-            <p className="text-sm text-white/60">Aucun·e participant·e pour le moment.</p>
+            <p className="text-sm text-rr-gris-clair">Aucun·e participant·e pour le moment.</p>
           </GlassCard>
         )}
       </div>

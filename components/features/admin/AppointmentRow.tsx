@@ -21,15 +21,15 @@ export function AppointmentRow({ appointment }: { appointment: Appointment }) {
   return (
     <GlassCard className="p-5">
       <div className="flex items-center justify-between gap-3">
-        <p className="font-display text-base text-white">{formatDateTime(appointment.scheduled_at)}</p>
+        <p className="font-rr-display text-base text-rr-ivoire">{formatDateTime(appointment.scheduled_at)}</p>
         <div className="flex items-center gap-2">
           <Badge variant="neutral">{SESSION_TYPE_LABEL[appointment.session_type]}</Badge>
           <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
         </div>
       </div>
 
-      {appointment.title && <p className="mt-2 text-sm text-white/70">{appointment.title}</p>}
-      {appointment.notes && <p className="mt-2 text-sm leading-relaxed text-white/50">{appointment.notes}</p>}
+      {appointment.title && <p className="mt-2 text-sm text-rr-gris-clair">{appointment.title}</p>}
+      {appointment.notes && <p className="mt-2 text-sm leading-relaxed text-rr-gris">{appointment.notes}</p>}
 
       {appointment.status === "upcoming" && (
         <div className="mt-3 flex gap-4">

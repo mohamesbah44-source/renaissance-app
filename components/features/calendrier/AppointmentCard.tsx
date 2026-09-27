@@ -20,7 +20,7 @@ export function AppointmentCard({ appointment, highlight }: { appointment: Appoi
   return (
     <GlassCard className={cn("p-6", highlight && "border-rr-or/30")}>
       <div className="flex items-center justify-between gap-3">
-        <p className="font-display text-lg text-white">{formatDateTime(appointment.scheduled_at)}</p>
+        <p className="font-rr-display text-lg text-rr-ivoire">{formatDateTime(appointment.scheduled_at)}</p>
         <Badge variant={STATUS_VARIANT[appointment.status]}>{STATUS_LABEL[appointment.status]}</Badge>
       </div>
 
@@ -28,9 +28,9 @@ export function AppointmentCard({ appointment, highlight }: { appointment: Appoi
         {SESSION_TYPE_LABEL[appointment.session_type]}
       </p>
 
-      {appointment.title && <p className="mt-2 text-sm text-white/70">{appointment.title}</p>}
+      {appointment.title && <p className="mt-2 text-sm text-rr-gris-clair">{appointment.title}</p>}
 
-      {appointment.notes && <p className="mt-2 text-sm leading-relaxed text-white/50">{appointment.notes}</p>}
+      {appointment.notes && <p className="mt-2 text-sm leading-relaxed text-rr-gris">{appointment.notes}</p>}
 
       {appointment.meeting_url && appointment.status === "upcoming" && (
         <a

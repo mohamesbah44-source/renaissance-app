@@ -10,8 +10,8 @@ export function RadarLinkCard() {
           <Compass className="h-5 w-5 text-amber-300" strokeWidth={1.75} />
         </div>
         <div>
-          <p className="font-display text-base text-white">Renaissance Radar™</p>
-          <p className="mt-1 text-sm text-white/50">Ton état dominant, ta fenêtre de transformation, tes priorités.</p>
+          <p className="font-rr-display text-base text-rr-ivoire">Renaissance Radar™</p>
+          <p className="mt-1 text-sm text-rr-gris">Ton état dominant, ta fenêtre de transformation, tes priorités.</p>
         </div>
       </GlassCard>
     </Link>

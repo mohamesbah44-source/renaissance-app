@@ -17,9 +17,9 @@ export default async function RessourcesPage() {
   return (
     <div className="mx-auto max-w-2xl pb-8">
       <header className="pt-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Bibliothèque</p>
-        <h1 className="mt-2 font-display text-3xl text-white">Tes ressources</h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Bibliothèque</p>
+        <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Tes ressources</h1>
+        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
           Respirations, méditations, visualisations, exercices et replays pour t&apos;accompagner entre
           chaque séance.
         </p>

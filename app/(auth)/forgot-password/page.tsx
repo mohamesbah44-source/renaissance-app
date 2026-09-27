@@ -13,8 +13,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <GlassCard className="p-8">
-      <h1 className="font-display text-2xl text-white">Mot de passe oublié.</h1>
-      <p className="mt-2 text-sm text-white/60">
+      <h1 className="font-rr-display text-2xl text-rr-ivoire">Mot de passe oublié.</h1>
+      <p className="mt-2 text-sm text-rr-gris-clair">
         Indique ton email : nous t&apos;enverrons un lien pour en choisir un nouveau.
       </p>
 
@@ -39,7 +39,7 @@ export default function ForgotPasswordPage() {
         </form>
       )}
 
-      <p className="mt-6 text-center text-sm text-white/50">
+      <p className="mt-6 text-center text-sm text-rr-gris">
         <Link href="/login" className="text-rr-or-clair hover:text-rr-or-clair">
           Retour à la connexion
         </Link>

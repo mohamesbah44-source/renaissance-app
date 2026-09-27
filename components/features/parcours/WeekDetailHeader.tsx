@@ -20,22 +20,22 @@ export function WeekDetailHeader({ week, status }: { week: Week; status: Progres
     <header className="pt-2">
       <Link
         href="/parcours"
-        className="inline-flex items-center gap-2 text-sm text-white/40 transition-colors hover:text-white/70"
+        className="inline-flex items-center gap-2 text-sm text-rr-gris transition-colors hover:text-rr-gris-clair"
       >
         <ArrowLeft className="h-4 w-4" />
         Retour au parcours
       </Link>
 
       <div className="mt-6 flex items-center gap-3">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Semaine {week.week_number} / 8</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Semaine {week.week_number} / 8</p>
         <Badge variant={STATUS_VARIANT[status]}>{STATUS_LABEL[status]}</Badge>
       </div>
 
-      <h1 className="mt-2 font-display text-3xl text-white">{week.title}</h1>
+      <h1 className="mt-2 font-rr-display text-3xl text-rr-ivoire">{week.title}</h1>
 
       {week.intention && <p className="mt-3 text-base italic text-rr-or-clair/80">{week.intention}</p>}
 
-      {week.description && <p className="mt-4 text-sm leading-relaxed text-white/60">{week.description}</p>}
+      {week.description && <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">{week.description}</p>}
     </header>
   );
 }

@@ -8,10 +8,10 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-gradient-to-r from-rr-or to-gold-500 text-rr-noir shadow-[0_8px_30px_-8px_rgba(201,169,110,0.55)] hover:brightness-110 hover:shadow-[0_8px_40px_-6px_rgba(232,213,163,0.5)]",
+          "bg-gradient-to-r from-rr-or to-gold-500 text-rr-noir shadow-[0_8px_30px_-8px_rgba(201,169,110,0.55)] hover:brightness-110 hover:shadow-[0_10px_44px_-6px_rgba(232,213,163,0.55)] hover:-translate-y-px active:translate-y-0",
         outline:
-          "border border-white/15 bg-white/[0.03] text-white/90 hover:border-white/25 hover:bg-white/[0.08]",
-        ghost: "text-white/70 hover:bg-white/[0.06] hover:text-white",
+          "border border-rr-or/25 bg-white/[0.03] text-rr-ivoire/90 hover:border-rr-or/40 hover:bg-rr-or/[0.06]",
+        ghost: "text-rr-gris-clair hover:bg-white/[0.06] hover:text-rr-ivoire",
       },
       size: {
         default: "h-12 px-6 text-sm",

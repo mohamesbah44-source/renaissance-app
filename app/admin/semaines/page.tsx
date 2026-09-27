@@ -8,9 +8,9 @@ export default async function AdminSemainesPage() {
   return (
     <div className="flex flex-col gap-8 pb-12">
       <header>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Admin</p>
-        <h1 className="mt-2 font-display text-3xl text-white">Le parcours en 8 semaines</h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Admin</p>
+        <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Le parcours en 8 semaines</h1>
+        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
           Édite le contenu de chaque semaine : intention, description, médias et questions de journalisation.
         </p>
       </header>

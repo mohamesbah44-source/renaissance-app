@@ -6,8 +6,8 @@ export function OfferCard({ offer }: { offer: ProgramOffer }) {
   return (
     <GlassCard className="mt-6 border-rr-or/20 bg-rr-or/[0.04] p-6">
       <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Pour la suite</p>
-      <p className="mt-2 font-display text-lg text-white">{offer.title}</p>
-      <p className="mt-2 text-sm leading-relaxed text-white/60">{offer.description}</p>
+      <p className="mt-2 font-rr-display text-lg text-rr-ivoire">{offer.title}</p>
+      <p className="mt-2 text-sm leading-relaxed text-rr-gris-clair">{offer.description}</p>
       <div className="mt-4 flex items-center gap-3">
         <a
           href={offer.cta_url}
@@ -17,7 +17,7 @@ export function OfferCard({ offer }: { offer: ProgramOffer }) {
         >
           {offer.cta_label}
         </a>
-        {offer.price_label && <span className="text-xs text-white/40">{offer.price_label}</span>}
+        {offer.price_label && <span className="text-xs text-rr-gris">{offer.price_label}</span>}
       </div>
     </GlassCard>
   );

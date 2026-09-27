@@ -21,12 +21,12 @@ export default async function MessagesPage() {
     return (
       <div className="mx-auto max-w-2xl pb-8">
         <header className="pt-2">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Messages</p>
-          <h1 className="mt-2 font-display text-3xl text-white">Ton espace d&apos;échange</h1>
+          <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Messages</p>
+          <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Ton espace d&apos;échange</h1>
         </header>
 
         <GlassCard className="mt-8 p-6">
-          <p className="text-sm text-white/60">La messagerie sera bientôt disponible.</p>
+          <p className="text-sm text-rr-gris-clair">La messagerie sera bientôt disponible.</p>
         </GlassCard>
       </div>
     );
@@ -47,11 +47,11 @@ export default async function MessagesPage() {
       <MarkMessagesRead userId={user.id} fromUserId={practitioner.id} />
 
       <header className="pt-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Messages</p>
-        <h1 className="mt-2 font-display text-3xl text-white">
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Messages</p>
+        <h1 className="mt-2 font-rr-display text-3xl text-rr-ivoire">
           {practitioner.first_name ? `Échange avec ${practitioner.first_name}` : "Ton espace d'échange"}
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/60">
+        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
           {profile?.first_name
             ? `${profile.first_name}, un mot, une question, un doute : ce fil est là pour toi.`
             : "Un mot, une question, un doute : ce fil est là pour toi."}

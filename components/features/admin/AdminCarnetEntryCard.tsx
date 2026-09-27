@@ -12,7 +12,7 @@ export function AdminCarnetEntryCard({ entry }: { entry: CarnetEntry }) {
   return (
     <GlassCard className="p-5">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-white/40">{formatDate(entry.created_at)}</span>
+        <span className="text-xs text-rr-gris">{formatDate(entry.created_at)}</span>
         <Badge variant={entry.source === "analyzer" ? "violet" : "neutral"}>
           {entry.source === "analyzer" ? "Re-Naissance Analyzer™" : "Note manuelle"}
         </Badge>
@@ -23,13 +23,13 @@ export function AdminCarnetEntryCard({ entry }: { entry: CarnetEntry }) {
         ))}
       </div>
 
-      <p className="mt-2 font-display text-lg text-white">{entry.titre}</p>
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/70">{entry.synthese}</p>
+      <p className="mt-2 font-rr-display text-lg text-rr-ivoire">{entry.titre}</p>
+      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-rr-gris-clair">{entry.synthese}</p>
 
       {hypotheses.length > 0 && (
         <ul className="mt-3 flex flex-col gap-1 border-t border-white/10 pt-3">
           {hypotheses.map((hypothese, index) => (
-            <li key={index} className="text-xs text-white/50">
+            <li key={index} className="text-xs text-rr-gris">
               · {hypothese}
             </li>
           ))}

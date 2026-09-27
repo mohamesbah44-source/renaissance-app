@@ -26,8 +26,8 @@ export function AdminOfferCard({ offer }: { offer: ProgramOffer }) {
             <Badge variant={offer.is_active ? "gold" : "neutral"}>{offer.is_active ? "Active" : "Inactive"}</Badge>
             {offer.price_label && <Badge variant="neutral">{offer.price_label}</Badge>}
           </div>
-          <p className="mt-2 font-display text-lg text-white">{offer.title}</p>
-          <p className="mt-1 text-sm text-white/60">{offer.description}</p>
+          <p className="mt-2 font-rr-display text-lg text-rr-ivoire">{offer.title}</p>
+          <p className="mt-1 text-sm text-rr-gris-clair">{offer.description}</p>
           <a
             href={offer.cta_url}
             target="_blank"
@@ -57,3 +57,4 @@ export function AdminOfferCard({ offer }: { offer: ProgramOffer }) {
     </GlassCard>
   );
 }
+

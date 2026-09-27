@@ -12,8 +12,8 @@ export default function ResetPasswordPage() {
 
   return (
     <GlassCard className="p-8">
-      <h1 className="font-display text-2xl text-white">Nouveau départ.</h1>
-      <p className="mt-2 text-sm text-white/60">Choisis ton nouveau mot de passe.</p>
+      <h1 className="font-rr-display text-2xl text-rr-ivoire">Nouveau départ.</h1>
+      <p className="mt-2 text-sm text-rr-gris-clair">Choisis ton nouveau mot de passe.</p>
 
       <form action={formAction} className="mt-8 flex flex-col gap-5">
         <Field label="Nouveau mot de passe" htmlFor="password">

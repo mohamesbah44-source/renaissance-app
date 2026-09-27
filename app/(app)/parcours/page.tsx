@@ -26,9 +26,9 @@ export default async function ParcoursPage() {
   return (
     <div className="mx-auto max-w-2xl">
       <header className="pt-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Ton parcours</p>
-        <h1 className="mt-2 font-display text-3xl text-white">8 semaines vers toi-même</h1>
-        <p className="mt-3 text-sm leading-relaxed text-white/60">
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Ton parcours</p>
+        <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">8 semaines vers toi-même</h1>
+        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
           Chaque semaine ouvre un espace d&apos;exploration : une intention, des pratiques, un temps
           d&apos;écriture. Avance à ton rythme, sans te juger.
         </p>

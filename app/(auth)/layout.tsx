@@ -5,7 +5,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="flex min-h-dvh flex-col items-center justify-center px-6 py-16">
       <Link
         href="/"
-        className="mb-10 font-display text-2xl italic tracking-wide text-white/90 transition-colors hover:text-white"
+        className="mb-10 font-rr-display text-2xl italic tracking-wide text-rr-ivoire transition-colors hover:text-rr-ivoire"
       >
         Renaissance
       </Link>

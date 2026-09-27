@@ -13,8 +13,8 @@ export default function LoginPage() {
 
   return (
     <GlassCard className="p-8">
-      <h1 className="font-display text-2xl text-white">Te revoilà.</h1>
-      <p className="mt-2 text-sm text-white/60">
+      <h1 className="font-rr-display text-2xl text-rr-ivoire">Te revoilà.</h1>
+      <p className="mt-2 text-sm text-rr-gris-clair">
         Reviens te poser dans ton espace Renaissance.
       </p>
 
@@ -45,8 +45,8 @@ export default function LoginPage() {
         <SubmitButton>Entrer dans mon espace</SubmitButton>
       </form>
 
-      <div className="mt-6 flex flex-col items-center gap-3 text-sm text-white/50">
-        <Link href="/forgot-password" className="hover:text-white/80">
+      <div className="mt-6 flex flex-col items-center gap-3 text-sm text-rr-gris">
+        <Link href="/forgot-password" className="hover:text-rr-gris-clair">
           Mot de passe oublié ?
         </Link>
         <p>

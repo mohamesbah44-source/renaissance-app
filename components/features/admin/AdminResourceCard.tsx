@@ -29,10 +29,10 @@ export function AdminResourceCard({ resource, weeks }: { resource: Resource; wee
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Badge variant="neutral">{RESOURCE_TYPE_LABELS[resource.type]}</Badge>
-          <p className="mt-2 font-display text-lg text-white">{resource.title}</p>
-          {resource.description && <p className="mt-1 text-sm text-white/60">{resource.description}</p>}
+          <p className="mt-2 font-rr-display text-lg text-rr-ivoire">{resource.title}</p>
+          {resource.description && <p className="mt-1 text-sm text-rr-gris-clair">{resource.description}</p>}
         </div>
-        {resource.duration && <span className="shrink-0 text-xs text-white/40">{resource.duration}</span>}
+        {resource.duration && <span className="shrink-0 text-xs text-rr-gris">{resource.duration}</span>}
       </div>
 
       <div className="mt-4 flex items-center gap-4">

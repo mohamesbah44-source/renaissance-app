@@ -14,8 +14,8 @@ export default function RegisterPage() {
   if (state?.success) {
     return (
       <GlassCard className="p-8 text-center">
-        <h1 className="font-display text-2xl text-white">Presque prêt(e).</h1>
-        <p className="mt-3 text-sm text-white/60">{state.success}</p>
+        <h1 className="font-rr-display text-2xl text-rr-ivoire">Presque prêt(e).</h1>
+        <p className="mt-3 text-sm text-rr-gris-clair">{state.success}</p>
         <Link
           href="/login"
           className="mt-6 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair"
@@ -28,8 +28,8 @@ export default function RegisterPage() {
 
   return (
     <GlassCard className="p-8">
-      <h1 className="font-display text-2xl text-white">Bienvenue.</h1>
-      <p className="mt-2 text-sm text-white/60">
+      <h1 className="font-rr-display text-2xl text-rr-ivoire">Bienvenue.</h1>
+      <p className="mt-2 text-sm text-rr-gris-clair">
         Crée ton espace Renaissance. Le chemin commence ici, à ton rythme.
       </p>
 
@@ -84,7 +84,7 @@ export default function RegisterPage() {
         <SubmitButton>Créer mon espace</SubmitButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-white/50">
+      <p className="mt-6 text-center text-sm text-rr-gris">
         Déjà un compte ?{" "}
         <Link href="/login" className="text-rr-or-clair hover:text-rr-or-clair">
           Te connecter

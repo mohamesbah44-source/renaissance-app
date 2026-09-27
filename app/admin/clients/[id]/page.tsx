@@ -70,11 +70,11 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
   return (
     <div className="flex flex-col gap-8 pb-12">
       <header>
-        <Link href="/admin/clients" className="text-xs text-white/40 transition-colors hover:text-white/70">
+        <Link href="/admin/clients" className="text-xs text-rr-gris transition-colors hover:text-rr-gris-clair">
           ← Retour aux participant·e·s
         </Link>
-        <h1 className="mt-3 font-display text-3xl text-white">{fullName}</h1>
-        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-white/50">
+        <h1 className="mt-3 font-rr-display text-3xl text-rr-ivoire">{fullName}</h1>
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-rr-gris">
           <span>{client.email}</span>
           <Badge variant="violet">Semaine {client.current_week} / 8</Badge>
           {client.program_start_date && <span>Depuis le {formatDate(client.program_start_date)}</span>}
@@ -82,7 +82,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       </header>
 
       <GlassCard className="p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Réglages du parcours</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Réglages du parcours</p>
         <div className="mt-4">
           <ClientSettingsForm client={client} />
         </div>
@@ -93,11 +93,11 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       <ClientRadarPanel bilans={radarRows ?? []} />
 
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Journal</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Journal</p>
         <div className="mt-4 flex flex-col gap-4">
           {(journalEntries ?? []).length === 0 && (
             <GlassCard className="p-6">
-              <p className="text-sm text-white/60">Aucune entrée de journal pour le moment.</p>
+              <p className="text-sm text-rr-gris-clair">Aucune entrée de journal pour le moment.</p>
             </GlassCard>
           )}
 
@@ -108,16 +108,16 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Carnet Re-Naissance™</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Carnet Re-Naissance™</p>
         <div className="mt-4 flex flex-col gap-4">
           <GlassCard className="p-6">
-            <p className="mb-4 text-sm text-white/70">Publier une synthèse dans le Carnet</p>
+            <p className="mb-4 text-sm text-rr-gris-clair">Publier une synthèse dans le Carnet</p>
             <CarnetEntryForm clientId={id} />
           </GlassCard>
 
           {(carnetEntries ?? []).length === 0 && (
             <GlassCard className="p-6">
-              <p className="text-sm text-white/60">Aucune entrée publiée pour le moment.</p>
+              <p className="text-sm text-rr-gris-clair">Aucune entrée publiée pour le moment.</p>
             </GlassCard>
           )}
 
@@ -128,16 +128,16 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Chansons personnalisées</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Chansons personnalisées</p>
         <div className="mt-4 flex flex-col gap-4">
           <GlassCard className="p-6">
-            <p className="mb-4 text-sm text-white/70">Publier une nouvelle chanson</p>
+            <p className="mb-4 text-sm text-rr-gris-clair">Publier une nouvelle chanson</p>
             <ClientSongForm clientId={id} />
           </GlassCard>
 
           {(songs ?? []).length === 0 && (
             <GlassCard className="p-6">
-              <p className="text-sm text-white/60">Aucune chanson publiée pour le moment.</p>
+              <p className="text-sm text-rr-gris-clair">Aucune chanson publiée pour le moment.</p>
             </GlassCard>
           )}
 
@@ -148,7 +148,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Rendez-vous</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Rendez-vous</p>
         <div className="mt-4 flex flex-col gap-4">
           <SessionProgressPanel appointments={appointments ?? []} />
 
@@ -157,14 +157,14 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
           ))}
 
           <GlassCard className="p-6">
-            <p className="mb-4 text-sm text-white/70">Planifier un nouveau rendez-vous</p>
+            <p className="mb-4 text-sm text-rr-gris-clair">Planifier un nouveau rendez-vous</p>
             <AppointmentForm clientId={id} />
           </GlassCard>
         </div>
       </div>
 
       <div>
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Messages</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Messages</p>
         <MarkMessagesRead userId={user.id} fromUserId={id} />
         <div className="mt-4">
           <MessageThread messages={messages ?? []} currentUserId={user.id} />

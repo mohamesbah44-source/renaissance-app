@@ -7,11 +7,11 @@ export function AdminClientSongCard({ song }: { song: ClientSong }) {
   return (
     <GlassCard className="p-5">
       <div className="flex items-center justify-between gap-3">
-        <p className="font-display text-base text-white">{song.titre}</p>
-        <span className="text-xs text-white/40">{formatDate(song.created_at)}</span>
+        <p className="font-rr-display text-base text-rr-ivoire">{song.titre}</p>
+        <span className="text-xs text-rr-gris">{formatDate(song.created_at)}</span>
       </div>
 
-      {song.message && <p className="mt-2 text-sm leading-relaxed text-white/60">{song.message}</p>}
+      {song.message && <p className="mt-2 text-sm leading-relaxed text-rr-gris-clair">{song.message}</p>}
 
       <audio controls src={song.media_url} className="mt-3 w-full" />
 
