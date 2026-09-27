@@ -9,8 +9,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <aside className="shrink-0 border-b border-white/10 px-6 py-5 md:w-64 md:border-b-0 md:border-r md:border-white/10 md:px-4 md:py-8">
         <div className="flex items-center justify-between md:block">
           <div>
-            <Link href="/dashboard" className="font-display text-lg italic tracking-wide text-white/90">
-              Renaissance
+            <Link href="/dashboard" className="font-rr-display text-sm uppercase tracking-[0.14em] text-rr-ivoire">
+              Le Programme <span className="text-rr-or">Re-Naissance</span>
+              <sup className="ml-0.5 text-[8px]">™</sup>
             </Link>
             <p className="mt-1 text-xs uppercase tracking-[0.3em] text-white/40">Admin</p>
           </div>

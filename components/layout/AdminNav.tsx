@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, Compass, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, Compass, Sparkles, Gift } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/admin/clients", label: "Participant·e·s", icon: Users },
   { href: "/admin/semaines", label: "Semaines", icon: Compass },
   { href: "/admin/ressources", label: "Ressources", icon: Sparkles },
+  { href: "/admin/offre", label: "Offre de suite", icon: Gift },
 ];
 
 export function AdminNav() {

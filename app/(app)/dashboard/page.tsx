@@ -7,6 +7,7 @@ import { RadarLinkCard } from "@/components/features/dashboard/RadarLinkCard";
 import { NextAppointmentCard } from "@/components/features/dashboard/NextAppointmentCard";
 import { WeeklyActionsList } from "@/components/features/dashboard/WeeklyActionsList";
 import { ContinueButton } from "@/components/features/dashboard/ContinueButton";
+import { OfferCard } from "@/components/features/dashboard/OfferCard";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -21,7 +22,7 @@ export default async function DashboardPage() {
   const profile = await getProfile(supabase, user.id);
   const currentWeekNumber = profile?.current_week ?? 1;
 
-  const [{ data: currentWeek }, { data: progressRows }, { data: journalEntries }, { data: appointments }] =
+  const [{ data: currentWeek }, { data: progressRows }, { data: journalEntries }, { data: appointments }, { data: offer }] =
     await Promise.all([
       supabase.from("weeks").select("*").eq("week_number", currentWeekNumber).single(),
       supabase.from("user_progress").select("*").eq("user_id", user.id),
@@ -39,6 +40,13 @@ export default async function DashboardPage() {
         .gte("scheduled_at", new Date().toISOString())
         .order("scheduled_at", { ascending: true })
         .limit(1),
+      supabase
+        .from("program_offers")
+        .select("*")
+        .eq("is_active", true)
+        .order("updated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
 
   const completedCount = progressRows?.filter((p) => p.status === "completed").length ?? 0;
@@ -63,6 +71,8 @@ export default async function DashboardPage() {
       {currentWeek && <WeeklyActionsList week={currentWeek} progress={currentProgress} />}
 
       {currentWeek && <ContinueButton weekId={currentWeek.id} status={currentProgress?.status} />}
+
+      {offer && <OfferCard offer={offer} />}
     </div>
   );
 }

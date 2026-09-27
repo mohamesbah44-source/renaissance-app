@@ -4,6 +4,7 @@ import { WeekDetailHeader } from "@/components/features/parcours/WeekDetailHeade
 import { MediaSection } from "@/components/features/parcours/MediaSection";
 import { JournalingPromptForm } from "@/components/features/parcours/JournalingPromptForm";
 import { MarkCompleteButton } from "@/components/features/parcours/MarkCompleteButton";
+import { OfferSpotlight } from "@/components/features/parcours/OfferSpotlight";
 import type { JournalingPrompt, JournalingResponses, WeekPdf } from "@/lib/types/database.types";
 
 interface WeekDetailPageProps {
@@ -39,6 +40,17 @@ export default async function WeekDetailPage({ params }: WeekDetailPageProps) {
   const pdfs = (week.pdf_urls as WeekPdf[] | null) ?? [];
   const status = progress?.status ?? "not_started";
 
+  const { data: offer } =
+    week.week_number === 8
+      ? await supabase
+          .from("program_offers")
+          .select("*")
+          .eq("is_active", true)
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : { data: null };
+
   return (
     <div className="mx-auto max-w-2xl pb-8">
       <WeekDetailHeader week={week} status={status} />
@@ -50,6 +62,8 @@ export default async function WeekDetailPage({ params }: WeekDetailPageProps) {
       )}
 
       <MarkCompleteButton weekId={week.id} weekNumber={week.week_number} status={status} />
+
+      {offer && <OfferSpotlight offer={offer} />}
     </div>
   );
 }

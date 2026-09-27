@@ -390,6 +390,42 @@ export type Database = {
         };
         Relationships: [];
       };
+      program_offers: {
+        Row: {
+          id: string;
+          title: string;
+          description: string;
+          cta_label: string;
+          cta_url: string;
+          price_label: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          title: string;
+          description: string;
+          cta_label?: string;
+          cta_url: string;
+          price_label?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          title?: string;
+          description?: string;
+          cta_label?: string;
+          cta_url?: string;
+          price_label?: string | null;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       messages: {
         Row: {
           id: string;
@@ -440,3 +476,4 @@ export type Appointment = Tables<"appointments">;
 export type Message = Tables<"messages">;
 export type CarnetEntry = Tables<"carnet_entries">;
 export type ClientSong = Tables<"client_songs">;
+export type ProgramOffer = Tables<"program_offers">;
