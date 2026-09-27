@@ -8,19 +8,6 @@
   --color-night-700: #1a2040;
   --color-night-600: #262e58;
 
-  /* Violet */
-  --color-violet-300: #c9bdfb;
-  --color-violet-400: #a78bfa;
-  --color-violet-500: #8b7cf6;
-  --color-violet-600: #6d5bd0;
-  --color-violet-700: #5642a6;
-
-  /* Rose lumineux */
-  --color-rose-300: #fbc7e0;
-  --color-rose-400: #fb8fc4;
-  --color-rose-500: #f472b6;
-  --color-rose-600: #df539e;
-
   /* Orange dore */
   --color-gold-300: #fde3bb;
   --color-gold-400: #fbc382;
@@ -34,7 +21,7 @@
   --animate-drift-slower: drift 52s ease-in-out infinite alternate-reverse;
   --animate-glow: glow 6s ease-in-out infinite;
 
-  /* Radar Renaissance™ — charte dédiée (noir / or / ivoire), scopée à /radar/* */
+  /* Le Programme Re-Naissance™ — charte principale (noir / or / ivoire), utilisée dans toute l'application */
   --color-rr-noir: #0c0b0a;
   --color-rr-encre: #161310;
   --color-rr-encre2: #1e1a16;
@@ -84,7 +71,7 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-violet-500) 40%, transparent);
+  background: color-mix(in srgb, var(--color-rr-or) 40%, transparent);
   color: #ffffff;
 }
 
@@ -96,6 +83,6 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--color-violet-500) 35%, transparent);
+  background: color-mix(in srgb, var(--color-rr-or) 35%, transparent);
   border-radius: 9999px;
 }

@@ -16,7 +16,7 @@ const outfit = Outfit({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-// Charte dédiée au Renaissance Radar™ (scopée à /radar/*)
+// Charte Le Programme Re-Naissance™ (noir / or / ivoire), utilisée dans toute l'application
 const cinzel = Cinzel({
   variable: "--font-rr-display",
   subsets: ["latin"],
@@ -36,13 +36,29 @@ const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const TITLE = "Le Programme Re-Naissance™ — Plus qu'un accompagnement, une rencontre avec vous-même";
+const DESCRIPTION =
+  "Le Programme Re-Naissance™ est un accompagnement transformationnel de 8 semaines pour les entrepreneurs qui veulent retrouver sécurité intérieure, clarté et vitalité.";
+
 export const metadata: Metadata = {
-  title: "Le Programme Re-Naissance™ — Plus qu'un accompagnement, une rencontre avec vous-même",
-  description:
-    "Le Programme Re-Naissance™ est un accompagnement transformationnel de 8 semaines pour les entrepreneurs qui veulent retrouver sécurité intérieure, clarté et vitalité.",
+  title: TITLE,
+  description: DESCRIPTION,
   icons: {
     icon: "/favicon-32.png",
     apple: "/apple-touch-icon.png",
+  },
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    images: [{ url: "/logo-re-naissance.png", width: 1254, height: 1254, alt: "Le Programme Re-Naissance™" }],
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/logo-re-naissance.png"],
   },
 };
 
