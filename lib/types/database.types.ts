@@ -29,6 +29,8 @@ export type EtatDominant = "SURVIE" | "ADAPTATION" | "ALIGNEMENT" | "EXPANSION";
 
 export type AppointmentStatus = "upcoming" | "completed" | "cancelled";
 
+export type HabitSource = "auto" | "manuel";
+
 /**
  * Type de séance de l'accompagnement 8 semaines : 2 breathwork (1h30/mois) +
  * 6 courtes (30 min/mois : méditation, visualisation ou EFT) + le rendez-vous
@@ -426,6 +428,63 @@ export type Database = {
         };
         Relationships: [];
       };
+      habits: {
+        Row: {
+          id: string;
+          user_id: string;
+          pilier_id: number;
+          titre: string;
+          source: HabitSource;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          pilier_id: number;
+          titre: string;
+          source?: HabitSource;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          pilier_id?: number;
+          titre?: string;
+          source?: HabitSource;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      habit_logs: {
+        Row: {
+          id: string;
+          habit_id: string;
+          user_id: string;
+          log_date: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          habit_id: string;
+          user_id: string;
+          log_date: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          habit_id?: string;
+          user_id?: string;
+          log_date?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       messages: {
         Row: {
           id: string;
@@ -477,3 +536,5 @@ export type Message = Tables<"messages">;
 export type CarnetEntry = Tables<"carnet_entries">;
 export type ClientSong = Tables<"client_songs">;
 export type ProgramOffer = Tables<"program_offers">;
+export type Habit = Tables<"habits">;
+export type HabitLog = Tables<"habit_logs">;

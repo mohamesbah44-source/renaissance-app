@@ -193,6 +193,12 @@ export function RadarResults({
         {topPriorities.map((priority, i) => (
           <RadarPriorityCard key={priority.pilierId} rank={i + 1} priority={priority} />
         ))}
+        <Link
+          href="/habitudes"
+          className="mt-1 self-center text-xs uppercase tracking-[0.25em] text-rr-or transition-all duration-300 hover:text-rr-or-clair"
+        >
+          Ancrer ces piliers dans mes habitudes →
+        </Link>
       </section>
 
       {/* 10. Scores détaillés par pilier */}

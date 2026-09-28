@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ClientSettingsForm } from "@/components/features/admin/ClientSettingsForm";
 import { ClientProgressPanel } from "@/components/features/admin/ClientProgressPanel";
 import { ClientRadarPanel } from "@/components/features/admin/ClientRadarPanel";
+import { AdminHabitsPanel } from "@/components/features/admin/AdminHabitsPanel";
 import { AdminJournalEntryCard } from "@/components/features/admin/AdminJournalEntryCard";
 import { AdminCarnetEntryCard } from "@/components/features/admin/AdminCarnetEntryCard";
 import { CarnetEntryForm } from "@/components/features/admin/CarnetEntryForm";
@@ -45,6 +46,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
     { data: songs },
     { data: appointments },
     { data: messages },
+    { data: habits },
   ] = await Promise.all([
     supabase.from("weeks").select("*").order("week_number", { ascending: true }),
     supabase.from("user_progress").select("*").eq("user_id", id),
@@ -58,6 +60,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       .select("*")
       .or(`and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id})`)
       .order("created_at", { ascending: true }),
+    supabase.from("habits").select("*").eq("user_id", id).order("created_at", { ascending: false }),
   ]);
 
   const progressByWeekId = new Map((progressRows ?? []).map((progress) => [progress.week_id, progress]));
@@ -91,6 +94,13 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {weeks && <ClientProgressPanel weeks={weeks} progressByWeekId={progressByWeekId} />}
 
       <ClientRadarPanel bilans={radarRows ?? []} />
+
+      <div>
+        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Habitudes</p>
+        <div className="mt-4">
+          <AdminHabitsPanel clientId={id} habits={habits ?? []} />
+        </div>
+      </div>
 
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Journal</p>

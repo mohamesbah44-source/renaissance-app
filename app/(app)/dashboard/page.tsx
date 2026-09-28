@@ -8,6 +8,8 @@ import { NextAppointmentCard } from "@/components/features/dashboard/NextAppoint
 import { WeeklyActionsList } from "@/components/features/dashboard/WeeklyActionsList";
 import { ContinueButton } from "@/components/features/dashboard/ContinueButton";
 import { OfferCard } from "@/components/features/dashboard/OfferCard";
+import { HabitsLinkCard } from "@/components/features/dashboard/HabitsLinkCard";
+import { todayISODate } from "@/lib/habits/streak";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -22,7 +24,9 @@ export default async function DashboardPage() {
   const profile = await getProfile(supabase, user.id);
   const currentWeekNumber = profile?.current_week ?? 1;
 
-  const [{ data: currentWeek }, { data: progressRows }, { data: journalEntries }, { data: appointments }, { data: offer }] =
+  const today = todayISODate();
+
+  const [{ data: currentWeek }, { data: progressRows }, { data: journalEntries }, { data: appointments }, { data: offer }, { data: activeHabits }, { data: todayLogs }] =
     await Promise.all([
       supabase.from("weeks").select("*").eq("week_number", currentWeekNumber).single(),
       supabase.from("user_progress").select("*").eq("user_id", user.id),
@@ -47,6 +51,8 @@ export default async function DashboardPage() {
         .order("updated_at", { ascending: false })
         .limit(1)
         .maybeSingle(),
+      supabase.from("habits").select("id").eq("user_id", user.id).eq("is_active", true),
+      supabase.from("habit_logs").select("habit_id").eq("user_id", user.id).eq("log_date", today),
     ]);
 
   const completedCount = progressRows?.filter((p) => p.status === "completed").length ?? 0;
@@ -71,6 +77,8 @@ export default async function DashboardPage() {
       {currentWeek && <WeeklyActionsList week={currentWeek} progress={currentProgress} />}
 
       {currentWeek && <ContinueButton weekId={currentWeek.id} status={currentProgress?.status} />}
+
+      <HabitsLinkCard activeCount={activeHabits?.length ?? 0} doneTodayCount={todayLogs?.length ?? 0} />
 
       {offer && <OfferCard offer={offer} />}
     </div>
