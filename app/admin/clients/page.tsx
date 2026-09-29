@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ProgressBar } from "@/components/ui/ProgressBar";
+import { InviteClientForm } from "@/components/features/admin/InviteClientForm";
 
 export default async function AdminClientsPage() {
   const supabase = await createClient();
@@ -22,6 +23,8 @@ export default async function AdminClientsPage() {
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Admin</p>
         <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Participant·e·s</h1>
       </header>
+
+      <InviteClientForm />
 
       <div className="flex flex-col gap-3">
         {(clients ?? []).map((client) => {

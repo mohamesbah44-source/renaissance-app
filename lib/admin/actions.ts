@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getURL } from "@/lib/utils";
 import type {
   AppointmentStatus,
   JournalingPrompt,
@@ -15,6 +17,53 @@ export type AdminFormState = { success?: boolean; error?: string } | undefined;
 const RESOURCE_TYPES: ResourceType[] = ["breathwork", "meditation", "visualization", "pdf", "exercise", "replay"];
 const APPOINTMENT_STATUSES: AppointmentStatus[] = ["upcoming", "completed", "cancelled"];
 const SESSION_TYPES: SessionType[] = ["breathwork", "courte", "theme_natal", "autre"];
+
+/**
+ * Crée la fiche d'un nouveau membre et lui envoie une invitation par email
+ * pour qu'il choisisse lui-même son mot de passe (le profil "client" est
+ * créé automatiquement par le trigger `handle_new_user`).
+ */
+export async function inviteClient(_prevState: AdminFormState, formData: FormData): Promise<AdminFormState> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Session expirée. Reconnecte-toi." };
+  }
+
+  const { data: caller } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  if (caller?.role !== "admin") {
+    return { error: "Action réservée à l'accompagnant·e." };
+  }
+
+  const email = String(formData.get("email") ?? "").trim();
+  const firstName = String(formData.get("firstName") ?? "").trim();
+  const lastName = String(formData.get("lastName") ?? "").trim();
+
+  if (!email || !firstName) {
+    return { error: "Email et prénom sont requis." };
+  }
+
+  const supabaseAdmin = createAdminClient();
+  const { error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
+    data: { first_name: firstName, last_name: lastName || null },
+    redirectTo: `${getURL()}/auth/confirm?next=/reset-password`,
+  });
+
+  if (error) {
+    return {
+      error: error.message.toLowerCase().includes("already")
+        ? "Un compte existe déjà avec cet email."
+        : "Impossible d'envoyer l'invitation. Réessaie dans un instant.",
+    };
+  }
+
+  revalidatePath("/admin/clients");
+
+  return { success: true };
+}
 
 /** Met à jour la semaine courante et la date de démarrage d'un·e participant·e. */
 export async function updateClientSettings(_prevState: AdminFormState, formData: FormData): Promise<AdminFormState> {

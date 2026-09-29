@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { ClientSettingsForm } from "@/components/features/admin/ClientSettingsForm";
 import { ClientProgressPanel } from "@/components/features/admin/ClientProgressPanel";
 import { ClientRadarPanel } from "@/components/features/admin/ClientRadarPanel";
+import { ClientOverviewBanner } from "@/components/features/admin/ClientOverviewBanner";
+import { ImportAnalyzerButton } from "@/components/features/admin/ImportAnalyzerButton";
 import { AdminHabitsPanel } from "@/components/features/admin/AdminHabitsPanel";
 import { AdminJournalEntryCard } from "@/components/features/admin/AdminJournalEntryCard";
 import { AdminCarnetEntryCard } from "@/components/features/admin/AdminCarnetEntryCard";
@@ -19,6 +21,7 @@ import { MessageThread } from "@/components/features/messages/MessageThread";
 import { MessageComposer } from "@/components/features/messages/MessageComposer";
 import { MarkMessagesRead } from "@/components/features/messages/MarkMessagesRead";
 import { formatDate } from "@/lib/utils";
+import { todayISODate } from "@/lib/habits/streak";
 
 export default async function AdminClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -47,6 +50,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
     { data: appointments },
     { data: messages },
     { data: habits },
+    { data: todayLogs },
   ] = await Promise.all([
     supabase.from("weeks").select("*").order("week_number", { ascending: true }),
     supabase.from("user_progress").select("*").eq("user_id", id),
@@ -61,6 +65,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       .or(`and(sender_id.eq.${user.id},recipient_id.eq.${id}),and(sender_id.eq.${id},recipient_id.eq.${user.id})`)
       .order("created_at", { ascending: true }),
     supabase.from("habits").select("*").eq("user_id", id).order("created_at", { ascending: false }),
+    supabase.from("habit_logs").select("habit_id").eq("user_id", id).eq("log_date", todayISODate()),
   ]);
 
   const progressByWeekId = new Map((progressRows ?? []).map((progress) => [progress.week_id, progress]));
@@ -69,6 +74,8 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
   );
 
   const fullName = [client.first_name, client.last_name].filter(Boolean).join(" ") || "Sans nom";
+  const currentWeekEntity = (weeks ?? []).find((week) => week.week_number === client.current_week);
+  const activeHabits = (habits ?? []).filter((h) => h.is_active);
 
   return (
     <div className="flex flex-col gap-8 pb-12">
@@ -84,6 +91,14 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         </div>
       </header>
 
+      <ClientOverviewBanner
+        currentWeek={client.current_week}
+        weekTitle={currentWeekEntity?.title ?? null}
+        latestBilan={radarRows?.[0] ?? null}
+        activeHabitsCount={activeHabits.length}
+        doneTodayCount={todayLogs?.length ?? 0}
+      />
+
       <GlassCard className="p-6">
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Réglages du parcours</p>
         <div className="mt-4">
@@ -94,6 +109,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {weeks && <ClientProgressPanel weeks={weeks} progressByWeekId={progressByWeekId} />}
 
       <ClientRadarPanel bilans={radarRows ?? []} />
+      <ImportAnalyzerButton clientId={id} />
 
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Habitudes</p>

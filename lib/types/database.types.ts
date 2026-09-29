@@ -31,6 +31,8 @@ export type AppointmentStatus = "upcoming" | "completed" | "cancelled";
 
 export type HabitSource = "auto" | "manuel";
 
+export type RadarBilanSource = "questionnaire" | "analyzer";
+
 /**
  * Type de séance de l'accompagnement 8 semaines : 2 breathwork (1h30/mois) +
  * 6 courtes (30 min/mois : méditation, visualisation ou EFT) + le rendez-vous
@@ -220,6 +222,8 @@ export type Database = {
           raw_answers: Json;
           pillar_scores: Json;
           top_priorities: Json;
+          source: RadarBilanSource;
+          analyzer_session_id: string | null;
         };
         Insert: {
           id?: string;
@@ -237,6 +241,8 @@ export type Database = {
           raw_answers: Json;
           pillar_scores: Json;
           top_priorities: Json;
+          source?: RadarBilanSource;
+          analyzer_session_id?: string | null;
         };
         Update: {
           id?: string;
@@ -254,6 +260,8 @@ export type Database = {
           raw_answers?: Json;
           pillar_scores?: Json;
           top_priorities?: Json;
+          source?: RadarBilanSource;
+          analyzer_session_id?: string | null;
         };
         Relationships: [];
       };
