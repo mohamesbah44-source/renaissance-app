@@ -5,7 +5,6 @@ import { ProgressOverview } from "@/components/features/dashboard/ProgressOvervi
 import { CurrentStateCard } from "@/components/features/dashboard/CurrentStateCard";
 import { RadarLinkCard } from "@/components/features/dashboard/RadarLinkCard";
 import { NextAppointmentCard } from "@/components/features/dashboard/NextAppointmentCard";
-import { WeeklyActionsList } from "@/components/features/dashboard/WeeklyActionsList";
 import { ContinueButton } from "@/components/features/dashboard/ContinueButton";
 import { OfferCard } from "@/components/features/dashboard/OfferCard";
 import { HabitsLinkCard } from "@/components/features/dashboard/HabitsLinkCard";
@@ -68,19 +67,19 @@ export default async function DashboardPage() {
         completedCount={completedCount}
       />
 
-      <CurrentStateCard entry={journalEntries?.[0] ?? null} />
-
-      <RadarLinkCard />
-
-      <NextAppointmentCard appointment={appointments?.[0] ?? null} />
-
-      {currentWeek && <WeeklyActionsList week={currentWeek} progress={currentProgress} />}
-
       {currentWeek && <ContinueButton weekId={currentWeek.id} status={currentProgress?.status} />}
 
-      <HabitsLinkCard activeCount={activeHabits?.length ?? 0} doneTodayCount={todayLogs?.length ?? 0} />
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        <NextAppointmentCard appointment={appointments?.[0] ?? null} />
+        <HabitsLinkCard activeCount={activeHabits?.length ?? 0} doneTodayCount={todayLogs?.length ?? 0} />
+      </div>
 
-      {offer && <OfferCard offer={offer} />}
+      <section className="mt-12">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Pour aller plus loin</p>
+        <CurrentStateCard entry={journalEntries?.[0] ?? null} />
+        <RadarLinkCard />
+        {offer && <OfferCard offer={offer} />}
+      </section>
     </div>
   );
 }
