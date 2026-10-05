@@ -17,7 +17,7 @@ export function ContinueButton({ weekId, status }: ContinueButtonProps) {
         : "Commencer ma semaine";
 
   return (
-    <Link href={`/parcours/semaine/${weekId}`} className={cn(buttonVariants({ size: "lg" }), "mt-7 w-full")}>
+    <Link href={`/parcours/semaine/${weekId}`} className={cn(buttonVariants({ size: "lg" }), "mt-4 w-full")}>
       {label}
     </Link>
   );
