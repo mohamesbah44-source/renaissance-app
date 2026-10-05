@@ -1,38 +1,28 @@
 import Link from "next/link";
+import { CalendarDays } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { formatDateTime } from "@/lib/utils";
 import type { Appointment } from "@/lib/types/database.types";
 
 export function NextAppointmentCard({ appointment }: { appointment: Appointment | null }) {
   return (
-    <GlassCard className="mt-5 p-7">
-      <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Prochain rendez-vous</p>
-
-      {appointment ? (
-        <div className="mt-4">
-          <p className="font-rr-display text-lg text-rr-ivoire">{formatDateTime(appointment.scheduled_at)}</p>
-          {appointment.title && <p className="mt-1 text-sm text-rr-gris-clair">{appointment.title}</p>}
-          {appointment.meeting_url && (
-            <a
-              href={appointment.meeting_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-block text-sm text-rr-or-clair transition-all duration-300 hover:text-rr-ivoire"
-            >
-              Rejoindre la visio
-            </a>
-          )}
-        </div>
-      ) : (
-        <p className="mt-4 text-sm text-rr-gris-clair">Aucun rendez-vous prévu pour le moment.</p>
-      )}
-
-      <Link
-        href="/calendrier"
-        className="mt-5 inline-block text-sm text-rr-or-clair transition-all duration-300 hover:text-rr-ivoire"
-      >
-        Voir le calendrier
-      </Link>
-    </GlassCard>
+    <Link href="/calendrier" className="group block h-full">
+      <GlassCard className="flex h-full flex-col p-5 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-rr-or/30">
+        <CalendarDays className="h-5 w-5 text-rr-or" strokeWidth={1.75} />
+        <p className="mt-4 text-[11px] uppercase tracking-[0.2em] text-rr-gris">Rendez-vous</p>
+        {appointment ? (
+          <>
+            <p className="mt-1.5 font-rr-display text-base leading-snug text-rr-ivoire">
+              {formatDateTime(appointment.scheduled_at)}
+            </p>
+            {appointment.title && (
+              <p className="mt-1 line-clamp-1 text-xs text-rr-gris-clair">{appointment.title}</p>
+            )}
+          </>
+        ) : (
+          <p className="mt-1.5 text-sm text-rr-gris-clair">Aucun prévu</p>
+        )}
+      </GlassCard>
+    </Link>
   );
 }
