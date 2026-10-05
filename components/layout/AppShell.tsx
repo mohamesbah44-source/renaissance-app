@@ -7,7 +7,7 @@ import { signOut } from "@/lib/auth/actions";
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center justify-between px-6 py-6">
+      <header className="flex items-center justify-between px-5 py-4">
         <Link href="/dashboard" className="group flex items-center gap-3">
           <Image
             src="/logo-icon.png"
@@ -18,11 +18,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             priority
           />
           <span className="font-rr-display text-[13px] uppercase tracking-[0.14em] text-rr-ivoire">
-            Le Programme <span className="text-rr-or">Re-Naissance</span>
+            <span className="hidden sm:inline">Le Programme </span>
+            <span className="text-rr-or">Re-Naissance</span>
             <sup className="ml-0.5 text-[8px]">™</sup>
           </span>
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Link
             href="/sos"
             aria-label="Protocole SOS Re-Naissance™"
@@ -49,7 +50,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 px-6 pb-32 pt-2">{children}</main>
+      <main className="flex-1 px-5 pb-36 pt-2">{children}</main>
 
       <BottomNav />
     </div>
