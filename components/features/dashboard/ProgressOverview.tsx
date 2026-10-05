@@ -1,5 +1,4 @@
 import { GlassCard } from "@/components/ui/GlassCard";
-import { ProgressBar } from "@/components/ui/ProgressBar";
 
 interface ProgressOverviewProps {
   currentWeek: number;
@@ -9,15 +8,35 @@ interface ProgressOverviewProps {
 
 export function ProgressOverview({ currentWeek, weekTitle, completedCount }: ProgressOverviewProps) {
   return (
-    <GlassCard className="mt-7 p-7">
-      <div className="flex items-baseline justify-between">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Semaine {currentWeek} / 8</p>
-        <p className="text-xs text-rr-gris">{completedCount}/8 terminées</p>
+    <GlassCard className="mt-8 p-6">
+      <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Semaine {currentWeek} sur 8</p>
+
+      {weekTitle && (
+        <h2 className="mt-3 font-rr-display text-2xl leading-snug text-rr-ivoire">{weekTitle}</h2>
+      )}
+
+      <div
+        className="mt-6 flex gap-1.5"
+        role="img"
+        aria-label={`${completedCount} semaines terminées sur 8`}
+      >
+        {Array.from({ length: 8 }, (_, i) => {
+          const done = i < completedCount;
+          const current = i === currentWeek - 1;
+          return (
+            <span
+              key={i}
+              className={
+                done
+                  ? "h-1 flex-1 rounded-full bg-rr-or"
+                  : current
+                    ? "h-1 flex-1 rounded-full bg-rr-or/45"
+                    : "h-1 flex-1 rounded-full bg-white/10"
+              }
+            />
+          );
+        })}
       </div>
-
-      {weekTitle && <h2 className="mt-3 font-rr-display text-xl text-rr-ivoire">{weekTitle}</h2>}
-
-      <ProgressBar value={(completedCount / 8) * 100} className="mt-6" />
     </GlassCard>
   );
 }
