@@ -17,7 +17,7 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-rr-or/[0.12] bg-rr-noir/85 backdrop-blur-xl">
+    <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-rr-or/[0.12] bg-rr-noir/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
       <ul className="mx-auto flex max-w-2xl items-stretch justify-between px-2 py-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || pathname.startsWith(`${href}/`);
@@ -26,16 +26,17 @@ export function BottomNav() {
             <li key={href} className="flex-1">
               <Link
                 href={href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "group flex flex-col items-center gap-1.5 px-2 py-2.5 text-[11px] tracking-[0.02em] transition-colors duration-300",
-                  isActive ? "text-rr-ivoire" : "text-rr-gris hover:text-rr-gris-clair"
+                  isActive ? "text-rr-or" : "text-rr-gris hover:text-rr-gris-clair"
                 )}
               >
                 <span
                   className={cn(
                     "flex h-9 w-9 items-center justify-center rounded-full transition-all duration-300",
                     isActive
-                      ? "bg-rr-or/[0.14] shadow-[inset_0_0_0_1px_rgba(201,169,110,0.3)]"
+                      ? "bg-rr-or/[0.16] shadow-[inset_0_0_0_1px_rgba(201,169,110,0.35),0_0_18px_-4px_rgba(201,169,110,0.5)]"
                       : "group-hover:bg-white/[0.05]"
                   )}
                 >
