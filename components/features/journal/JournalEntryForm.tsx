@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { Field } from "@/components/ui/Field";
+import { ChevronDown } from "lucide-react";
+import { Field } from "@/components/ui/Field";f
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { Textarea } from "@/components/ui/Textarea";
@@ -32,11 +33,25 @@ export function JournalEntryForm({ entry, weeks, defaultDate, onSaved, onCancel 
     }
   }, [state, entry, onSaved]);
 
+  // Les options facultatives s'ouvrent d'office en modification si elles sont déjà remplies.
+  const hasExtras = Boolean(entry?.title) || Boolean(entry?.week_id);
+
   return (
     <form ref={formRef} action={formAction} className="flex flex-col gap-5">
       {entry && <input type="hidden" name="id" value={entry.id} />}
 
-      <div className="grid grid-cols-2 gap-5">
+      <Field label="Ton texte" htmlFor="content">
+        <Textarea
+          id="content"
+          name="content"
+          defaultValue={entry?.content ?? ""}
+          rows={7}
+          placeholder="Écris ce qui traverse ton esprit, sans filtre…"
+          required
+        />
+      </Field>
+
+      <div className="grid grid-cols-2 gap-4">
         <Field label="Date" htmlFor="entryDate">
           <Input
             id="entryDate"
@@ -50,11 +65,11 @@ export function JournalEntryForm({ entry, weeks, defaultDate, onSaved, onCancel 
 
         <Field label="Humeur" htmlFor="mood">
           <Select id="mood" name="mood" defaultValue={entry?.mood ?? ""}>
-            <option value="" className="bg-night-900">
-              Choisir...
+            <option value="" className="bg-rr-encre">
+              Choisir…
             </option>
             {MOOD_OPTIONS.map((mood) => (
-              <option key={mood} value={mood} className="bg-night-900">
+              <option key={mood} value={mood} className="bg-rr-encre">
                 {mood}
               </option>
             ))}
@@ -62,46 +77,49 @@ export function JournalEntryForm({ entry, weeks, defaultDate, onSaved, onCancel 
         </Field>
       </div>
 
-      <Field label="Titre (facultatif)" htmlFor="title">
-        <Input
-          id="title"
-          name="title"
-          type="text"
-          defaultValue={entry?.title ?? ""}
-          placeholder="Un mot pour résumer..."
-        />
-      </Field>
+      <details className="group" open={hasExtras}>
+        <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-rr-or-clair transition-colors duration-300 hover:text-rr-ivoire [&::-webkit-details-marker]:hidden">
+          <ChevronDown
+            className="h-4 w-4 transition-transform duration-300 group-open:rotate-180"
+            strokeWidth={1.75}
+          />
+          Ajouter un titre ou une semaine
+        </summary>
 
-      {weeks.length > 0 && (
-        <Field label="Semaine associée (facultatif)" htmlFor="weekId">
-          <Select id="weekId" name="weekId" defaultValue={entry?.week_id ?? ""}>
-            <option value="" className="bg-night-900">
-              Aucune
-            </option>
-            {weeks.map((week) => (
-              <option key={week.id} value={week.id} className="bg-night-900">
-                Semaine {week.week_number} — {week.title}
-              </option>
-            ))}
-          </Select>
-        </Field>
-      )}
+        <div className="mt-5 flex flex-col gap-5">
+          <Field label="Titre (facultatif)" htmlFor="title">
+            <Input
+              id="title"
+              name="title"
+              type="text"
+              defaultValue={entry?.title ?? ""}
+              placeholder="Un mot pour résumer…"
+            />
+          </Field>
 
-      <Field label="Ton texte" htmlFor="content">
-        <Textarea
-          id="content"
-          name="content"
-          defaultValue={entry?.content ?? ""}
-          rows={6}
-          placeholder="Écris ce qui traverse ton esprit, sans filtre..."
-          required
-        />
-      </Field>
+          {weeks.length > 0 && (
+            <Field label="Semaine associée (facultatif)" htmlFor="weekId">
+              <Select id="weekId" name="weekId" defaultValue={entry?.week_id ?? ""}>
+                <option value="" className="bg-rr-encre">
+                  Aucune
+                </option>
+                {weeks.map((week) => (
+                  <option key={week.id} value={week.id} className="bg-rr-encre">
+                    Semaine {week.week_number} — {week.title}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          )}
+        </div>
+      </details>
 
       {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
-      {state?.success && !entry && <p className="text-sm text-rr-or-clair">Ton entrée a été enregistrée.</p>}
+      {state?.success && !entry && !onSaved && (
+        <p className="text-sm text-rr-or-clair">Ton entrée a été enregistrée.</p>
+      )}
 
-      <div className="flex gap-4">
+      <div className="flex gap-3">
         <SubmitButton className="flex-1">{entry ? "Mettre à jour" : "Ajouter au journal"}</SubmitButton>
         {onCancel && (
           <Button type="button" variant="outline" onClick={onCancel} className="flex-1">
