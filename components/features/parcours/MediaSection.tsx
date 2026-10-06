@@ -25,11 +25,11 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
   }
 
   return (
-    <div className="mt-7 flex flex-col gap-5">
+    <div className="mt-8 flex flex-col gap-4">
       {week.video_url && (
         <GlassCard className="overflow-hidden p-0">
           {isVideoFile(week.video_url) ? (
-            <video controls className="aspect-video w-full">
+            <video controls playsInline className="aspect-video w-full">
               <source src={week.video_url} />
             </video>
           ) : (
@@ -44,29 +44,29 @@ export function MediaSection({ week, pdfs }: MediaSectionProps) {
       )}
 
       {audios.length > 0 && (
-        <GlassCard className="flex flex-col gap-5 p-7">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Pratiques audio</p>
+        <GlassCard className="flex flex-col gap-5 p-6">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Pratiques audio</p>
           {audios.map((audio) => (
             <div key={audio.label}>
-              <p className="mb-2 text-sm text-white/70">{audio.label}</p>
-              <audio controls src={audio.url} className="w-full" />
+              <p className="mb-2 font-rr-display text-base text-rr-ivoire">{audio.label}</p>
+              <audio controls src={audio.url} className="w-full [color-scheme:dark]" />
             </div>
           ))}
         </GlassCard>
       )}
 
       {pdfs.length > 0 && (
-        <GlassCard className="flex flex-col gap-3 p-7">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Documents</p>
+        <GlassCard className="flex flex-col gap-3 p-6">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Documents</p>
           {pdfs.map((pdf) => (
             <a
               key={pdf.url}
               href={pdf.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 rounded-xl -mx-2 px-2 py-1.5 text-sm text-white/70 transition-all duration-300 hover:bg-white/[0.05] hover:text-white"
+              className="group -mx-2 flex items-center gap-3 rounded-xl px-2 py-2 text-sm text-rr-ivoire/90 transition-all duration-300 hover:bg-white/[0.05]"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-rr-or/[0.1] transition-all duration-300 group-hover:bg-rr-or/[0.18]">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rr-or/[0.12] transition-all duration-300 group-hover:bg-rr-or/[0.2]">
                 <FileText className="h-4 w-4 text-rr-or-clair" />
               </span>
               {pdf.title}
