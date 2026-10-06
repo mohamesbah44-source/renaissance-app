@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { PenLine, X } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { JournalEntryForm } from "@/components/features/journal/JournalEntryForm";
@@ -33,7 +33,8 @@ export function JournalCarnetTabs({
 }: JournalCarnetTabsProps) {
   const [tab, setTab] = useState<Tab>("journal");
   const [writing, setWriting] = useState(false);
-
+  const handleSaved = useCallback(() => setWriting(false), []);
+  
   return (
     <div>
       <div
@@ -79,7 +80,7 @@ export function JournalCarnetTabs({
                 </button>
               </div>
               <div className="mt-5">
-                <JournalEntryForm weeks={weeks} defaultDate={defaultDate} />
+                <JournalEntryForm weeks={weeks} defaultDate={defaultDate} onSaved={handleSaved} />
               </div>
             </GlassCard>
           ) : (
