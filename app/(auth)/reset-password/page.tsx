@@ -11,9 +11,10 @@ export default function ResetPasswordPage() {
   const [state, formAction] = useActionState(updatePassword, undefined);
 
   return (
-    <GlassCard className="p-8">
-      <h1 className="font-rr-display text-2xl text-rr-ivoire">Nouveau départ.</h1>
-      <p className="mt-2 text-sm text-rr-gris-clair">Choisis ton nouveau mot de passe.</p>
+    <GlassCard className="p-6 sm:p-8">
+      <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Re-Naissance™</p>
+      <h1 className="mt-3 font-rr-display text-3xl leading-tight text-rr-ivoire">Nouveau départ.</h1>
+      <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">Choisis ton nouveau mot de passe.</p>
 
       <form action={formAction} className="mt-8 flex flex-col gap-5">
         <Field label="Nouveau mot de passe" htmlFor="password">
