@@ -36,9 +36,14 @@ export default async function JournalPage() {
         <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
           Pose des mots sur ce que tu traverses, et retrouve les synthèses que ton praticien te partage.
         </p>
-      </header>
-
-      <div className="mt-9">
+           <header className="pt-1">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ton espace</p>
+        <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">Un espace pour toi</h1>
+        <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
+          Pose des mots sur ce que tu traverses, et retrouve les synthèses que ton praticien te partage.
+        </p>
+             
+<div className="mt-10">
         <JournalCarnetTabs
           entries={entries ?? []}
           weeks={weekOptions}
