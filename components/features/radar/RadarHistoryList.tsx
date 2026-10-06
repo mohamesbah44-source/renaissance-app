@@ -47,3 +47,16 @@ export function RadarHistoryList({ bilans }: { bilans: RadarBilan[] }) {
                     </div>
                   </div>
                 </div>
+
+                <ChevronRight
+                  className="h-5 w-5 shrink-0 text-rr-gris transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-rr-or"
+                  strokeWidth={1.75}
+                />
+              </GlassCard>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
