@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
-import { LifeBuoy, LogOut, MessageCircle } from "lucide-react";
+import { LifeBuoy, MessageCircle } from "lucide-react";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { signOut } from "@/lib/auth/actions";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -38,15 +37,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           >
             <MessageCircle className="h-5 w-5" strokeWidth={1.75} />
           </Link>
-          <form action={signOut}>
-            <button
-              type="submit"
-              aria-label="Se déconnecter"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-rr-gris transition-all duration-300 hover:bg-white/[0.06] hover:text-rr-ivoire"
-            >
-              <LogOut className="h-5 w-5" strokeWidth={1.75} />
-            </button>
-          </form>
         </div>
       </header>
 
