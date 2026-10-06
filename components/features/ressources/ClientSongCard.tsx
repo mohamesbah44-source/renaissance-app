@@ -5,17 +5,19 @@ import type { ClientSong } from "@/lib/types/database.types";
 /** Une chanson personnalisée Re-Naissance™, composée pour ce moment du parcours. */
 export function ClientSongCard({ song }: { song: ClientSong }) {
   return (
-    <GlassCard className="p-7">
-      <div className="flex items-center justify-between gap-3">
-        <p className="font-rr-display text-lg text-rr-ivoire">{song.titre}</p>
-        <span className="text-xs text-white/40">{formatDate(song.created_at)}</span>
-      </div>
+    <GlassCard className="border-rr-or/25 p-6">
+      <p className="text-[11px] uppercase tracking-[0.25em] text-rr-or">
+        Pour toi
+        <span className="text-rr-gris"> · {formatDate(song.created_at)}</span>
+      </p>
+
+      <p className="mt-3 font-rr-display text-xl leading-snug text-rr-ivoire">{song.titre}</p>
 
       {song.message && (
-        <p className="mt-2 font-rr-serif text-sm italic leading-relaxed text-rr-creme">{song.message}</p>
+        <p className="mt-3 font-rr-serif text-[15px] italic leading-relaxed text-rr-creme">{song.message}</p>
       )}
 
-      <audio controls src={song.media_url} className="mt-5 w-full" />
+      <audio controls src={song.media_url} className="mt-5 w-full [color-scheme:dark]" />
     </GlassCard>
   );
 }
