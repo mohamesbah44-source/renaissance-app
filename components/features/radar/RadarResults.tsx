@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ChevronDown } from "lucide-react";
+import { GlassCard } from "@/components/ui/GlassCard";
 import { RadarChart, type RadarChartSeries } from "@/components/ui/RadarChart";
 import { RadarPillarScore } from "@/components/features/radar/RadarPillarScore";
 import { RadarPriorityCard } from "@/components/features/radar/RadarPriorityCard";
@@ -23,6 +25,8 @@ const CERCLE_COLOR: Record<CercleId, string> = {
 };
 
 const PREVIOUS_COLOR = "#ede6d6";
+
+const SUB_CARD = "rounded-2xl border border-white/[0.08] bg-white/[0.03]";
 
 export function RadarResults({
   bilan,
@@ -63,25 +67,35 @@ export function RadarResults({
   const fenetreDelta = previousFenetrePct !== null ? fenetrePct - previousFenetrePct : null;
 
   return (
-    <div className="flex flex-col gap-10 pb-12 pt-2">
-      {/* 1. Fenêtre de Transformation */}
-      <section className="text-center">
-        <p className="text-xs uppercase tracking-[0.35em] text-rr-or">Fenêtre de Transformation</p>
-        <p className="mt-3 font-rr-display text-5xl text-rr-ivoire">{fenetrePct}%</p>
-        <p className="mt-2 font-rr-serif text-lg italic text-rr-or-clair">{interpretation}</p>
-      </section>
+    <div className="mx-auto flex max-w-2xl flex-col gap-10 pb-12 pt-1">
+      {/* Fenêtre de Transformation + état dominant */}
+      <GlassCard className="p-8 text-center">
+        <p className="text-[11px] uppercase tracking-[0.35em] text-rr-or">Fenêtre de Transformation</p>
+        <p className="mt-4 font-rr-display text-6xl leading-none text-rr-ivoire">
+          {fenetrePct}
+          <span className="text-3xl text-rr-or">%</span>
+        </p>
+        <p className="mt-3 font-rr-serif text-lg italic text-rr-or-clair">{interpretation}</p>
 
-      {/* 2. État dominant */}
-      <section className="rounded-2xl border border-rr-or/15 bg-rr-encre p-6 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">État dominant</p>
-        <p className="mt-3 font-rr-display text-3xl uppercase tracking-[0.1em] text-rr-ivoire">
+        <div className="mx-auto mt-7 h-px w-16 bg-rr-or/30" />
+
+        <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-rr-gris">État dominant</p>
+        <p className="mt-2 font-rr-display text-2xl text-rr-ivoire">
           {etat.lune} {etat.label}
+        </p>
+      </GlassCard>
+
+      {/* Message personnalisé */}
+      <section>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Pour toi</p>
+        <p className="mt-4 font-rr-serif text-lg italic leading-relaxed text-rr-creme">
+          {ETAT_MESSAGES[bilan.etat]}
         </p>
       </section>
 
-      {/* 3. Radar visuel — 12 piliers */}
+      {/* Radar visuel — 12 piliers */}
       <section>
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Ton radar</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ton radar</p>
         <div className="mt-4">
           <RadarChart axes={axes} series={series} pointColors={pointColors} />
         </div>
@@ -100,15 +114,15 @@ export function RadarResults({
         </div>
       </section>
 
-      {/* 4. Scores par cercle */}
+      {/* Scores par cercle */}
       <section>
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Tes 3 cercles</p>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Tes 3 cercles</p>
+        <div className="mt-4 grid grid-cols-3 gap-3">
           {CERCLES.map((c) => {
             const pct = Math.round((cercleScores[c.id] ?? 0) * 100);
             return (
-              <div key={c.id} className="rounded-xl border border-rr-or/10 bg-rr-encre p-4 text-center">
-                <p className="font-rr-display text-sm uppercase tracking-[0.15em] text-rr-ivoire">{c.nom}</p>
+              <div key={c.id} className={`${SUB_CARD} p-4 text-center`}>
+                <p className="font-rr-display text-sm uppercase tracking-[0.12em] text-rr-ivoire">{c.nom}</p>
                 <p className="mt-2 font-rr-display text-2xl" style={{ color: CERCLE_COLOR[c.id] }}>
                   {pct}%
                 </p>
@@ -118,61 +132,16 @@ export function RadarResults({
         </div>
       </section>
 
-      {/* 5. Capacités transversales */}
+      {/* Évolution */}
       <section>
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Tes 5 capacités</p>
-        <div className="mt-4 flex flex-col gap-3">
-          {CAPACITES.map((cap) => {
-            const pct = Math.round((capaciteScores[cap.id as CapaciteId] ?? 0) * 100);
-            return (
-              <div key={cap.id} className="flex items-center gap-4">
-                <p className="w-32 shrink-0 text-xs uppercase tracking-[0.15em] text-rr-creme">{cap.nom}</p>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-rr-encre2">
-                  <div className="h-full rounded-full bg-rr-vert" style={{ width: `${pct}%` }} />
-                </div>
-                <p className="w-10 shrink-0 text-right font-rr-display text-sm text-rr-or-clair">{pct}%</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 6. Méta-indicateurs */}
-      <section>
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Méta-indicateurs</p>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {(Object.keys(META_LABELS) as (keyof typeof META_LABELS)[]).map((key) => {
-            const raw = metaIndicateurs[key] ?? 0;
-            const pct = Math.round(raw * 100);
-            const label = META_LABELS[key];
-            return (
-              <div key={key} className="rounded-xl border border-rr-or/10 bg-rr-encre p-4">
-                <div className="flex items-center justify-between">
-                  <p className="font-rr-display text-sm uppercase tracking-[0.1em] text-rr-ivoire">{label.nom}</p>
-                  <p className="font-rr-display text-lg text-rr-or-clair">
-                    {key === "ecartIncarnation" && raw >= 0 ? "+" : ""}
-                    {pct}%
-                  </p>
-                </div>
-                <p className="mt-2 font-rr-serif text-sm italic leading-relaxed text-rr-creme">
-                  {raw >= 0.5 ? label.haut : label.bas}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* 7. Évolution temporelle / comparaison */}
-      <section className="rounded-2xl border border-rr-or/15 bg-rr-encre p-5">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Évolution</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Évolution</p>
         {previousBilan ? (
-          <div className="mt-3 text-sm leading-relaxed text-rr-creme">
+          <div className={`${SUB_CARD} mt-4 p-5 text-sm leading-relaxed text-rr-creme`}>
             <p>
               Bilan précédent du {formatDate(previousBilan.created_at)} : {EVOLUTION_STATES[previousBilan.etat].lune}{" "}
               {EVOLUTION_STATES[previousBilan.etat].label}
             </p>
-            <p className="mt-1">
+            <p className="mt-2">
               Fenêtre de Transformation : {previousFenetrePct}% → {fenetrePct}%{" "}
               <span className="text-rr-or-clair">
                 ({fenetreDelta !== null && fenetreDelta >= 0 ? "+" : ""}
@@ -181,47 +150,99 @@ export function RadarResults({
             </p>
           </div>
         ) : (
-          <p className="mt-3 text-sm text-rr-gris-clair">
+          <p className="mt-4 font-rr-serif text-base italic leading-relaxed text-rr-gris-clair">
             Premier bilan enregistré. Refais un bilan plus tard pour suivre ton évolution.
           </p>
         )}
       </section>
 
-      {/* 8 & 9. Top 3 zones prioritaires + micro-protocoles */}
+      {/* Top 3 zones prioritaires + micro-protocoles */}
       <section className="flex flex-col gap-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Tes 3 zones prioritaires</p>
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Tes 3 zones prioritaires</p>
         {topPriorities.map((priority, i) => (
           <RadarPriorityCard key={priority.pilierId} rank={i + 1} priority={priority} />
         ))}
         <Link
           href="/habitudes"
-          className="mt-1 self-center text-xs uppercase tracking-[0.25em] text-rr-or transition-all duration-300 hover:text-rr-or-clair"
+          className="mt-1 flex h-12 items-center justify-center rounded-full border border-rr-or/30 text-xs uppercase tracking-[0.2em] text-rr-or-clair transition-all duration-300 hover:bg-white/[0.05]"
         >
-          Ancrer ces piliers dans mes habitudes →
+          Ancrer ces piliers dans mes habitudes
         </Link>
       </section>
 
-      {/* 10. Scores détaillés par pilier */}
-      <section>
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Tes 12 scores détaillés</p>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {PILIERS.map((pilier) => {
-            const score = pillarScores.find((s) => s.pilierId === pilier.id);
-            if (!score) return null;
-            return <RadarPillarScore key={pilier.id} pilier={pilier} score={score} />;
-          })}
+      {/* Analyse détaillée (repliée) */}
+      <details className="group">
+        <summary className="flex cursor-pointer list-none items-center justify-between py-2 [&::-webkit-details-marker]:hidden">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Analyse détaillée</span>
+          <ChevronDown
+            className="h-4 w-4 text-rr-gris transition-transform duration-300 group-open:rotate-180"
+            strokeWidth={1.75}
+          />
+        </summary>
+
+        <div className="mt-6 flex flex-col gap-10">
+          {/* Capacités transversales */}
+          <section>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Tes 5 capacités</p>
+            <div className="mt-4 flex flex-col gap-4">
+              {CAPACITES.map((cap) => {
+                const pct = Math.round((capaciteScores[cap.id as CapaciteId] ?? 0) * 100);
+                return (
+                  <div key={cap.id} className="flex items-center gap-4">
+                    <p className="w-28 shrink-0 text-[11px] uppercase leading-tight tracking-[0.12em] text-rr-creme">
+                      {cap.nom}
+                    </p>
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full rounded-full bg-rr-vert" style={{ width: `${pct}%` }} />
+                    </div>
+                    <p className="w-10 shrink-0 text-right font-rr-display text-sm text-rr-or-clair">{pct}%</p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Méta-indicateurs */}
+          <section>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Méta-indicateurs</p>
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {(Object.keys(META_LABELS) as (keyof typeof META_LABELS)[]).map((key) => {
+                const raw = metaIndicateurs[key] ?? 0;
+                const pct = Math.round(raw * 100);
+                const label = META_LABELS[key];
+                return (
+                  <div key={key} className={`${SUB_CARD} p-4`}>
+                    <div className="flex items-center justify-between">
+                      <p className="font-rr-display text-sm uppercase tracking-[0.1em] text-rr-ivoire">{label.nom}</p>
+                      <p className="font-rr-display text-lg text-rr-or-clair">
+                        {key === "ecartIncarnation" && raw >= 0 ? "+" : ""}
+                        {pct}%
+                      </p>
+                    </div>
+                    <p className="mt-2 font-rr-serif text-sm italic leading-relaxed text-rr-creme">
+                      {raw >= 0.5 ? label.haut : label.bas}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Scores détaillés par pilier */}
+          <section>
+            <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Tes 12 scores détaillés</p>
+            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {PILIERS.map((pilier) => {
+                const score = pillarScores.find((s) => s.pilierId === pilier.id);
+                if (!score) return null;
+                return <RadarPillarScore key={pilier.id} pilier={pilier} score={score} />;
+              })}
+            </div>
+          </section>
         </div>
-      </section>
+      </details>
 
-      {/* 11. Message final personnalisé */}
-      <section className="rounded-2xl border border-rr-or/15 bg-rr-encre p-6">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Message</p>
-        <p className="mt-3 font-rr-serif text-lg italic leading-relaxed text-rr-creme">
-          {ETAT_MESSAGES[bilan.etat]}
-        </p>
-      </section>
-
-      {/* 12 & 13. PDF + retour */}
+      {/* PDF + retour */}
       <section className="flex flex-col items-center gap-4">
         <RadarPDFButton bilan={bilan} pillarScores={pillarScores} topPriorities={topPriorities} />
         <Link
