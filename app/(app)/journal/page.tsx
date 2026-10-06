@@ -30,20 +30,15 @@ export default async function JournalPage() {
 
   return (
     <div className="mx-auto max-w-2xl pb-8">
-      <header className="pt-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Ton espace</p>
-        <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">Un espace pour toi</h1>
-        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
-          Pose des mots sur ce que tu traverses, et retrouve les synthèses que ton praticien te partage.
-        </p>
-           <header className="pt-1">
+      <header className="pt-1">
         <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ton espace</p>
         <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">Un espace pour toi</h1>
         <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
           Pose des mots sur ce que tu traverses, et retrouve les synthèses que ton praticien te partage.
         </p>
-             
-<div className="mt-10">
+      </header>
+
+      <div className="mt-10">
         <JournalCarnetTabs
           entries={entries ?? []}
           weeks={weekOptions}
