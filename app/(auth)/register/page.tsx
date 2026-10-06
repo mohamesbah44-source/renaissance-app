@@ -13,12 +13,13 @@ export default function RegisterPage() {
 
   if (state?.success) {
     return (
-      <GlassCard className="p-8 text-center">
-        <h1 className="font-rr-display text-2xl text-rr-ivoire">Presque prêt(e).</h1>
-        <p className="mt-3 text-sm text-rr-gris-clair">{state.success}</p>
+      <GlassCard className="p-6 text-center sm:p-8">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Re-Naissance™</p>
+        <h1 className="mt-3 font-rr-display text-3xl leading-tight text-rr-ivoire">Presque prêt(e).</h1>
+        <p className="mt-4 font-rr-serif text-base italic leading-relaxed text-rr-creme">{state.success}</p>
         <Link
           href="/login"
-          className="mt-6 inline-block text-sm text-rr-or-clair hover:text-rr-or-clair"
+          className="mt-8 flex h-12 items-center justify-center rounded-full border border-rr-or/30 text-xs uppercase tracking-[0.25em] text-rr-or-clair transition-all duration-300 hover:bg-white/[0.05]"
         >
           Retour à la connexion
         </Link>
@@ -27,9 +28,10 @@ export default function RegisterPage() {
   }
 
   return (
-    <GlassCard className="p-8">
-      <h1 className="font-rr-display text-2xl text-rr-ivoire">Bienvenue.</h1>
-      <p className="mt-2 text-sm text-rr-gris-clair">
+    <GlassCard className="p-6 sm:p-8">
+      <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Re-Naissance™</p>
+      <h1 className="mt-3 font-rr-display text-3xl leading-tight text-rr-ivoire">Bienvenue.</h1>
+      <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
         Crée ton espace Renaissance. Le chemin commence ici, à ton rythme.
       </p>
 
@@ -86,7 +88,10 @@ export default function RegisterPage() {
 
       <p className="mt-6 text-center text-sm text-rr-gris">
         Déjà un compte ?{" "}
-        <Link href="/login" className="text-rr-or-clair hover:text-rr-or-clair">
+        <Link
+          href="/login"
+          className="inline-block px-1 py-2 text-rr-or-clair transition-colors duration-300 hover:text-rr-ivoire"
+        >
           Te connecter
         </Link>
       </p>
