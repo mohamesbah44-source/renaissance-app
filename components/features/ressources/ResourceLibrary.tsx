@@ -18,7 +18,11 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
 
   return (
     <div>
-      <div className="flex gap-2 overflow-x-auto pb-2">
+      <div
+        role="tablist"
+        aria-label="Filtrer les ressources"
+        className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      >
         <FilterButton active={activeType === "all"} onClick={() => setActiveType("all")}>
           Tout
         </FilterButton>
@@ -29,11 +33,13 @@ export function ResourceLibrary({ resources }: ResourceLibraryProps) {
         ))}
       </div>
 
-      <div className="mt-7 flex flex-col gap-4">
+      <div className="mt-6 flex flex-col gap-3">
         {filtered.length > 0 ? (
           filtered.map((resource) => <ResourceCard key={resource.id} resource={resource} />)
         ) : (
-          <p className="text-center text-sm text-white/40">Aucune ressource pour le moment.</p>
+          <p className="px-4 py-8 text-center font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
+            Aucune ressource pour le moment.
+          </p>
         )}
       </div>
     </div>
@@ -52,12 +58,14 @@ function FilterButton({
   return (
     <button
       type="button"
+      role="tab"
+      aria-selected={active}
       onClick={onClick}
       className={cn(
-        "shrink-0 rounded-full border px-4 py-2 text-xs font-medium transition-all duration-300",
+        "h-10 shrink-0 rounded-full border px-5 text-xs uppercase tracking-[0.2em] transition-all duration-300",
         active
-          ? "border-rr-or/40 bg-rr-or/15 text-rr-or-clair"
-          : "border-white/10 bg-white/[0.03] text-white/50 hover:border-white/20 hover:bg-white/[0.05] hover:text-white/80"
+          ? "border-rr-or/40 bg-rr-or/[0.16] text-rr-or-clair"
+          : "border-white/10 bg-white/[0.03] text-rr-gris hover:border-rr-or/30 hover:text-rr-gris-clair"
       )}
     >
       {children}
