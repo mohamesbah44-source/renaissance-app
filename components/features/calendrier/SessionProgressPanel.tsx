@@ -10,20 +10,20 @@ export function SessionProgressPanel({ appointments }: { appointments: Appointme
   const totalTarget = counts.reduce((sum, c) => sum + c.target, 0);
 
   return (
-    <GlassCard className="p-7">
-      <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.3em] text-white/40">Suivi des séances</p>
-        <p className="text-xs text-rr-or-clair">
-          {totalCompleted} / {totalTarget}
+    <GlassCard className="p-6">
+      <div className="flex items-baseline justify-between">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Suivi des séances</p>
+        <p className="font-rr-display text-2xl text-rr-ivoire">
+          {totalCompleted} <span className="text-base text-rr-gris">/ {totalTarget}</span>
         </p>
       </div>
 
-      <div className="mt-5 flex flex-col gap-5">
+      <div className="mt-6 flex flex-col gap-5">
         {counts.map((count) => (
           <div key={count.type}>
-            <div className="flex items-center justify-between text-sm text-white/70">
-              <span>{count.label}</span>
-              <span className="text-white/40">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-rr-ivoire/90">{count.label}</span>
+              <span className="text-rr-gris">
                 {count.completed} / {count.target}
               </span>
             </div>
