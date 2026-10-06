@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, Cormorant_Garamond, Fraunces, Montserrat, Outfit } from "next/font/google";
 import { CosmicBackground } from "@/components/layout/CosmicBackground";
 import "./globals.css";
@@ -36,7 +36,7 @@ const montserrat = Montserrat({
   weight: ["300", "400", "500", "600", "700"],
 });
 
-const TITLE = "Le Programme Re-Naissance™ — Plus qu'un accompagnement, une rencontre avec vous-même";
+const TITLE = "Le Programme Re-Naissance™ — Plus qu'un accompagnement, une rencontre avec toi-même";
 const DESCRIPTION =
   "Le Programme Re-Naissance™ est un accompagnement transformationnel de 8 semaines pour les entrepreneurs qui veulent retrouver sécurité intérieure, clarté et vitalité.";
 
@@ -62,6 +62,13 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0c0b0a",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -72,7 +79,7 @@ export default function RootLayout({
       lang="fr"
       className={`${fraunces.variable} ${outfit.variable} ${cinzel.variable} ${cormorantGaramond.variable} ${montserrat.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
+      <body className="min-h-full pt-[env(safe-area-inset-top)]">
         <CosmicBackground />
         {children}
       </body>
