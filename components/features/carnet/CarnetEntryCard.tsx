@@ -1,5 +1,4 @@
 import { GlassCard } from "@/components/ui/GlassCard";
-import { Badge } from "@/components/ui/Badge";
 import { pilierById } from "@/lib/radar/constants";
 import { formatDate } from "@/lib/utils";
 import type { CarnetEntry } from "@/lib/types/database.types";
@@ -8,32 +7,37 @@ import type { CarnetEntry } from "@/lib/types/database.types";
 export function CarnetEntryCard({ entry }: { entry: CarnetEntry }) {
   const hypotheses = (entry.hypotheses as unknown as string[] | null) ?? [];
   const piliers = entry.pilier_ids.map((id) => pilierById(id)).filter((p): p is NonNullable<typeof p> => Boolean(p));
+  const sourceLabel = entry.source === "analyzer" ? "Re-Naissance Analyzer™" : "Note du praticien";
 
   return (
     <GlassCard className="p-6">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs text-white/40">{formatDate(entry.created_at)}</span>
-        <Badge variant={entry.source === "analyzer" ? "violet" : "neutral"}>
-          {entry.source === "analyzer" ? "Re-Naissance Analyzer™" : "Note du praticien"}
-        </Badge>
-        {piliers.map((pilier) => (
-          <Badge key={pilier.id} variant="neutral">
-            {pilier.court}
-          </Badge>
-        ))}
-      </div>
+      <p className="text-[11px] uppercase tracking-[0.2em] text-rr-gris">
+        {formatDate(entry.created_at)}
+        <span className="text-rr-or"> · {sourceLabel}</span>
+      </p>
 
-      <p className="mt-3 font-rr-display text-lg text-rr-ivoire">{entry.titre}</p>
+      <p className="mt-4 font-rr-display text-xl leading-snug text-rr-ivoire">{entry.titre}</p>
 
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-white/70">{entry.synthese}</p>
+      {piliers.length > 0 && (
+        <p className="mt-1.5 text-xs text-rr-gris-clair">{piliers.map((pilier) => pilier.court).join(" · ")}</p>
+      )}
+
+      <p className="mt-5 whitespace-pre-wrap font-rr-serif text-base leading-relaxed text-rr-ivoire/85">
+        {entry.synthese}
+      </p>
 
       {hypotheses.length > 0 && (
-        <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
-          <p className="text-xs uppercase tracking-[0.25em] text-rr-or/70">Pistes de réflexion</p>
-          <ul className="flex flex-col gap-1.5">
+        <div className="mt-6 border-t border-rr-or/20 pt-5">
+          <p className="text-[11px] uppercase tracking-[0.25em] text-rr-or">Pistes de réflexion</p>
+          <ul className="mt-4 flex flex-col gap-3">
             {hypotheses.map((hypothese, index) => (
-              <li key={index} className="flex gap-2 text-sm leading-relaxed text-white/70">
-                <span className="text-rr-or">·</span>
+              <li
+                key={index}
+                className="flex gap-3 font-rr-serif text-[15px] italic leading-relaxed text-rr-creme"
+              >
+                <span aria-hidden="true" className="text-rr-or">
+                  ·
+                </span>
                 <span>{hypothese}</span>
               </li>
             ))}
