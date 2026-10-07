@@ -1,14 +1,17 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { todayISODate } from "@/lib/habits/streak";
 
 async function getUserId() {
-  const supabase = await createClient();
+  const client = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await client.auth.getUser();
+  // Client non typé : les tables du Lot 1 ne sont pas encore dans les types générés.
+  const supabase = client as unknown as SupabaseClient;
   return { supabase, userId: user?.id ?? null };
 }
 
