@@ -39,23 +39,48 @@ function firstSentence(text: string): string {
   return idx === -1 ? text : text.slice(0, idx + 1);
 }
 
+/** Envoie le PDF au serveur, qui le renvoie comme un téléchargement classique. */
+function downloadViaServer(base64: string, filename: string) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = "/api/radar/pdf";
+  form.style.display = "none";
+
+  const dataInput = document.createElement("input");
+  dataInput.type = "hidden";
+  dataInput.name = "data";
+  dataInput.value = base64;
+  form.appendChild(dataInput);
+
+  const nameInput = document.createElement("input");
+  nameInput.type = "hidden";
+  nameInput.name = "filename";
+  nameInput.value = filename;
+  form.appendChild(nameInput);
+
+  document.body.appendChild(form);
+  form.submit();
+  window.setTimeout(() => form.remove(), 5000);
+}
+
 interface RadarPDFButtonProps {
   bilan: RadarBilan;
   pillarScores: PillarScore[];
   topPriorities: TopPriority[];
 }
 
-/** Génère le rapport PDF premium du bilan côté client (jsPDF en import dynamique) et l'ouvre dans un onglet. */
+/** Génère le rapport PDF premium du bilan côté client (jsPDF en import dynamique). */
 export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
 
   const filename = `radar-renaissance-${String(bilan.created_at).slice(0, 10)}.pdf`;
 
   async function handleClick() {
     setIsGenerating(true);
     setError(null);
+    setDone(false);
 
     try {
       const { jsPDF } = await import("jspdf");
@@ -236,14 +261,11 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         doc.text(footerLines, MARGIN_X, pageHeight - 12);
       }
 
-      // Le PDF est ouvert dans un onglet (lecteur du navigateur) : plus fiable qu'un téléchargement forcé.
-      const blob = doc.output("blob");
-      const url = URL.createObjectURL(blob);
-      setPdfUrl((previous) => {
-        if (previous) URL.revokeObjectURL(previous);
-        return url;
-      });
-      window.open(url, "_blank", "noopener");
+      // Téléchargement via le serveur (évite les blobs, bloqués sur certains PC).
+      const dataUri = doc.output("datauristring");
+      const base64 = dataUri.slice(dataUri.indexOf("base64,") + 7);
+      downloadViaServer(base64, filename);
+      setDone(true);
     } catch (e) {
       console.error("Génération du PDF Radar impossible :", e);
       const detail = e instanceof Error ? e.message : String(e);
@@ -264,19 +286,10 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         {isGenerating ? "Génération..." : "Télécharger mon rapport PDF"}
       </button>
 
-      {pdfUrl && (
-        <div className="flex flex-col items-center gap-1.5 text-center text-sm text-rr-gris-clair">
-          <p>Ton rapport est prêt. Il s&apos;est ouvert dans un nouvel onglet.</p>
-          <p className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
-            <a href={pdfUrl} target="_blank" rel="noopener" className="text-rr-or-clair underline-offset-4 hover:underline">
-              Ouvrir le rapport
-            </a>
-            <a href={pdfUrl} download={filename} className="text-rr-or-clair underline-offset-4 hover:underline">
-              Enregistrer le fichier
-            </a>
-          </p>
-          <p className="text-xs text-rr-gris">Dans le lecteur, utilise Ctrl + S pour l&apos;enregistrer.</p>
-        </div>
+      {done && !error && (
+        <p className="max-w-sm text-center text-sm text-rr-gris-clair">
+          Ton rapport est en cours de téléchargement. Tu le retrouveras dans tes Téléchargements.
+        </p>
       )}
 
       {error && <p className="max-w-sm text-center text-sm text-rr-rouge">{error}</p>}
