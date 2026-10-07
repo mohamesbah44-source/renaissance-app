@@ -45,10 +45,13 @@ interface RadarPDFButtonProps {
   topPriorities: TopPriority[];
 }
 
-/** Génère et télécharge le rapport PDF premium du bilan, côté client uniquement (jsPDF en import dynamique). */
+/** Génère le rapport PDF premium du bilan côté client (jsPDF en import dynamique) et l'ouvre dans un onglet. */
 export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  const filename = `radar-renaissance-${String(bilan.created_at).slice(0, 10)}.pdf`;
 
   async function handleClick() {
     setIsGenerating(true);
@@ -233,23 +236,14 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         doc.text(footerLines, MARGIN_X, pageHeight - 12);
       }
 
-      // Téléchargement : méthode standard, avec ouverture dans un onglet en secours (iPhone).
-      const filename = `radar-renaissance-${String(bilan.created_at).slice(0, 10)}.pdf`;
+      // Le PDF est ouvert dans un onglet (lecteur du navigateur) : plus fiable qu'un téléchargement forcé.
       const blob = doc.output("blob");
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      link.rel = "noopener";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS) {
-        window.open(url, "_blank");
-      }
-      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      setPdfUrl((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return url;
+      });
+      window.open(url, "_blank", "noopener");
     } catch (e) {
       console.error("Génération du PDF Radar impossible :", e);
       const detail = e instanceof Error ? e.message : String(e);
@@ -260,7 +254,7 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
   }
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-3">
       <button
         type="button"
         onClick={handleClick}
@@ -269,6 +263,22 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       >
         {isGenerating ? "Génération..." : "Télécharger mon rapport PDF"}
       </button>
+
+      {pdfUrl && (
+        <div className="flex flex-col items-center gap-1.5 text-center text-sm text-rr-gris-clair">
+          <p>Ton rapport est prêt. Il s&apos;est ouvert dans un nouvel onglet.</p>
+          <p className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1">
+            <a href={pdfUrl} target="_blank" rel="noopener" className="text-rr-or-clair underline-offset-4 hover:underline">
+              Ouvrir le rapport
+            </a>
+            <a href={pdfUrl} download={filename} className="text-rr-or-clair underline-offset-4 hover:underline">
+              Enregistrer le fichier
+            </a>
+          </p>
+          <p className="text-xs text-rr-gris">Dans le lecteur, utilise Ctrl + S pour l&apos;enregistrer.</p>
+        </div>
+      )}
+
       {error && <p className="max-w-sm text-center text-sm text-rr-rouge">{error}</p>}
     </div>
   );
