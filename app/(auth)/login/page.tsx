@@ -6,6 +6,7 @@ import { signIn } from "@/lib/auth/actions";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
 export default function LoginPage() {
@@ -31,10 +32,9 @@ export default function LoginPage() {
           />
         </Field>
         <Field label="Mot de passe" htmlFor="password">
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
             placeholder="••••••••"
