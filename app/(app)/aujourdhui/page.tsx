@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LifeBuoy, Check } from "lucide-react";
