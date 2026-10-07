@@ -98,3 +98,220 @@ export default async function AujourdhuiPage() {
         .eq("is_active", true)
         .order("created_at", { ascending: true }),
       db.from("habit_logs").select("habit_id").eq("user_id", user.id).eq("log_date", today),
+      db.from("daily_progress").select("*").eq("user_id", user.id).eq("log_date", today).maybeSingle(),
+      db
+        .from("daily_checkins")
+        .select("energy, tension")
+        .eq("user_id", user.id)
+        .eq("checkin_date", today)
+        .maybeSingle(),
+    ]);
+
+  const { data: override } = programDay
+    ? await db
+        .from("client_day_overrides")
+        .select("journaling_question, mission")
+        .eq("user_id", user.id)
+        .eq("day_id", programDay.id)
+        .maybeSingle()
+    : { data: null };
+
+  const mission: string | null = override?.mission ?? programDay?.mission ?? null;
+  const question: string =
+    override?.journaling_question ?? programDay?.journaling_question ?? pickQuestion(week?.journaling_prompts, dayNumber);
+
+  const doneIds = new Set<string>((logs ?? []).map((l: { habit_id: string }) => l.habit_id));
+  type TodayHabit = {
+    id: string;
+    titre: string;
+    time_of_day: string;
+    weekdays: number[] | null;
+    start_date: string | null;
+    end_date: string | null;
+  };
+  const todaysHabits: TodayHabit[] = ((habits ?? []) as TodayHabit[]).filter((h) => {
+    if (h.start_date && h.start_date > today) return false;
+    if (h.end_date && h.end_date < today) return false;
+    const days = h.weekdays ?? [1, 2, 3, 4, 5, 6, 7];
+    return days.includes(isoWeekday);
+  });
+
+  const morning = todaysHabits.filter((h) => h.time_of_day === "morning");
+  const daytime = todaysHabits.filter((h) => h.time_of_day === "day");
+  const evening = todaysHabits.filter((h) => h.time_of_day === "evening");
+
+  const missionDone: boolean = progress?.mission_done ?? false;
+  const journalingDone: boolean = progress?.journaling_done ?? false;
+  const closed = Boolean(progress?.day_closed_at);
+
+  const steps = [
+    !!checkin,
+    journalingDone,
+    ...(mission ? [missionDone] : []),
+    ...todaysHabits.map((h) => doneIds.has(h.id)),
+  ];
+  const doneCount = steps.filter(Boolean).length;
+
+  return (
+    <div className="mx-auto max-w-2xl pb-8">
+      <header className="pt-1">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">{formatDate(new Date())}</p>
+        <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">Aujourd&apos;hui</h1>
+        <p className="mt-3 text-sm text-rr-gris-clair">
+          Semaine {weekNumber} · Jour {dayNumber}
+          {week?.title ? ` · ${week.title}` : ""}
+        </p>
+      </header>
+
+      <GlassCard className="mt-8 p-6">
+        <div className="flex items-baseline justify-between">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Ta journée</p>
+          <p className="font-rr-display text-2xl text-rr-ivoire">
+            {doneCount} <span className="text-base text-rr-gris">/ {steps.length}</span>
+          </p>
+        </div>
+        <div className="mt-5 flex gap-1.5" role="img" aria-label={`${doneCount} étapes sur ${steps.length}`}>
+          {steps.map((s, i) => (
+            <span key={i} className={cn("h-1 flex-1 rounded-full", s ? "bg-rr-or" : "bg-white/10")} />
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-rr-gris-clair">La régularité compte plus que la perfection.</p>
+      </GlassCard>
+
+      {morning.length > 0 && (
+        <section className="mt-10">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Routine du matin</p>
+          <div className="mt-4 flex flex-col gap-2.5">
+            {morning.map((h) => (
+              <TodayHabitRow key={h.id} id={h.id} titre={h.titre} isDone={doneIds.has(h.id)} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {mission && (
+        <section className="mt-10">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Mission du jour</p>
+          <form action={toggleMission} className="mt-4">
+            <input type="hidden" name="done" value={missionDone ? "1" : "0"} />
+            <button
+              type="submit"
+              className={cn(
+                "flex w-full items-start gap-4 rounded-2xl border p-5 text-left transition-all duration-300",
+                missionDone ? "border-rr-or/30 bg-rr-or/[0.05]" : "border-white/10 bg-white/[0.02] hover:border-rr-or/30"
+              )}
+            >
+              <span
+                className={cn(
+                  "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
+                  missionDone ? "border-rr-or bg-rr-or text-rr-noir" : "border-white/15 text-transparent"
+                )}
+              >
+                <Check className="h-4 w-4" strokeWidth={2.5} />
+              </span>
+              <span className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">{mission}</span>
+            </button>
+          </form>
+        </section>
+      )}
+
+      <section className="mt-10">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Check-in · 30 secondes</p>
+        <GlassCard className="mt-4 p-5">
+          {checkin ? (
+            <p className="text-sm text-rr-gris-clair">
+              Énergie <span className="text-rr-ivoire">{checkin.energy}/5</span> · Tension{" "}
+              <span className="text-rr-ivoire">{checkin.tension}/5</span>. Merci de t&apos;être écouté·e.
+            </p>
+          ) : (
+            <form action={saveCheckin} className="flex flex-col gap-6">
+              <ScaleInput name="energy" label="Mon niveau d'énergie" low="Très bas" high="Très haut" />
+              <ScaleInput name="tension" label="Ma tension intérieure" low="Détendu·e" high="Très tendu·e" />
+              <button
+                type="submit"
+                className="h-12 rounded-full border border-rr-or/40 text-sm text-rr-or transition-colors hover:bg-rr-or/10"
+              >
+                Enregistrer
+              </button>
+            </form>
+          )}
+        </GlassCard>
+      </section>
+
+      {daytime.length > 0 && (
+        <section className="mt-10">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Dans la journée</p>
+          <div className="mt-4 flex flex-col gap-2.5">
+            {daytime.map((h) => (
+              <TodayHabitRow key={h.id} id={h.id} titre={h.titre} isDone={doneIds.has(h.id)} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="mt-10">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Journaling</p>
+        <GlassCard className="mt-4 p-5">
+          <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">{question}</p>
+          {journalingDone ? (
+            <p className="mt-4 text-sm text-rr-gris-clair">Écrit pour aujourd&apos;hui. Retrouve-le dans ton journal.</p>
+          ) : (
+            <form action={saveJournalAnswer} className="mt-4 flex flex-col gap-4">
+              <input type="hidden" name="question" value={question} />
+              <input type="hidden" name="weekId" value={week?.id ?? ""} />
+              <textarea
+                name="content"
+                required
+                rows={5}
+                placeholder="Écris ce qui vient, sans te corriger."
+                className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-[15px] leading-relaxed text-rr-ivoire placeholder:text-rr-gris focus:border-rr-or/50 focus:outline-none"
+              />
+              <button
+                type="submit"
+                className="h-12 rounded-full border border-rr-or/40 text-sm text-rr-or transition-colors hover:bg-rr-or/10"
+              >
+                Enregistrer
+              </button>
+            </form>
+          )}
+        </GlassCard>
+      </section>
+
+      {evening.length > 0 && (
+        <section className="mt-10">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Routine du soir</p>
+          <div className="mt-4 flex flex-col gap-2.5">
+            {evening.map((h) => (
+              <TodayHabitRow key={h.id} id={h.id} titre={h.titre} isDone={doneIds.has(h.id)} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <div className="mt-12">
+        {closed ? (
+          <p className="text-center font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
+            Ta journée est terminée. Repose-toi bien.
+          </p>
+        ) : (
+          <form action={closeDay}>
+            <button
+              type="submit"
+              className="h-14 w-full rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90"
+            >
+              Terminer ma journée
+            </button>
+          </form>
+        )}
+      </div>
+
+      <Link
+        href="/sos"
+        className="mt-6 flex items-center justify-center gap-2 rounded-full border border-rr-orange/30 px-5 py-3.5 text-sm text-rr-orange/90 transition-colors hover:bg-rr-orange/[0.08]"
+      >
+        <LifeBuoy className="h-4 w-4" strokeWidth={1.75} />
+        J&apos;ai besoin de revenir à moi
+      </Link>
+    </div>
+  );
+}
