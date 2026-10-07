@@ -4,7 +4,8 @@ import { updateSession } from "@/lib/supabase/middleware";
 const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
 
 const PROTECTED_PREFIXES = [
-  "/dashboard",
+  "/aujourdhui",
+  "/dashboard", 
   "/parcours",
   "/radar",
   "/journal",
