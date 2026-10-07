@@ -8,7 +8,7 @@ import { ClientProgressPanel } from "@/components/features/admin/ClientProgressP
 import { ClientRadarPanel } from "@/components/features/admin/ClientRadarPanel";
 import { ClientOverviewBanner } from "@/components/features/admin/ClientOverviewBanner";
 import { ImportAnalyzerButton } from "@/components/features/admin/ImportAnalyzerButton";
-import { AdminHabitsPanel } from "@/components/features/admin/AdminHabitsPanel";
+import { AdminHabitsManager } from "@/components/features/admin/AdminHabitsManager";
 import { AdminJournalEntryCard } from "@/components/features/admin/AdminJournalEntryCard";
 import { AdminCarnetEntryCard } from "@/components/features/admin/AdminCarnetEntryCard";
 import { CarnetEntryForm } from "@/components/features/admin/CarnetEntryForm";
@@ -115,7 +115,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       <div>
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Habitudes</p>
         <div className="mt-4">
-          <AdminHabitsPanel clientId={id} habits={habits ?? []} />
+          <AdminHabitsManager clientId={id} />
         </div>
       </div>
 
@@ -201,7 +201,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
         </div>
       </div>
 
-      <div>
+      <div className="border-t border-white/[0.06] pt-8">
         <p className="text-xs uppercase tracking-[0.3em] text-rr-gris">Zone sensible</p>
         <div className="mt-4">
           <DeleteClientButton clientId={id} clientName={fullName} />
