@@ -63,12 +63,13 @@ export default async function AujourdhuiPage() {
   const jsDay = todayDate.getDay();
   const isoWeekday = jsDay === 0 ? 7 : jsDay;
 
-  const { data: profile } = await supabase
-      const db = supabase as unknown as SupabaseClient;
+      const { data: profile } = await supabase
     .from("profiles")
     .select("first_name, program_start_date, current_week")
     .eq("id", user.id)
     .single();
+
+  const db = supabase as unknown as SupabaseClient;
 
   let weekNumber = profile?.current_week ?? 1;
   let dayNumber = 1;
