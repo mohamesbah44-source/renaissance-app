@@ -64,6 +64,7 @@ export default async function AujourdhuiPage() {
   const isoWeekday = jsDay === 0 ? 7 : jsDay;
 
   const { data: profile } = await supabase
+      const db = supabase as unknown as SupabaseClient;
     .from("profiles")
     .select("first_name, program_start_date, current_week")
     .eq("id", user.id)
@@ -82,6 +83,13 @@ export default async function AujourdhuiPage() {
 
   const [{ data: programDay }, { data: habits }, { data: logs }, { data: progress }, { data: checkin }] = await Promise.all([
     week
+      ? db.from("program_days").select("id, journaling_question, mission").eq("week_id", week.id).eq("day_number", dayNumber).maybeSingle()
+      : Promise.resolve({ data: null }),
+    db.from("habits").select("id, titre, time_of_day, weekdays, start_date, end_date").eq("user_id", user.id).eq("is_active", true).order("created_at", { ascending: true }),
+    db.from("habit_logs").select("habit_id").eq("user_id", user.id).eq("log_date", today),
+    db.from("daily_progress").select("*").eq("user_id", user.id).eq("log_date", today).maybeSingle(),
+    db.from("daily_checkins").select("energy, tension").eq("user_id", user.id).eq("checkin_date", today).maybeSingle(),
+  ]);
       ? supabase.from("program_days").select("id, journaling_question, mission").eq("week_id", week.id).eq("day_number", dayNumber).maybeSingle()
       : Promise.resolve({ data: null }),
     supabase.from("habits").select("id, titre, time_of_day, weekdays, start_date, end_date").eq("user_id", user.id).eq("is_active", true).order("created_at", { ascending: true }),
@@ -90,7 +98,7 @@ export default async function AujourdhuiPage() {
     supabase.from("daily_checkins").select("energy, tension").eq("user_id", user.id).eq("checkin_date", today).maybeSingle(),
   ]);
 
-  const { data: override } = programDay
+ await db.from("client_day_overrides") = programDay
     ? await supabase.from("client_day_overrides").select("journaling_question, mission").eq("user_id", user.id).eq("day_id", programDay.id).maybeSingle()
     : { data: null };
 
