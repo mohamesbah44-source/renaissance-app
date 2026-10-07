@@ -25,6 +25,15 @@ const MARGIN_BOTTOM = 22;
 const FOOTER_TEXT =
   "Ce rapport est un support d'introspection. Il ne remplace pas un avis médical, psychologique ou thérapeutique.";
 
+/** Les polices de base du PDF ne gèrent ni les emojis ni les espaces spéciaux : on les retire. */
+function clean(text: string): string {
+  return String(text ?? "")
+    .replace(/[\u00A0\u202F\u2009\u2007]/g, " ")
+    .replace(/[^\n\u0020-\u00FF\u2013\u2014\u2018\u2019\u201C\u201D\u2026\u2122\u20AC]/g, "")
+    .replace(/ {2,}/g, " ")
+    .trim();
+}
+
 function firstSentence(text: string): string {
   const idx = text.indexOf(".");
   return idx === -1 ? text : text.slice(0, idx + 1);
@@ -73,13 +82,13 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       doc.setTextColor(...OR);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(20);
-      doc.text("Rapport Renaissance Radar™", MARGIN_X, y);
+      doc.text(clean("Rapport Renaissance Radar™"), MARGIN_X, y);
       y += 7;
 
       doc.setTextColor(...GRIS);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(10);
-      doc.text(`Bilan du ${formatDate(bilan.created_at)}`, MARGIN_X, y);
+      doc.text(clean(`Bilan du ${formatDate(bilan.created_at)}`), MARGIN_X, y);
       y += 12;
 
       // 2. État dominant
@@ -87,12 +96,12 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       doc.setTextColor(...IVOIRE);
       doc.setFont("helvetica", "bold");
       doc.setFontSize(15);
-      doc.text(`État dominant : ${etat.lune} ${etat.label}`, MARGIN_X, y);
+      doc.text(clean(`État dominant : ${etat.label}`), MARGIN_X, y);
       y += 7;
 
       doc.setFont("times", "italic");
       doc.setFontSize(11);
-      const etatShortLines = doc.splitTextToSize(firstSentence(ETAT_MESSAGES[bilan.etat]), contentWidth);
+      const etatShortLines = doc.splitTextToSize(clean(firstSentence(ETAT_MESSAGES[bilan.etat])), contentWidth);
       doc.text(etatShortLines, MARGIN_X, y);
       y += etatShortLines.length * 5.5 + 10;
 
@@ -107,7 +116,7 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       doc.setTextColor(...IVOIRE);
       doc.setFont("helvetica", "normal");
       doc.setFontSize(11);
-      doc.text(`${fenetrePct}% — ${fenetreInterpretation(bilan.fenetre_transformation)}`, MARGIN_X, y);
+      doc.text(clean(`${fenetrePct}% — ${fenetreInterpretation(bilan.fenetre_transformation)}`), MARGIN_X, y);
       y += 12;
 
       // 4. Scores par pilier
@@ -125,7 +134,7 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
           const score = pillarScores.find((s) => s.pilierId === pilier.id);
           const pct = score ? Math.round(score.ratio * 100) : 0;
           doc.setTextColor(...IVOIRE);
-          doc.text(`${pilier.nom} (${cercle.nom})`, MARGIN_X, y);
+          doc.text(clean(`${pilier.nom} (${cercle.nom})`), MARGIN_X, y);
           doc.setTextColor(...CERCLE_RGB[pilier.cercle]);
           doc.text(`${pct}%`, pageWidth - MARGIN_X, y, { align: "right" });
           y += 6.5;
@@ -150,13 +159,13 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(...IVOIRE);
-        doc.text(`${i + 1}. ${pilier.nom} — ${pct}%`, MARGIN_X, y);
+        doc.text(clean(`${i + 1}. ${pilier.nom} — ${pct}%`), MARGIN_X, y);
         y += 5.5;
 
         doc.setFont("times", "italic");
         doc.setFontSize(10);
         doc.setTextColor(...GRIS);
-        const reasonLines = doc.splitTextToSize(PRIORITY_REASONS[priority.pilierId] ?? "", contentWidth);
+        const reasonLines = doc.splitTextToSize(clean(PRIORITY_REASONS[priority.pilierId] ?? ""), contentWidth);
         doc.text(reasonLines, MARGIN_X, y);
         y += reasonLines.length * 5 + 4;
       }
@@ -175,23 +184,24 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         y += 8;
 
         for (const acte of [protocol.acte1, protocol.acte2]) {
+          if (!acte) continue;
           ensureSpace(20);
           doc.setFont("helvetica", "bold");
           doc.setFontSize(11);
           doc.setTextColor(...IVOIRE);
-          doc.text(acte.nom, MARGIN_X, y);
+          doc.text(clean(acte.nom), MARGIN_X, y);
           y += 5;
 
           doc.setFont("helvetica", "normal");
           doc.setFontSize(9);
           doc.setTextColor(...GRIS);
-          doc.text(acte.frequence, MARGIN_X, y);
+          doc.text(clean(acte.frequence), MARGIN_X, y);
           y += 5;
 
           doc.setFont("times", "normal");
           doc.setFontSize(10.5);
           doc.setTextColor(...IVOIRE);
-          const descLines = doc.splitTextToSize(acte.description, contentWidth);
+          const descLines = doc.splitTextToSize(clean(acte.description), contentWidth);
           doc.text(descLines, MARGIN_X, y);
           y += descLines.length * 5 + 6;
         }
@@ -208,13 +218,13 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       doc.setFont("times", "italic");
       doc.setFontSize(11);
       doc.setTextColor(...IVOIRE);
-      const finalLines = doc.splitTextToSize(ETAT_MESSAGES[bilan.etat], contentWidth);
+      const finalLines = doc.splitTextToSize(clean(ETAT_MESSAGES[bilan.etat]), contentWidth);
       doc.text(finalLines, MARGIN_X, y);
       y += finalLines.length * 5.5;
 
       // 8. Footer (sur chaque page)
       const pageCount = doc.getNumberOfPages();
-      const footerLines = doc.splitTextToSize(FOOTER_TEXT, contentWidth);
+      const footerLines = doc.splitTextToSize(clean(FOOTER_TEXT), contentWidth);
       for (let page = 1; page <= pageCount; page += 1) {
         doc.setPage(page);
         doc.setFont("helvetica", "italic");
@@ -223,9 +233,27 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
         doc.text(footerLines, MARGIN_X, pageHeight - 12);
       }
 
-      doc.save(`radar-renaissance-${bilan.created_at.slice(0, 10)}.pdf`);
-    } catch {
-      setError("Le PDF n'a pas pu être généré. Réessaie dans un instant.");
+      // Téléchargement : méthode standard, avec ouverture dans un onglet en secours (iPhone).
+      const filename = `radar-renaissance-${String(bilan.created_at).slice(0, 10)}.pdf`;
+      const blob = doc.output("blob");
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.rel = "noopener";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        window.open(url, "_blank");
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    } catch (e) {
+      console.error("Génération du PDF Radar impossible :", e);
+      const detail = e instanceof Error ? e.message : String(e);
+      setError(`Le PDF n'a pas pu être généré. Réessaie dans un instant. (${detail})`);
     } finally {
       setIsGenerating(false);
     }
@@ -241,7 +269,7 @@ export function RadarPDFButton({ bilan, pillarScores, topPriorities }: RadarPDFB
       >
         {isGenerating ? "Génération..." : "Télécharger mon rapport PDF"}
       </button>
-      {error && <p className="text-sm text-rr-rouge">{error}</p>}
+      {error && <p className="max-w-sm text-center text-sm text-rr-rouge">{error}</p>}
     </div>
   );
 }
