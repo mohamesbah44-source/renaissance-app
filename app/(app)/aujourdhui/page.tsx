@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LifeBuoy, Check } from "lucide-react";
+import { LifeBuoy, Check, Moon } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -93,7 +93,7 @@ export default async function AujourdhuiPage() {
         : Promise.resolve({ data: null }),
       db
         .from("habits")
-        .select("id, titre, time_of_day, weekdays, start_date, end_date")
+        .select("id, titre, time_of_day, weekdays, start_date, end_date, system_key")
         .eq("user_id", user.id)
         .eq("is_active", true)
         .order("created_at", { ascending: true }),
@@ -128,6 +128,7 @@ export default async function AujourdhuiPage() {
     weekdays: number[] | null;
     start_date: string | null;
     end_date: string | null;
+    system_key: string | null;
   };
   const todaysHabits: TodayHabit[] = ((habits ?? []) as TodayHabit[]).filter((h) => {
     if (h.start_date && h.start_date > today) return false;
@@ -183,7 +184,13 @@ export default async function AujourdhuiPage() {
           <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Routine du matin</p>
           <div className="mt-4 flex flex-col gap-2.5">
             {morning.map((h) => (
-              <TodayHabitRow key={h.id} id={h.id} titre={h.titre} isDone={doneIds.has(h.id)} />
+              <TodayHabitRow
+                key={h.id}
+                id={h.id}
+                titre={h.titre}
+                isDone={doneIds.has(h.id)}
+                systemKey={h.system_key}
+              />
             ))}
           </div>
         </section>
@@ -243,7 +250,13 @@ export default async function AujourdhuiPage() {
           <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Dans la journée</p>
           <div className="mt-4 flex flex-col gap-2.5">
             {daytime.map((h) => (
-              <TodayHabitRow key={h.id} id={h.id} titre={h.titre} isDone={doneIds.has(h.id)} />
+              <TodayHabitRow
+                key={h.id}
+                id={h.id}
+                titre={h.titre}
+                isDone={doneIds.has(h.id)}
+                systemKey={h.system_key}
+              />
             ))}
           </div>
         </section>
@@ -282,7 +295,13 @@ export default async function AujourdhuiPage() {
           <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Routine du soir</p>
           <div className="mt-4 flex flex-col gap-2.5">
             {evening.map((h) => (
-              <TodayHabitRow key={h.id} id={h.id} titre={h.titre} isDone={doneIds.has(h.id)} />
+              <TodayHabitRow
+                key={h.id}
+                id={h.id}
+                titre={h.titre}
+                isDone={doneIds.has(h.id)}
+                systemKey={h.system_key}
+              />
             ))}
           </div>
         </section>
@@ -311,6 +330,14 @@ export default async function AujourdhuiPage() {
       >
         <LifeBuoy className="h-4 w-4" strokeWidth={1.75} />
         J&apos;ai besoin de revenir à moi
+      </Link>
+
+      <Link
+        href="/pratique/sommeil"
+        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
+      >
+        <Moon className="h-4 w-4" strokeWidth={1.75} />
+        Je n&apos;arrive pas à dormir
       </Link>
     </div>
   );
