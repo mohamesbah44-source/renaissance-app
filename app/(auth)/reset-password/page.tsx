@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { updatePassword } from "@/lib/auth/actions";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Field } from "@/components/ui/Field";
-import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
 export default function ResetPasswordPage() {
@@ -18,20 +18,18 @@ export default function ResetPasswordPage() {
 
       <form action={formAction} className="mt-8 flex flex-col gap-5">
         <Field label="Nouveau mot de passe" htmlFor="password">
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             required
             placeholder="8 caractères minimum"
           />
         </Field>
         <Field label="Confirmer le mot de passe" htmlFor="passwordConfirm">
-          <Input
+          <PasswordInput
             id="passwordConfirm"
             name="passwordConfirm"
-            type="password"
             autoComplete="new-password"
             required
             placeholder="••••••••"
