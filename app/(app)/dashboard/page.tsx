@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/queries";
 import { WelcomeHeader } from "@/components/features/dashboard/WelcomeHeader";
@@ -66,7 +67,12 @@ export default async function DashboardPage() {
         weekTitle={currentWeek?.title ?? null}
         completedCount={completedCount}
       />
-
+      <Link
+        href="/aujourdhui"
+        className="mt-4 flex w-full items-center justify-center rounded-full bg-rr-or px-6 py-4 text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90"
+      >
+        Ma journée
+      </Link>
       {currentWeek && <ContinueButton weekId={currentWeek.id} status={currentProgress?.status} />}
 
       <div className="mt-4 grid grid-cols-2 gap-3">
