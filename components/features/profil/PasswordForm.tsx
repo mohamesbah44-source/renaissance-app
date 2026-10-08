@@ -17,7 +17,7 @@ export function PasswordForm() {
   }, [state]);
 
   return (
-    <form ref={formRef} action={formAction} className="flex flex-col gap-4">
+    <form ref={formRef} action={formAction} className="flex flex-col gap-6">
       <Field label="Nouveau mot de passe" htmlFor="password">
         <Input
           id="password"
@@ -40,8 +40,16 @@ export function PasswordForm() {
         />
       </Field>
 
-      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
-      {state?.success && <p className="text-sm text-rr-or-clair">Ton mot de passe a été mis à jour.</p>}
+      {state?.error && (
+        <p role="alert" className="text-sm text-rr-rouge">
+          {state.error}
+        </p>
+      )}
+      {state?.success && (
+        <p role="status" className="font-rr-serif text-base italic text-rr-or-clair">
+          Ton mot de passe a été mis à jour.
+        </p>
+      )}
 
       <SubmitButton className="w-auto self-start px-8">Mettre à jour le mot de passe</SubmitButton>
     </form>
