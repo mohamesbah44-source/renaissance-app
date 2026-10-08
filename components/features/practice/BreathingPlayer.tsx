@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Pause, Play, X } from "lucide-react";
+import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import { completePractice, type PracticeMode } from "@/lib/today/practice-actions";
 import { cn } from "@/lib/utils";
 
@@ -18,6 +18,27 @@ const WORD: Record<Kind, string> = {
 };
 
 const SCALE: Record<Kind, number> = { inhale: 1, hold: 1, exhale: 0.62, contract: 0.82, release: 0.62 };
+
+const VOICE_KEY = "rr-breath-voice";
+
+/** Prononce un mot en français, d'une voix lente et posée (synthèse vocale du navigateur). */
+function speak(text: string, enabled: boolean) {
+  if (!enabled || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  const french = synth.getVoices().find((v) => v.lang.toLowerCase().startsWith("fr"));
+  if (french) utterance.voice = french;
+  utterance.rate = 0.85;
+  utterance.pitch = 0.95;
+  utterance.volume = 1;
+  synth.speak(utterance);
+}
+
+function stopSpeech() {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+}
 
 function cycles(n: number, make: () => Segment[]): Segment[] {
   return Array.from({ length: n }, make).flat();
@@ -59,16 +80,46 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
   const [duration, setDuration] = useState(mode === "sleep" ? 600 : 300);
   const [index, setIndex] = useState(0);
   const [remaining, setRemaining] = useState(0);
+  const [voiceOn, setVoiceOn] = useState(true);
   const savedRef = useRef(false);
+  const voiceRef = useRef(true);
+  const spokenRef = useRef(-1);
 
   const segments = useMemo(() => buildSegments(mode, retention && retentionAllowed, duration), [mode, retention, retentionAllowed, duration]);
   const total = useMemo(() => segments.reduce((s, x) => s + x.seconds, 0), [segments]);
   const current = segments[Math.min(index, segments.length - 1)];
 
+  // Préférence de voix mémorisée sur l'appareil.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(VOICE_KEY) === "off") {
+        setVoiceOn(false);
+        voiceRef.current = false;
+      }
+    } catch {
+      /* stockage indisponible : on garde la voix activée */
+    }
+  }, []);
+
+  function toggleVoice() {
+    const next = !voiceOn;
+    setVoiceOn(next);
+    voiceRef.current = next;
+    try {
+      localStorage.setItem(VOICE_KEY, next ? "on" : "off");
+    } catch {
+      /* ignoré */
+    }
+    if (!next) stopSpeech();
+  }
+
   function start() {
     setIndex(0);
     setRemaining(segments[0].seconds);
     savedRef.current = false;
+    // Premier mot prononcé dans le geste de l'utilisateur (nécessaire sur iPhone).
+    spokenRef.current = 0;
+    speak(WORD[segments[0].kind], voiceRef.current);
     setStatus("running");
   }
 
@@ -96,6 +147,20 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
     }
   }, [remaining, status, index, segments]);
 
+  // Voix : un mot au début de chaque phase.
+  useEffect(() => {
+    if (status !== "running") return;
+    if (spokenRef.current === index) return;
+    spokenRef.current = index;
+    speak(WORD[segments[index].kind], voiceRef.current);
+  }, [status, index, segments]);
+
+  // La voix s'arrête en pause, à la fin, et quand on quitte la page.
+  useEffect(() => {
+    if (status === "paused" || status === "done") stopSpeech();
+  }, [status]);
+  useEffect(() => stopSpeech, []);
+
   // Enregistrement automatique à la fin.
   useEffect(() => {
     if (status !== "done" || savedRef.current) return;
@@ -106,12 +171,12 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
   const active = status === "running" || status === "paused";
   const scale = active ? SCALE[current.kind] : 0.62;
   const dur = current.kind === "hold" ? 0.5 : current.seconds;
+  const orbOpacity = dark ? 0.82 : 1;
 
   const shell = cn(
     "fixed inset-0 z-50 flex flex-col items-center justify-between overflow-y-auto px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]",
     dark ? "bg-[#07060a] text-rr-gris-clair" : "bg-rr-noir text-rr-ivoire"
   );
-  const accent = dark ? "border-rr-gris/40 bg-white/[0.03]" : "border-rr-or/50 bg-rr-or/10";
 
   return (
     <div className={shell}>
@@ -119,13 +184,24 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
         <p className={cn("text-[11px] uppercase tracking-[0.3em]", dark ? "text-rr-gris" : "text-rr-or")}>
           {mode === "morning" ? "Routine du matin" : mode === "sleep" ? "Pour t'endormir" : "Routine du soir"}
         </p>
-        <Link
-          href="/aujourdhui"
-          aria-label="Quitter la pratique"
-          className="flex h-10 w-10 items-center justify-center rounded-full text-rr-gris transition-colors hover:text-rr-ivoire"
-        >
-          <X className="h-5 w-5" strokeWidth={1.75} />
-        </Link>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={toggleVoice}
+            aria-label={voiceOn ? "Couper la voix" : "Activer la voix"}
+            aria-pressed={voiceOn}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-rr-gris transition-colors hover:text-rr-ivoire"
+          >
+            {voiceOn ? <Volume2 className="h-5 w-5" strokeWidth={1.75} /> : <VolumeX className="h-5 w-5" strokeWidth={1.75} />}
+          </button>
+          <Link
+            href="/aujourdhui"
+            aria-label="Quitter la pratique"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-rr-gris transition-colors hover:text-rr-ivoire"
+          >
+            <X className="h-5 w-5" strokeWidth={1.75} />
+          </Link>
+        </div>
       </div>
 
       <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center py-8 text-center">
@@ -175,11 +251,17 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
               </label>
             )}
 
+            <p className="mt-8 text-xs text-rr-gris">
+              {voiceOn
+                ? "La voix te guide : « Inspire », « Retiens », « Expire ». Tu peux la couper en haut à droite."
+                : "La voix est coupée. Tu peux la réactiver en haut à droite."}
+            </p>
+
             <button
               type="button"
               onClick={start}
               className={cn(
-                "mt-10 h-14 w-full rounded-full text-[15px] font-medium transition-opacity hover:opacity-90",
+                "mt-6 h-14 w-full rounded-full text-[15px] font-medium transition-opacity hover:opacity-90",
                 dark ? "border border-rr-gris/50 text-rr-ivoire" : "bg-rr-or text-rr-noir"
               )}
             >
@@ -191,9 +273,34 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
         {active && (
           <>
             <div className="relative flex h-72 w-72 max-w-full items-center justify-center" aria-hidden="true">
+              {/* Halo violet qui respire avec l'orbe */}
               <span
-                className={cn("absolute inset-0 rounded-full border transition-transform ease-in-out", accent)}
-                style={{ transform: `scale(${scale})`, transitionDuration: `${dur}s` }}
+                className="absolute inset-[-22%] rounded-full blur-3xl transition-transform ease-in-out motion-reduce:transition-none"
+                style={{
+                  background:
+                    "radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(109,40,217,0.28) 45%, rgba(46,16,101,0) 72%)",
+                  transform: `scale(${scale})`,
+                  transitionDuration: `${dur}s`,
+                  opacity: orbOpacity,
+                }}
+              />
+              {/* L'orbe */}
+              <span
+                className="absolute inset-0 rounded-full transition-transform ease-in-out motion-reduce:transition-none"
+                style={{
+                  background:
+                    "radial-gradient(circle at 35% 30%, #ddd6fe 0%, #a78bfa 22%, #7c3aed 52%, #4c1d95 82%, #2e1065 100%)",
+                  boxShadow:
+                    "0 0 70px 10px rgba(139,92,246,0.45), inset 0 0 50px rgba(255,255,255,0.14), inset 0 -20px 50px rgba(30,10,70,0.55)",
+                  transform: `scale(${scale})`,
+                  transitionDuration: `${dur}s`,
+                  opacity: orbOpacity,
+                }}
+              />
+              {/* Reflet de lumière */}
+              <span
+                className="absolute left-[24%] top-[18%] h-[22%] w-[30%] rounded-full bg-white/25 blur-xl transition-transform ease-in-out motion-reduce:transition-none"
+                style={{ transform: `scale(${scale})`, transitionDuration: `${dur}s`, opacity: orbOpacity }}
               />
             </div>
             <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-rr-gris">{current.phase}</p>
