@@ -4,7 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ReminderSwitch } from "@/components/features/reminders/ReminderSwitch";
-import { saveReminderSettings } from "@/lib/reminders/actions";
+import { ReminderTimesForm } from "@/components/features/reminders/ReminderTimesForm";
 
 type Settings = {
   morning_enabled: boolean;
@@ -43,9 +43,6 @@ export default async function RappelsPage() {
       }
     : DEFAULTS;
 
-  const timeInput =
-    "h-11 rounded-xl border border-white/10 bg-white/[0.03] px-3 text-sm text-rr-ivoire focus:border-rr-or/50 focus:outline-none";
-
   return (
     <div className="mx-auto max-w-2xl pb-8">
       <header className="pt-1">
@@ -66,32 +63,12 @@ export default async function RappelsPage() {
       <section className="mt-10">
         <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Mes horaires</p>
         <GlassCard className="mt-4 p-5">
-          <form action={saveReminderSettings} className="flex flex-col gap-6">
-            <div className="flex items-center justify-between gap-4">
-              <label className="flex items-center gap-3 text-sm text-rr-ivoire">
-                <input type="checkbox" name="morning_enabled" defaultChecked={s.morning_enabled} className="h-4 w-4 accent-[#c9a961]" />
-                Le matin
-              </label>
-              <input type="time" name="morning_time" defaultValue={s.morning_time} required className={timeInput} />
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <label className="flex items-center gap-3 text-sm text-rr-ivoire">
-                <input type="checkbox" name="evening_enabled" defaultChecked={s.evening_enabled} className="h-4 w-4 accent-[#c9a961]" />
-                Le soir
-              </label>
-              <input type="time" name="evening_time" defaultValue={s.evening_time} required className={timeInput} />
-            </div>
-            <p className="text-xs text-rr-gris">
-              Le rappel du matin ne part pas si ton check-in est déjà fait. Celui du soir ne part pas si ta journée est déjà terminée.
-              Heure de Paris.
-            </p>
-            <button
-              type="submit"
-              className="h-12 rounded-full border border-rr-or/40 text-sm text-rr-or transition-colors hover:bg-rr-or/10"
-            >
-              Enregistrer mes horaires
-            </button>
-          </form>
+          <ReminderTimesForm
+            morningEnabled={s.morning_enabled}
+            morningTime={s.morning_time}
+            eveningEnabled={s.evening_enabled}
+            eveningTime={s.evening_time}
+          />
         </GlassCard>
       </section>
 
