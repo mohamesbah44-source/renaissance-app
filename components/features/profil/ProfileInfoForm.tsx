@@ -11,8 +11,8 @@ export function ProfileInfoForm({ profile }: { profile: Profile }) {
   const [state, formAction] = useActionState(updateProfileInfo, undefined);
 
   return (
-    <form action={formAction} className="flex flex-col gap-4">
-      <div className="grid grid-cols-2 gap-4">
+    <form action={formAction} className="flex flex-col gap-6">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Field label="Prénom" htmlFor="firstName">
           <Input id="firstName" name="firstName" type="text" defaultValue={profile.first_name ?? ""} required />
         </Field>
@@ -22,8 +22,16 @@ export function ProfileInfoForm({ profile }: { profile: Profile }) {
         </Field>
       </div>
 
-      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
-      {state?.success && <p className="text-sm text-rr-or-clair">Tes informations ont été mises à jour.</p>}
+      {state?.error && (
+        <p role="alert" className="text-sm text-rr-rouge">
+          {state.error}
+        </p>
+      )}
+      {state?.success && (
+        <p role="status" className="font-rr-serif text-base italic text-rr-or-clair">
+          Tes informations ont été mises à jour.
+        </p>
+      )}
 
       <SubmitButton className="w-auto self-start px-8">Enregistrer</SubmitButton>
     </form>
