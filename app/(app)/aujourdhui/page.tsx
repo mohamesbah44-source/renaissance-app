@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LifeBuoy, Check, Moon, CalendarCheck, TrendingUp, Bell } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -42,6 +43,29 @@ function ScaleInput({ name, label, low, high }: { name: string; label: string; l
         <span>{high}</span>
       </div>
     </fieldset>
+  );
+}
+
+function QuietTile({
+  href,
+  icon: Icon,
+  label,
+  ariaLabel,
+}: {
+  href: string;
+  icon: LucideIcon;
+  label: string;
+  ariaLabel?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={ariaLabel ?? label}
+      className="flex flex-col items-center gap-2 rounded-2xl bg-white/[0.03] px-2 py-4 text-rr-gris-clair transition-all duration-300 hover:bg-white/[0.06] hover:text-rr-ivoire active:scale-[0.97]"
+    >
+      <Icon className="h-5 w-5 text-rr-or/80" strokeWidth={1.5} />
+      <span className="text-[11px] tracking-wide">{label}</span>
+    </Link>
   );
 }
 
@@ -164,19 +188,27 @@ export default async function AujourdhuiPage() {
         </p>
       </header>
 
-      <GlassCard className="mt-8 p-6">
+      <GlassCard variant="gold" className="mt-8 p-6">
         <div className="flex items-baseline justify-between">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Ta journée</p>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/80">Ta journée</p>
           <p className="font-rr-display text-2xl text-rr-ivoire">
             {doneCount} <span className="text-base text-rr-gris">/ {steps.length}</span>
           </p>
         </div>
         <div className="mt-5 flex gap-1.5" role="img" aria-label={`${doneCount} étapes sur ${steps.length}`}>
           {steps.map((s, i) => (
-            <span key={i} className={cn("h-1 flex-1 rounded-full", s ? "bg-rr-or" : "bg-white/10")} />
+            <span
+              key={i}
+              className={cn(
+                "h-1 flex-1 rounded-full transition-colors duration-700",
+                s ? "bg-rr-or shadow-[0_0_10px_rgba(201,169,110,0.55)]" : "bg-white/10"
+              )}
+            />
           ))}
         </div>
-        <p className="mt-4 text-sm text-rr-gris-clair">La régularité compte plus que la perfection.</p>
+        <p className="mt-4 font-rr-serif text-base italic text-rr-gris-clair">
+          La régularité compte plus que la perfection.
+        </p>
       </GlassCard>
 
       {morning.length > 0 && (
@@ -204,14 +236,18 @@ export default async function AujourdhuiPage() {
             <button
               type="submit"
               className={cn(
-                "flex w-full items-start gap-4 rounded-2xl border p-5 text-left transition-all duration-300",
-                missionDone ? "border-rr-or/30 bg-rr-or/[0.05]" : "border-white/10 bg-white/[0.02] hover:border-rr-or/30"
+                "flex w-full items-start gap-4 rounded-[24px] border p-5 text-left transition-all duration-300",
+                missionDone
+                  ? "border-rr-or/30 bg-rr-or/[0.05]"
+                  : "border-rr-or/25 bg-gradient-to-b from-rr-or/[0.07] to-transparent hover:border-rr-or/50"
               )}
             >
               <span
                 className={cn(
-                  "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border",
-                  missionDone ? "border-rr-or bg-rr-or text-rr-noir" : "border-white/15 text-transparent"
+                  "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition-all duration-500",
+                  missionDone
+                    ? "border-rr-or bg-rr-or text-rr-noir shadow-[0_0_18px_rgba(201,169,110,0.45)]"
+                    : "border-rr-or/40 text-transparent"
                 )}
               >
                 <Check className="h-4 w-4" strokeWidth={2.5} />
@@ -224,7 +260,7 @@ export default async function AujourdhuiPage() {
 
       <section className="mt-10">
         <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Check-in · 30 secondes</p>
-        <GlassCard className="mt-4 p-5">
+        <GlassCard variant={checkin ? "quiet" : "default"} className="mt-4 p-5">
           {checkin ? (
             <p className="text-sm text-rr-gris-clair">
               Énergie <span className="text-rr-ivoire">{checkin.energy}/5</span> · Tension{" "}
@@ -264,7 +300,7 @@ export default async function AujourdhuiPage() {
 
       <section className="mt-10">
         <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Journaling</p>
-        <GlassCard className="mt-4 p-5">
+        <GlassCard variant={journalingDone ? "quiet" : "default"} className="mt-4 p-5">
           <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">{question}</p>
           {journalingDone ? (
             <p className="mt-4 text-sm text-rr-gris-clair">Écrit pour aujourd&apos;hui. Retrouve-le dans ton journal.</p>
@@ -316,7 +352,7 @@ export default async function AujourdhuiPage() {
           <form action={closeDay}>
             <button
               type="submit"
-              className="h-14 w-full rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90"
+              className="rr-shimmer h-14 w-full rounded-full bg-rr-or text-[15px] font-medium text-rr-noir shadow-[0_10px_40px_-12px_rgba(201,169,110,0.6)] transition-opacity hover:opacity-90"
             >
               Terminer ma journée
             </button>
@@ -325,44 +361,19 @@ export default async function AujourdhuiPage() {
       </div>
 
       <Link
-        href="/bilan"
-        className="mt-6 flex items-center justify-center gap-2 rounded-full border border-rr-or/30 px-5 py-3.5 text-sm text-rr-or transition-colors hover:bg-rr-or/10"
-      >
-        <CalendarCheck className="h-4 w-4" strokeWidth={1.75} />
-        Le bilan de ma semaine
-      </Link>
-
-      <Link
-        href="/progression"
-        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
-      >
-        <TrendingUp className="h-4 w-4" strokeWidth={1.75} />
-        Ma progression
-      </Link>
-
-      <Link
-        href="/rappels"
-        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
-      >
-        <Bell className="h-4 w-4" strokeWidth={1.75} />
-        Mes rappels
-      </Link>
-
-      <Link
         href="/revenir-a-moi"
-        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-rr-orange/30 px-5 py-3.5 text-sm text-rr-orange/90 transition-colors hover:bg-rr-orange/[0.08]"
+        className="mt-5 flex items-center justify-center gap-2 rounded-full border border-rr-orange/30 px-5 py-3.5 text-sm text-rr-orange/90 transition-colors hover:bg-rr-orange/[0.08]"
       >
         <LifeBuoy className="h-4 w-4" strokeWidth={1.75} />
         J&apos;ai besoin de revenir à moi
       </Link>
 
-      <Link
-        href="/pratique/sommeil"
-        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
-      >
-        <Moon className="h-4 w-4" strokeWidth={1.75} />
-        Je n&apos;arrive pas à dormir
-      </Link>
+      <nav aria-label="Mon espace" className="mt-8 grid grid-cols-4 gap-2.5">
+        <QuietTile href="/bilan" icon={CalendarCheck} label="Bilan" ariaLabel="Le bilan de ma semaine" />
+        <QuietTile href="/progression" icon={TrendingUp} label="Progression" ariaLabel="Ma progression" />
+        <QuietTile href="/rappels" icon={Bell} label="Rappels" ariaLabel="Mes rappels" />
+        <QuietTile href="/pratique/sommeil" icon={Moon} label="Sommeil" ariaLabel="Je n'arrive pas à dormir" />
+      </nav>
     </div>
   );
 }
