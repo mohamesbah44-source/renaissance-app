@@ -23,7 +23,7 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
 
   if (editing) {
     return (
-      <GlassCard className="p-6">
+      <GlassCard variant="gold" className="p-7">
         <JournalEntryForm
           entry={entry}
           weeks={weeks}
@@ -39,21 +39,29 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
   const weekLabel = entry.week_id ? weekTitleById[entry.week_id] : null;
 
   return (
-    <GlassCard className="p-6">
-      <p className="text-[11px] uppercase tracking-[0.2em] text-rr-gris">
-        {formatDate(entry.entry_date)}
-        {entry.mood && <span className="text-rr-or"> · {entry.mood}</span>}
-      </p>
+    <GlassCard className="p-7">
+      <div className="flex items-start justify-between gap-4">
+        <p className="text-[11px] uppercase tracking-[0.25em] text-rr-or-clair/80">
+          {formatDate(entry.entry_date)}
+        </p>
+        {entry.mood && (
+          <span className="shrink-0 rounded-full border border-rr-or/25 bg-rr-or/[0.06] px-3 py-1 text-[11px] text-rr-or">
+            {entry.mood}
+          </span>
+        )}
+      </div>
 
-      {entry.title && <p className="mt-3 font-rr-display text-xl leading-snug text-rr-ivoire">{entry.title}</p>}
+      {entry.title && (
+        <p className="mt-4 font-rr-display text-xl leading-snug text-rr-ivoire">{entry.title}</p>
+      )}
 
-      {weekLabel && <p className="mt-1 text-xs text-rr-gris-clair">{weekLabel}</p>}
+      {weekLabel && <p className="mt-1.5 text-xs text-rr-gris">{weekLabel}</p>}
 
       <p
         className={
           expanded
-            ? "mt-4 whitespace-pre-wrap text-[15px] leading-relaxed text-rr-ivoire/85"
-            : "mt-4 line-clamp-4 whitespace-pre-wrap text-[15px] leading-relaxed text-rr-ivoire/85"
+            ? "mt-5 whitespace-pre-wrap font-rr-serif text-lg leading-relaxed text-rr-ivoire/90"
+            : "mt-5 line-clamp-4 whitespace-pre-wrap font-rr-serif text-lg leading-relaxed text-rr-ivoire/90"
         }
       >
         {entry.content}
@@ -63,13 +71,13 @@ export function JournalEntryCard({ entry, weeks, weekTitleById, defaultDate }: J
         <button
           type="button"
           onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-xs text-rr-or-clair transition-colors duration-300 hover:text-rr-ivoire"
+          className="mt-3 text-xs text-rr-or-clair transition-colors duration-300 hover:text-rr-ivoire"
         >
           {expanded ? "Réduire" : "Lire la suite"}
         </button>
       )}
 
-      <div className="mt-5 flex items-center gap-5 border-t border-white/[0.06] pt-4">
+      <div className="mt-6 flex items-center gap-5 border-t border-white/[0.06] pt-4">
         {confirmingDelete ? (
           <>
             <p className="text-xs text-rr-gris-clair">Supprimer cette entrée ?</p>
