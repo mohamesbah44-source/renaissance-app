@@ -68,7 +68,7 @@ export function InviteMemberForm({ defaultDate }: { defaultDate: string }) {
 
           {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
 
-          <SubmitButton>Générer le lien d&apos;invitation</SubmitButton>
+          <SubmitButton>Inviter et envoyer l&apos;e-mail</SubmitButton>
         </form>
       </GlassCard>
 
@@ -77,16 +77,23 @@ export function InviteMemberForm({ defaultDate }: { defaultDate: string }) {
           <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">
             {state.existing ? "Ce membre a déjà un compte" : "Compte créé"}
           </p>
-          <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
-            {state.existing
-              ? `Voici un lien pour que ${state.firstName} redéfinisse son mot de passe.`
-              : `Envoie ce lien personnel à ${state.firstName} (${state.email}). Il choisira son mot de passe et entrera directement dans l'appli.`}
-          </p>
+
+          {state.emailSent ? (
+            <p className="mt-3 text-sm leading-relaxed text-rr-ivoire">
+              Un e-mail a été envoyé à {state.email}, avec le lien pour choisir son mot de passe.
+            </p>
+          ) : (
+            <p className="mt-3 text-sm leading-relaxed text-rr-orange">
+              {state.emailError ?? "L'e-mail n'a pas pu être envoyé."} Envoie-lui le lien toi-même.
+            </p>
+          )}
+
+          <p className="mt-4 text-xs text-rr-gris">Lien de secours, à n&apos;utiliser que si l&apos;e-mail n&apos;arrive pas :</p>
           <input
             readOnly
             value={state.link}
             onFocus={(e) => e.currentTarget.select()}
-            className={`${inputClass} mt-4 text-xs`}
+            className={`${inputClass} mt-2 text-xs`}
             aria-label="Lien d'invitation"
           />
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
