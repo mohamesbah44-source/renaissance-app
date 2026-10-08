@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
-import { getProfile } from "@/lib/supabase/queries";
 import { WeekListItem } from "@/components/features/parcours/WeekListItem";
+import { todayISODate } from "@/lib/habits/streak";
 import type { ProgressStatus } from "@/lib/types/database.types";
 
 export default async function ParcoursPage() {
@@ -13,8 +13,20 @@ export default async function ParcoursPage() {
     return null;
   }
 
-  const profile = await getProfile(supabase, user.id);
-  const currentWeekNumber = profile?.current_week ?? 1;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("program_start_date, current_week")
+    .eq("id", user.id)
+    .single();
+
+  // Même règle que la page Aujourd'hui : la semaine se calcule depuis la date de début.
+  let currentWeekNumber = profile?.current_week ?? 1;
+  if (profile?.program_start_date) {
+    const todayDate = new Date(`${todayISODate()}T12:00:00`);
+    const start = new Date(`${String(profile.program_start_date).slice(0, 10)}T12:00:00`);
+    const diff = Math.max(0, Math.round((todayDate.getTime() - start.getTime()) / 86400000));
+    currentWeekNumber = Math.min(8, Math.floor(diff / 7) + 1);
+  }
 
   const [{ data: weeks }, { data: progressRows }] = await Promise.all([
     supabase.from("weeks").select("*").order("week_number", { ascending: true }),
