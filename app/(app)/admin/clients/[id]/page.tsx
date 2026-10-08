@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ClientSettingsForm } from "@/components/features/admin/ClientSettingsForm";
 import { ClientProgressPanel } from "@/components/features/admin/ClientProgressPanel";
 import { ClientRadarPanel } from "@/components/features/admin/ClientRadarPanel";
+import { RadarEvolution } from "@/components/features/radar/RadarEvolution";
 import { ClientOverviewBanner } from "@/components/features/admin/ClientOverviewBanner";
 import { ImportAnalyzerButton } from "@/components/features/admin/ImportAnalyzerButton";
 import { AdminHabitsManager } from "@/components/features/admin/AdminHabitsManager";
@@ -122,6 +123,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
       {weeks && <ClientProgressPanel weeks={weeks} progressByWeekId={progressByWeekId} />}
 
       <ClientRadarPanel bilans={radarRows ?? []} />
+      <RadarEvolution userId={id} />
       <ImportAnalyzerButton clientId={id} />
 
       <div>
