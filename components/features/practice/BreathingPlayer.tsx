@@ -19,11 +19,18 @@ const WORD: Record<Kind, string> = {
 
 const SCALE: Record<Kind, number> = { inhale: 1, hold: 1, exhale: 0.62, contract: 0.82, release: 0.62 };
 
+/** Voix enregistrées. Les phases absentes de cette liste utilisent la synthèse vocale du téléphone. */
+const AUDIO: Partial<Record<Kind, string>> = {
+  inhale: "/audio/inspire.mp3",
+  hold: "/audio/retiens.mp3",
+  exhale: "/audio/expire.mp3",
+};
+
 const VOICE_KEY = "rr-breath-voice";
 
 /** Prononce un mot en français, d'une voix lente et posée (synthèse vocale du navigateur). */
-function speak(text: string, enabled: boolean) {
-  if (!enabled || typeof window === "undefined" || !("speechSynthesis" in window)) return;
+function speak(text: string) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
   const synth = window.speechSynthesis;
   synth.cancel();
   const utterance = new SpeechSynthesisUtterance(text);
@@ -38,6 +45,26 @@ function speak(text: string, enabled: boolean) {
 
 function stopSpeech() {
   if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+}
+
+/** Joue la voix enregistrée de la phase, ou la synthèse vocale en secours. */
+function cue(kind: Kind, enabled: boolean, audio: HTMLAudioElement | null) {
+  if (!enabled) return;
+  stopSpeech();
+  const src = AUDIO[kind];
+  if (src && audio) {
+    audio.src = src;
+    audio.currentTime = 0;
+    audio.play().catch(() => speak(WORD[kind]));
+    return;
+  }
+  audio?.pause();
+  speak(WORD[kind]);
+}
+
+function stopCue(audio: HTMLAudioElement | null) {
+  stopSpeech();
+  audio?.pause();
 }
 
 function cycles(n: number, make: () => Segment[]): Segment[] {
@@ -84,6 +111,7 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
   const savedRef = useRef(false);
   const voiceRef = useRef(true);
   const spokenRef = useRef(-1);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const segments = useMemo(() => buildSegments(mode, retention && retentionAllowed, duration), [mode, retention, retentionAllowed, duration]);
   const total = useMemo(() => segments.reduce((s, x) => s + x.seconds, 0), [segments]);
@@ -110,16 +138,18 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
     } catch {
       /* ignoré */
     }
-    if (!next) stopSpeech();
+    if (!next) stopCue(audioRef.current);
   }
 
   function start() {
     setIndex(0);
     setRemaining(segments[0].seconds);
     savedRef.current = false;
-    // Premier mot prononcé dans le geste de l'utilisateur (nécessaire sur iPhone).
+    // Le lecteur audio est créé dans le geste de l'utilisateur (nécessaire sur iPhone),
+    // puis réutilisé pour toutes les phases.
+    if (!audioRef.current) audioRef.current = new Audio();
     spokenRef.current = 0;
-    speak(WORD[segments[0].kind], voiceRef.current);
+    cue(segments[0].kind, voiceRef.current, audioRef.current);
     setStatus("running");
   }
 
@@ -152,14 +182,16 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
     if (status !== "running") return;
     if (spokenRef.current === index) return;
     spokenRef.current = index;
-    speak(WORD[segments[index].kind], voiceRef.current);
+    cue(segments[index].kind, voiceRef.current, audioRef.current);
   }, [status, index, segments]);
 
   // La voix s'arrête en pause, à la fin, et quand on quitte la page.
   useEffect(() => {
-    if (status === "paused" || status === "done") stopSpeech();
+    if (status === "paused" || status === "done") stopCue(audioRef.current);
   }, [status]);
-  useEffect(() => stopSpeech, []);
+  useEffect(() => {
+    return () => stopCue(audioRef.current);
+  }, []);
 
   // Enregistrement automatique à la fin.
   useEffect(() => {
