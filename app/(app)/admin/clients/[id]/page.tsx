@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { Badge } from "@/components/ui/Badge";
@@ -68,6 +69,17 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
     supabase.from("habits").select("*").eq("user_id", id).order("created_at", { ascending: false }),
     supabase.from("habit_logs").select("habit_id").eq("user_id", id).eq("log_date", todayISODate()),
   ]);
+
+  // Hypothèses privées : table réservée à l'admin (invisible pour les clients).
+  const carnetIds = (carnetEntries ?? []).map((entry) => entry.id);
+  const db = supabase as unknown as SupabaseClient;
+  const { data: hypothesesRows } =
+    carnetIds.length > 0
+      ? await db.from("carnet_hypotheses").select("entry_id, hypotheses").in("entry_id", carnetIds)
+      : { data: [] };
+  const hypothesesByEntry = new Map(
+    ((hypothesesRows ?? []) as { entry_id: string; hypotheses: unknown }[]).map((row) => [row.entry_id, row.hypotheses])
+  );
 
   const progressByWeekId = new Map((progressRows ?? []).map((progress) => [progress.week_id, progress]));
   const weekTitleById = Object.fromEntries(
@@ -149,7 +161,7 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
           )}
 
           {(carnetEntries ?? []).map((entry) => (
-            <AdminCarnetEntryCard key={entry.id} entry={entry} />
+            <AdminCarnetEntryCard key={entry.id} entry={entry} hypotheses={hypothesesByEntry.get(entry.id)} />
           ))}
         </div>
       </div>
