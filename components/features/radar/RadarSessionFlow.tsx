@@ -30,7 +30,12 @@ function readStoredSession(): StoredSession {
   return { answers: {}, index: 0 };
 }
 
-export function RadarSessionFlow() {
+/**
+ * `doneHref` : page où envoyer le membre une fois le bilan enregistré
+ * (l'identifiant du bilan est ajouté en `?id=`). Sans ce paramètre, le membre
+ * va vers la page de résultats habituelle du Radar.
+ */
+export function RadarSessionFlow({ doneHref }: { doneHref?: string }) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(saveRadarBilan, undefined);
   const [session, setSession] = useState<StoredSession>(readStoredSession);
@@ -59,9 +64,9 @@ export function RadarSessionFlow() {
   useEffect(() => {
     if (state?.success) {
       sessionStorage.removeItem(STORAGE_KEY);
-      router.push(`/radar/resultats/${state.id}`);
+      router.push(doneHref ? `${doneHref}?id=${state.id}` : `/radar/resultats/${state.id}`);
     }
-  }, [state, router]);
+  }, [state, router, doneHref]);
 
   const question = ALL_QUESTIONS[index];
   const isLast = index === ALL_QUESTIONS.length - 1;
