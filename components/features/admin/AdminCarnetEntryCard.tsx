@@ -5,8 +5,26 @@ import { deleteCarnetEntry } from "@/lib/carnet/actions";
 import { formatDate } from "@/lib/utils";
 import type { CarnetEntry } from "@/lib/types/database.types";
 
-export function AdminCarnetEntryCard({ entry }: { entry: CarnetEntry }) {
-  const hypotheses = (entry.hypotheses as unknown as string[] | null) ?? [];
+function toTexts(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (typeof item === "string") return item;
+      if (item && typeof item === "object") {
+        const o = item as Record<string, unknown>;
+        const v = o.hypothese ?? o.hypothesis ?? o.texte ?? o.text;
+        return typeof v === "string" ? v : "";
+      }
+      return "";
+    })
+    .filter((t) => t.trim().length > 0);
+}
+
+export function AdminCarnetEntryCard({ entry, hypotheses: privateHypotheses }: { entry: CarnetEntry; hypotheses?: unknown }) {
+  // Les hypothèses vivent désormais dans une table réservée à l'admin.
+  // On garde l'ancienne colonne en secours pour les entrées créées avant ce changement.
+  const fromPrivate = toTexts(privateHypotheses);
+  const hypotheses = fromPrivate.length > 0 ? fromPrivate : toTexts(entry.hypotheses);
   const piliers = entry.pilier_ids.map((id) => pilierById(id)).filter((p): p is NonNullable<typeof p> => Boolean(p));
 
   return (
@@ -27,13 +45,16 @@ export function AdminCarnetEntryCard({ entry }: { entry: CarnetEntry }) {
       <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-rr-gris-clair">{entry.synthese}</p>
 
       {hypotheses.length > 0 && (
-        <ul className="mt-3 flex flex-col gap-1 border-t border-white/10 pt-3">
-          {hypotheses.map((hypothese, index) => (
-            <li key={index} className="text-xs text-rr-gris">
-              · {hypothese}
-            </li>
-          ))}
-        </ul>
+        <div className="mt-4 rounded-xl border border-rr-or/20 bg-rr-or/[0.04] p-4">
+          <p className="text-[11px] uppercase tracking-[0.25em] text-rr-or">Hypothèses · visibles par toi seulement</p>
+          <ul className="mt-3 flex flex-col gap-1.5">
+            {hypotheses.map((hypothese, index) => (
+              <li key={index} className="text-sm leading-relaxed text-rr-gris-clair">
+                · {hypothese}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       <form action={deleteCarnetEntry} className="mt-3">
