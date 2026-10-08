@@ -6,6 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { TodayHabitRow } from "@/components/features/today/TodayHabitRow";
+import { RadarExpressInvite } from "@/components/features/radar/RadarExpressInvite";
 import { todayISODate } from "@/lib/habits/streak";
 import { formatDate, cn } from "@/lib/utils";
 import { toggleMission, saveCheckin, saveJournalAnswer, closeDay } from "@/lib/today/actions";
@@ -257,6 +258,10 @@ export default async function AujourdhuiPage() {
           </form>
         </section>
       )}
+
+      <div className="mt-10 empty:hidden">
+        <RadarExpressInvite />
+      </div>
 
       <section className="mt-10">
         <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Check-in · 30 secondes</p>
