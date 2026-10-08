@@ -1,169 +1,135 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LifeBuoy, Check, Moon, CalendarCheck, TrendingUp, Bell } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Check } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
-import { TodayHabitRow } from "@/components/features/today/TodayHabitRow";
-import { RadarExpressInvite } from "@/components/features/radar/RadarExpressInvite";
+import { programWeek } from "@/lib/radar/express";
 import { todayISODate } from "@/lib/habits/streak";
-import { formatDate, cn } from "@/lib/utils";
-import { toggleMission, saveCheckin, saveJournalAnswer, closeDay } from "@/lib/today/actions";
+import { cn } from "@/lib/utils";
 
-const FALLBACK_QUESTION = "Qu'est-ce qui, aujourd'hui, a mérité ton attention ?";
+type WeekRow = { id: string; week_number: number; title: string | null; intention: string | null };
 
-function pickQuestion(prompts: unknown, dayNumber: number): string {
-  if (!Array.isArray(prompts) || prompts.length === 0) return FALLBACK_QUESTION;
-  const item = prompts[(dayNumber - 1) % prompts.length];
-  if (typeof item === "string") return item;
-  if (item && typeof item === "object") {
-    const o = item as Record<string, unknown>;
-    const v = o.question ?? o.text ?? o.prompt;
-    if (typeof v === "string") return v;
-  }
-  return FALLBACK_QUESTION;
-}
-
-function greeting(): string {
-  const hour = Number(
-    new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", hourCycle: "h23", timeZone: "Europe/Paris" }).format(new Date())
-  );
-  if (hour < 5) return "Bonne nuit";
-  if (hour < 12) return "Bonjour";
-  if (hour < 18) return "Bon après-midi";
-  return "Bonsoir";
-}
-
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="h-px w-6 bg-rr-or/50" />
-      <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">{children}</p>
-    </div>
-  );
-}
-
-function ProgressRing({ done, total }: { done: number; total: number }) {
-  const r = 28;
-  const c = 2 * Math.PI * r;
-  const pct = total > 0 ? Math.min(1, done / total) : 0;
-  return (
-    <div className="relative h-[76px] w-[76px] shrink-0" role="img" aria-label={`${done} étapes sur ${total}`}>
-      <svg viewBox="0 0 72 72" className="h-full w-full -rotate-90">
-        <circle cx="36" cy="36" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2.5" />
-        <circle
-          cx="36"
-          cy="36"
-          r={r}
-          fill="none"
-          stroke="#c9a96e"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - pct)}
-          style={{ filter: "drop-shadow(0 0 6px rgba(201,169,110,0.55))", transition: "stroke-dashoffset 1s ease" }}
-        />
-      </svg>
-      <div className="absolute inset-0 flex items-center justify-center font-rr-display text-xl text-rr-ivoire">
-        {done}
-        <span className="text-xs text-rr-gris">/{total}</span>
-      </div>
-    </div>
-  );
-}
-
-function ScaleInput({ name, label, low, high }: { name: string; label: string; low: string; high: string }) {
-  return (
-    <fieldset>
-      <legend className="text-sm text-rr-ivoire">{label}</legend>
-      <div className="mt-3 flex gap-2">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <label key={n} className="flex-1">
-            <input type="radio" name={name} value={n} required className="peer sr-only" />
-            <span className="flex h-11 cursor-pointer items-center justify-center rounded-xl border border-white/10 bg-white/[0.02] text-sm text-rr-gris-clair transition-all duration-300 peer-checked:border-rr-or peer-checked:bg-rr-or/15 peer-checked:text-rr-or peer-focus-visible:ring-2 peer-focus-visible:ring-rr-or/50">
-              {n}
-            </span>
-          </label>
-        ))}
-      </div>
-      <div className="mt-1.5 flex justify-between text-[11px] text-rr-gris">
-        <span>{low}</span>
-        <span>{high}</span>
-      </div>
-    </fieldset>
-  );
-}
-
-function QuietTile({
-  href,
-  icon: Icon,
-  label,
-  ariaLabel,
-}: {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-  ariaLabel?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-label={ariaLabel ?? label}
-      className="flex flex-col items-center gap-2 rounded-2xl bg-white/[0.03] px-2 py-4 text-rr-gris-clair transition-all duration-300 hover:bg-white/[0.06] hover:text-rr-ivoire active:scale-[0.97]"
-    >
-      <Icon className="h-5 w-5 text-rr-or/80" strokeWidth={1.5} />
-      <span className="text-[11px] tracking-wide">{label}</span>
-    </Link>
-  );
-}
-
-export default async function AujourdhuiPage() {
+export default async function ParcoursPage() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const today = todayISODate();
-  const todayDate = new Date(`${today}T12:00:00`);
-  const jsDay = todayDate.getDay();
-  const isoWeekday = jsDay === 0 ? 7 : jsDay;
-
   const { data: profile } = await supabase
     .from("profiles")
-    .select("first_name, program_start_date, current_week")
+    .select("program_start_date, current_week")
     .eq("id", user.id)
     .single();
 
-  // Client non typé : les tables du Lot 1 ne sont pas encore dans les types générés.
+  const currentWeek = programWeek(profile?.program_start_date, todayISODate(), profile?.current_week ?? 1);
+
   const db = supabase as unknown as SupabaseClient;
-
-  let weekNumber = profile?.current_week ?? 1;
-  let dayNumber = 1;
-  if (profile?.program_start_date) {
-    const start = new Date(`${String(profile.program_start_date).slice(0, 10)}T12:00:00`);
-    const diff = Math.max(0, Math.round((todayDate.getTime() - start.getTime()) / 86400000));
-    weekNumber = Math.min(8, Math.floor(diff / 7) + 1);
-    dayNumber = (diff % 7) + 1;
-  }
-
-  const { data: week } = await supabase
+  const { data: weeksRaw } = await db
     .from("weeks")
-    .select("id, title, journaling_prompts")
-    .eq("week_number", weekNumber)
-    .maybeSingle();
+    .select("id, week_number, title, intention")
+    .order("week_number", { ascending: true });
+  const weeks = (weeksRaw ?? []) as WeekRow[];
 
-  const [{ data: programDay }, { data: habits }, { data: logs }, { data: progress }, { data: checkin }] =
-    await Promise.all([
-      week
-        ? db
-            .from("program_days")
-            .select("id, journaling_question, mission")
-            .eq("week_id", week.id)
-            .eq("day_number", dayNumber)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      db
-        .from("habits")
-        .select("id, titre, time_of_day, weekdays, start_date, end_date,
+  return (
+    <div className="mx-auto max-w-2xl pb-8">
+      <header className="pt-2">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">8 semaines</p>
+        <h1 className="mt-4 font-rr-display text-[2.6rem] leading-[1.1] text-rr-ivoire">Ton parcours</h1>
+        <p className="mt-4 text-sm text-rr-gris-clair">
+          Tu es en semaine {currentWeek} sur 8. Chaque semaine ouvre un nouveau pas, à ton rythme.
+        </p>
+      </header>
+
+      <div className="mt-10 flex flex-col gap-4">
+        {weeks.length === 0 && (
+          <GlassCard variant="quiet" className="p-6">
+            <p className="text-sm text-rr-gris-clair">Ton parcours se prépare. Reviens très bientôt.</p>
+          </GlassCard>
+        )}
+
+        {weeks.map((w) => {
+          const isCurrent = w.week_number === currentWeek;
+          const isPast = w.week_number < currentWeek;
+          const isFuture = w.week_number > currentWeek;
+
+          const content = (
+            <div className="flex items-start gap-5">
+              <span
+                className={cn(
+                  "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border font-rr-display text-base",
+                  isCurrent
+                    ? "border-rr-or bg-rr-or/15 text-rr-or shadow-[0_0_18px_rgba(201,169,110,0.35)]"
+                    : isPast
+                      ? "border-rr-or/40 text-rr-or/80"
+                      : "border-white/10 text-rr-gris"
+                )}
+              >
+                {isPast ? <Check className="h-4 w-4" strokeWidth={2.25} /> : w.week_number}
+              </span>
+              <div className="min-w-0">
+                <p
+                  className={cn(
+                    "text-[11px] uppercase tracking-[0.3em]",
+                    isCurrent ? "text-rr-or" : "text-rr-gris"
+                  )}
+                >
+                  Semaine {w.week_number}
+                  {isCurrent ? " · en cours" : ""}
+                </p>
+                <p
+                  className={cn(
+                    "mt-2 font-rr-display text-xl leading-snug",
+                    isFuture ? "text-rr-gris-clair" : "text-rr-ivoire"
+                  )}
+                >
+                  {w.title ?? `Semaine ${w.week_number}`}
+                </p>
+                {w.intention && (
+                  <p
+                    className={cn(
+                      "mt-2 font-rr-serif text-base italic leading-snug",
+                      isFuture ? "text-rr-gris" : "text-rr-gris-clair"
+                    )}
+                  >
+                    {w.intention}
+                  </p>
+                )}
+                {!isFuture && (
+                  <p className="mt-3 text-xs text-rr-or/80">Voir le bilan de cette semaine</p>
+                )}
+              </div>
+            </div>
+          );
+
+          if (isFuture) {
+            return (
+              <GlassCard key={w.id} variant="quiet" className="p-6 opacity-70">
+                {content}
+              </GlassCard>
+            );
+          }
+
+          return (
+            <Link key={w.id} href={`/bilan?semaine=${w.week_number}`} className="block">
+              <GlassCard
+                variant={isCurrent ? "gold" : "default"}
+                className="p-6 transition-transform duration-300 active:scale-[0.99]"
+              >
+                {content}
+              </GlassCard>
+            </Link>
+          );
+        })}
+      </div>
+
+      <Link
+        href="/aujourdhui"
+        className="mt-10 flex items-center justify-center rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
+      >
+        Retour à ma journée
+      </Link>
+    </div>
+  );
+}
