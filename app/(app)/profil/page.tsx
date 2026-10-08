@@ -6,6 +6,7 @@ import { signOut } from "@/lib/auth/actions";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { ProfileInfoForm } from "@/components/features/profil/ProfileInfoForm";
 import { PasswordForm } from "@/components/features/profil/PasswordForm";
+import WelcomeVideo from "@/components/features/bienvenue/WelcomeVideo";
 import { programWeek } from "@/lib/radar/express";
 import { todayISODate } from "@/lib/habits/streak";
 import { formatDate } from "@/lib/utils";
@@ -88,6 +89,24 @@ export default async function ProfilPage() {
           <WeekRing week={week} />
         </div>
       </GlassCard>
+
+      <details className="group rounded-[28px] border border-rr-or/[0.14] bg-white/[0.03] transition-colors duration-300 open:border-rr-or/25 open:bg-white/[0.04]">
+        <summary className="flex cursor-pointer list-none items-center justify-between p-6 [&::-webkit-details-marker]:hidden">
+          <span className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/80">
+            Revoir la présentation
+          </span>
+          <ChevronDown
+            className="h-4 w-4 text-rr-gris transition-transform duration-300 group-open:rotate-180"
+            strokeWidth={1.75}
+          />
+        </summary>
+        <div className="px-6 pb-7">
+          <p className="mb-5 text-center font-rr-serif text-base italic text-rr-gris-clair">
+            L&apos;application en 1 min 30.
+          </p>
+          <WelcomeVideo />
+        </div>
+      </details>
 
       <details className="group rounded-[28px] border border-rr-or/[0.14] bg-white/[0.03] transition-colors duration-300 open:border-rr-or/25 open:bg-white/[0.04]">
         <summary className="flex cursor-pointer list-none items-center justify-between p-6 [&::-webkit-details-marker]:hidden">
