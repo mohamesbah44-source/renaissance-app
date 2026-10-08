@@ -5,7 +5,13 @@ const AUTH_ROUTES = ["/login", "/register", "/forgot-password"];
 
 const PROTECTED_PREFIXES = [
   "/aujourdhui",
-  "/dashboard", 
+  "/bilan",
+  "/progression",
+  "/rappels",
+  "/revenir-a-moi",
+  "/pratique",
+  "/habitudes",
+  "/dashboard",
   "/parcours",
   "/radar",
   "/journal",
