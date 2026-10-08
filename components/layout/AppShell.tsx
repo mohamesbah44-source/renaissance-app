@@ -2,13 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { LifeBuoy, MessageCircle } from "lucide-react";
 import { BottomNav } from "@/components/layout/BottomNav";
-import { AmbientBackground } from "@/components/layout/AmbientBackground";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative">
-      <AmbientBackground />
-
       <div className="relative z-10 flex min-h-dvh flex-col">
         {/* Voile sous l'heure du téléphone : le contenu ne passe plus dessous */}
         <div
