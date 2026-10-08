@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
+import { RadarExpressForm } from "@/components/features/radar/RadarExpressForm";
+import { RadarExpressSummary } from "@/components/features/radar/RadarExpressSummary";
+import { levelsFromPillarScores, type Levels } from "@/lib/radar/express";
 import { todayISODate } from "@/lib/habits/streak";
 import { cn } from "@/lib/utils";
 import { saveWeeklySynthesis } from "@/lib/today/synthesis-actions";
@@ -10,6 +13,7 @@ import { saveWeeklySynthesis } from "@/lib/today/synthesis-actions";
 type Checkin = { checkin_date: string; energy: number | null; tension: number | null };
 type Progress = { log_date: string; mission_done: boolean; journaling_done: boolean };
 type Entry = { id: string; entry_date: string; content: string };
+type ExpressRow = { week_number: number; levels: Levels | null };
 
 const DAY_LETTERS = ["D", "L", "M", "M", "J", "V", "S"];
 
@@ -99,7 +103,14 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
     .eq("week_number", weekNumber)
     .maybeSingle();
 
-  const [{ data: checkinsRaw }, { data: progressRaw }, { data: entriesRaw }, { data: synthesis }] = await Promise.all([
+  const [
+    { data: checkinsRaw },
+    { data: progressRaw },
+    { data: entriesRaw },
+    { data: synthesis },
+    { data: expressRaw },
+    { data: baselineBilan },
+  ] = await Promise.all([
     db
       .from("daily_checkins")
       .select("checkin_date, energy, tension")
@@ -128,6 +139,18 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
           .eq("week_id", week.id)
           .maybeSingle()
       : Promise.resolve({ data: null }),
+    db
+      .from("radar_express")
+      .select("week_number, levels")
+      .eq("user_id", user.id)
+      .in("week_number", [weekNumber, weekNumber - 1]),
+    db
+      .from("radar_bilans")
+      .select("pillar_scores")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
   ]);
 
   const checkins = (checkinsRaw ?? []) as Checkin[];
@@ -144,6 +167,15 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
   const question: string =
     week?.synthesis_question || "Qu'as-tu compris cette semaine, et qu'as-tu envie de garder ?";
   const savedResponse: string = synthesis?.response ?? "";
+
+  // Radar express : niveaux de la semaine, et repère de comparaison
+  const expressRows = (expressRaw ?? []) as ExpressRow[];
+  const currentExpress = expressRows.find((r) => r.week_number === weekNumber)?.levels ?? null;
+  const previousExpress = expressRows.find((r) => r.week_number === weekNumber - 1)?.levels ?? null;
+  const baseline = levelsFromPillarScores(baselineBilan?.pillar_scores);
+  const previousLevels: Levels | null = previousExpress ?? baseline;
+  const previousLabel = previousExpress ? "la semaine dernière" : "ton point de départ";
+  const showRadar = weekNumber === currentWeek || currentExpress !== null;
 
   return (
     <div className="mx-auto max-w-2xl pb-8">
@@ -202,6 +234,39 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
           <Bars label="Tension intérieure" values={tensionByDay} letters={letters} />
         </div>
       </GlassCard>
+
+      {showRadar && (
+        <section id="radar" className="mt-10">
+          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ton Radar de la semaine</p>
+          {currentExpress ? (
+            <GlassCard className="mt-4 p-6">
+              <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">
+                Voici où tu en es cette semaine.
+              </p>
+              <RadarExpressSummary levels={currentExpress} previous={previousLevels} previousLabel={previousLabel} />
+              {weekNumber === currentWeek && (
+                <details className="mt-5 border-t border-white/5 pt-4">
+                  <summary className="cursor-pointer list-none text-sm text-rr-gris-clair">
+                    Refaire mon Radar de la semaine
+                  </summary>
+                  <RadarExpressForm defaults={currentExpress} previous={previousLevels} submitLabel="Mettre à jour mon Radar" />
+                </details>
+              )}
+            </GlassCard>
+          ) : (
+            <GlassCard variant="gold" className="mt-4 p-6">
+              <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">
+                1 minute pour sentir où tu en es.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-rr-gris-clair">
+                Pour chaque pilier, comment ça va cette semaine ? Réponds sans réfléchir : c&apos;est ton ressenti
+                du moment.
+              </p>
+              <RadarExpressForm previous={previousLevels} submitLabel="Enregistrer mon Radar" />
+            </GlassCard>
+          )}
+        </section>
+      )}
 
       {entries.length > 0 && (
         <details className="group mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
