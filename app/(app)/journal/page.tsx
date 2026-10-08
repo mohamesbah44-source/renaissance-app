@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { JournalCarnetTabs } from "@/components/features/journal/JournalCarnetTabs";
+import { todayISODate } from "@/lib/habits/streak";
 
 export default async function JournalPage() {
   const supabase = await createClient();
@@ -26,19 +27,19 @@ export default async function JournalPage() {
   const weekTitleById = Object.fromEntries(
     weekOptions.map((week) => [week.id, `Semaine ${week.week_number} — ${week.title}`])
   );
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayISODate();
 
   return (
     <div className="mx-auto max-w-2xl pb-8">
-      <header className="pt-1">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ton espace</p>
-        <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">Un espace pour toi</h1>
-        <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
+      <header className="pt-2">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">Ton espace</p>
+        <h1 className="mt-4 font-rr-display text-[2.6rem] leading-[1.1] text-rr-ivoire">Un espace pour toi</h1>
+        <p className="mt-4 font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
           Pose des mots sur ce que tu traverses, et retrouve les synthèses que ton praticien te partage.
         </p>
       </header>
 
-      <div className="mt-10">
+      <div className="mt-12">
         <JournalCarnetTabs
           entries={entries ?? []}
           weeks={weekOptions}
