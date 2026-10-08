@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { completeOnboarding } from "@/lib/onboarding/actions";
 import { ReminderSwitch } from "@/components/features/reminders/ReminderSwitch";
 import { cn } from "@/lib/utils";
 
-const STEPS = 4;
+const STEPS = 5;
 
 function ScaleInput({ name, label, low, high }: { name: string; label: string; low: string; high: string }) {
   return (
@@ -30,10 +31,18 @@ function ScaleInput({ name, label, low, high }: { name: string; label: string; l
 }
 
 const primary =
-  "h-14 w-full rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90";
+  "flex h-14 w-full items-center justify-center rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90";
 
-export function WelcomeFlow({ firstName }: { firstName: string }) {
-  const [step, setStep] = useState(0);
+export function WelcomeFlow({
+  firstName,
+  hasRadar,
+  initialStep,
+}: {
+  firstName: string;
+  hasRadar: boolean;
+  initialStep: number;
+}) {
+  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), STEPS - 1));
   const next = () => setStep((s) => Math.min(s + 1, STEPS - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
@@ -43,7 +52,7 @@ export function WelcomeFlow({ firstName }: { firstName: string }) {
         <p className="text-[11px] uppercase tracking-[0.35em] text-rr-or">Re-Naissance™</p>
         <div className="flex gap-1.5" role="img" aria-label={`Étape ${step + 1} sur ${STEPS}`}>
           {Array.from({ length: STEPS }, (_, i) => (
-            <span key={i} className={cn("h-1 w-6 rounded-full", i <= step ? "bg-rr-or" : "bg-white/10")} />
+            <span key={i} className={cn("h-1 w-5 rounded-full", i <= step ? "bg-rr-or" : "bg-white/10")} />
           ))}
         </div>
       </div>
@@ -61,22 +70,63 @@ export function WelcomeFlow({ firstName }: { firstName: string }) {
 
         {step === 1 && (
           <div>
+            <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Ton point de départ</h1>
+            <p className="mt-4 font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
+              Avant de te présenter l&apos;application, un premier temps pour toi : le Renaissance Radar™.
+            </p>
+            <ul className="mt-8 flex flex-col gap-5">
+              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
+                <span className="text-rr-ivoire">60 questions, une à la fois.</span> Compte une dizaine de minutes,
+                dans le calme.
+              </li>
+              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
+                <span className="text-rr-ivoire">Il n&apos;y a pas de bonne réponse.</span> Seulement la tienne, à
+                cet instant.
+              </li>
+              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
+                <span className="text-rr-ivoire">Il dessine ta carte intérieure :</span> 3 cercles, 12 piliers.
+                Ce n&apos;est pas une note, c&apos;est un miroir.
+              </li>
+            </ul>
+            <div className="mt-8 rounded-2xl border border-rr-or/25 bg-rr-or/[0.05] p-5">
+              <p className="text-sm leading-relaxed text-rr-ivoire">
+                Chaque semaine, tu le refais en <span className="text-rr-or">1 minute</span>, pour voir ce qui
+                bouge en toi.
+              </p>
+            </div>
+            {hasRadar && (
+              <p className="mt-6 font-rr-serif text-base italic text-rr-or-clair">
+                Ton Radar est déjà enregistré. Merci.
+              </p>
+            )}
+          </div>
+        )}
+
+        {step === 2 && (
+          <div>
             <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Comment ça se passe</h1>
             <ul className="mt-8 flex flex-col gap-6">
               <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">Chaque jour, une question et une mission.</span> Quelques minutes suffisent.
+                <span className="text-rr-ivoire">Chaque jour, une question et une mission.</span> Quelques minutes
+                suffisent.
               </li>
               <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">La régularité compte plus que la perfection.</span> Un jour manqué n&apos;efface rien.
+                <span className="text-rr-ivoire">Chaque semaine, ton Radar express.</span> 1 minute, à la fin du
+                bilan de ta semaine : tu vois ton évolution se dessiner.
               </li>
               <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">Quand c&apos;est lourd,</span> un bouton « J&apos;ai besoin de revenir à moi » t&apos;attend, toujours.
+                <span className="text-rr-ivoire">La régularité compte plus que la perfection.</span> Un jour manqué
+                n&apos;efface rien.
+              </li>
+              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
+                <span className="text-rr-ivoire">Quand c&apos;est lourd,</span> un bouton « J&apos;ai besoin de
+                revenir à moi » t&apos;attend, toujours.
               </li>
             </ul>
           </div>
         )}
 
-        {step === 2 && (
+        {step === 3 && (
           <div>
             <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Un rappel, en douceur</h1>
             <p className="mt-4 text-[15px] leading-relaxed text-rr-gris-clair">
@@ -88,12 +138,12 @@ export function WelcomeFlow({ firstName }: { firstName: string }) {
           </div>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <form action={completeOnboarding} id="welcome-form" className="flex flex-col gap-7">
             <div>
               <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Comment tu arrives ?</h1>
               <p className="mt-4 text-[15px] leading-relaxed text-rr-gris-clair">
-                30 secondes pour poser ton point de départ. Tu peux aussi passer cette étape.
+                30 secondes pour poser ton point de départ du jour. Tu peux aussi passer cette étape.
               </p>
             </div>
             <ScaleInput name="energy" label="Mon niveau d'énergie" low="Très bas" high="Très haut" />
@@ -103,13 +153,17 @@ export function WelcomeFlow({ firstName }: { firstName: string }) {
       </div>
 
       <div className="flex flex-col gap-3">
-        {step < STEPS - 1 ? (
-          <button type="button" onClick={next} className={primary}>
-            {step === 0 ? "Commencer" : "Continuer"}
-          </button>
-        ) : (
+        {step === STEPS - 1 ? (
           <button type="submit" form="welcome-form" className={primary}>
             Entrer dans mon espace
+          </button>
+        ) : step === 1 && !hasRadar ? (
+          <Link href="/bienvenue/radar" className={primary}>
+            Faire mon Radar
+          </Link>
+        ) : (
+          <button type="button" onClick={next} className={primary}>
+            {step === 0 ? "Commencer" : "Continuer"}
           </button>
         )}
         {step > 0 && (
