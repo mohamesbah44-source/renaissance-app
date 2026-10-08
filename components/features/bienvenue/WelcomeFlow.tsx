@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { completeOnboarding } from "@/lib/onboarding/actions";
 import { ReminderSwitch } from "@/components/features/reminders/ReminderSwitch";
+import WelcomeVideo from "@/components/features/bienvenue/WelcomeVideo";
 import { cn } from "@/lib/utils";
 
 const STEPS = 5;
@@ -105,73 +106,5 @@ export function WelcomeFlow({
         {step === 2 && (
           <div>
             <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Comment ça se passe</h1>
-            <ul className="mt-8 flex flex-col gap-6">
-              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">Chaque jour, une question et une mission.</span> Quelques minutes
-                suffisent.
-              </li>
-              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">Chaque semaine, ton Radar express.</span> 1 minute, à la fin du
-                bilan de ta semaine : tu vois ton évolution se dessiner.
-              </li>
-              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">La régularité compte plus que la perfection.</span> Un jour manqué
-                n&apos;efface rien.
-              </li>
-              <li className="text-[15px] leading-relaxed text-rr-gris-clair">
-                <span className="text-rr-ivoire">Quand c&apos;est lourd,</span> un bouton « J&apos;ai besoin de
-                revenir à moi » t&apos;attend, toujours.
-              </li>
-            </ul>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Un rappel, en douceur</h1>
-            <p className="mt-4 text-[15px] leading-relaxed text-rr-gris-clair">
-              Deux invitations par jour, jamais plus : le matin et le soir. Tu pourras choisir les heures plus tard.
-            </p>
-            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-              <ReminderSwitch />
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <form action={completeOnboarding} id="welcome-form" className="flex flex-col gap-7">
-            <div>
-              <h1 className="font-rr-display text-3xl leading-tight text-rr-ivoire">Comment tu arrives ?</h1>
-              <p className="mt-4 text-[15px] leading-relaxed text-rr-gris-clair">
-                30 secondes pour poser ton point de départ du jour. Tu peux aussi passer cette étape.
-              </p>
-            </div>
-            <ScaleInput name="energy" label="Mon niveau d'énergie" low="Très bas" high="Très haut" />
-            <ScaleInput name="tension" label="Ma tension intérieure" low="Détendu·e" high="Très tendu·e" />
-          </form>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {step === STEPS - 1 ? (
-          <button type="submit" form="welcome-form" className={primary}>
-            Entrer dans mon espace
-          </button>
-        ) : step === 1 && !hasRadar ? (
-          <Link href="/bienvenue/radar" className={primary}>
-            Faire mon Radar
-          </Link>
-        ) : (
-          <button type="button" onClick={next} className={primary}>
-            {step === 0 ? "Commencer" : "Continuer"}
-          </button>
-        )}
-        {step > 0 && (
-          <button type="button" onClick={back} className="text-sm text-rr-gris transition-colors hover:text-rr-gris-clair">
-            Retour
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}
+            <p className="mt-4 font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
+              Une présentation de l&apos;application,
