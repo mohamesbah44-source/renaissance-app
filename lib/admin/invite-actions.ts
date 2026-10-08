@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { createClient as createServiceClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { sendInviteEmail } from "@/lib/admin/mailer";
 
 export type InviteState = {
   error?: string;
@@ -10,6 +11,8 @@ export type InviteState = {
   firstName?: string;
   email?: string;
   existing?: boolean;
+  emailSent?: boolean;
+  emailError?: string;
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -86,5 +89,14 @@ export async function inviteMember(_prev: InviteState | undefined, formData: For
 
   const link = `${origin}/auth/confirm?token_hash=${encodeURIComponent(hashed as string)}&type=${linkType}&next=${encodeURIComponent("/reset-password")}`;
 
-  return { link, firstName, email, existing };
+  const mail = await sendInviteEmail({ to: email, firstName, link, existing });
+
+  return {
+    link,
+    firstName,
+    email,
+    existing,
+    emailSent: mail.ok,
+    emailError: mail.ok ? undefined : mail.error,
+  };
 }
