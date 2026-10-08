@@ -325,8 +325,15 @@ export default async function AujourdhuiPage() {
       </div>
 
       <Link
-        href="/sos"
-        className="mt-6 flex items-center justify-center gap-2 rounded-full border border-rr-orange/30 px-5 py-3.5 text-sm text-rr-orange/90 transition-colors hover:bg-rr-orange/[0.08]"
+        href="/bilan"
+        className="mt-6 flex items-center justify-center rounded-full border border-rr-or/30 px-5 py-3.5 text-sm text-rr-or transition-colors hover:bg-rr-or/10"
+      >
+        Le bilan de ma semaine
+      </Link>
+
+      <Link
+        href="/revenir-a-moi"
+        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-rr-orange/30 px-5 py-3.5 text-sm text-rr-orange/90 transition-colors hover:bg-rr-orange/[0.08]"
       >
         <LifeBuoy className="h-4 w-4" strokeWidth={1.75} />
         J&apos;ai besoin de revenir à moi
