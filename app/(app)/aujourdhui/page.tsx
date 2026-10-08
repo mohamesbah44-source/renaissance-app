@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LifeBuoy, Check, Moon, CalendarCheck } from "lucide-react";
+import { LifeBuoy, Check, Moon, CalendarCheck, TrendingUp, Bell } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -330,6 +330,22 @@ export default async function AujourdhuiPage() {
       >
         <CalendarCheck className="h-4 w-4" strokeWidth={1.75} />
         Le bilan de ma semaine
+      </Link>
+
+      <Link
+        href="/progression"
+        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
+      >
+        <TrendingUp className="h-4 w-4" strokeWidth={1.75} />
+        Ma progression
+      </Link>
+
+      <Link
+        href="/rappels"
+        className="mt-3 flex items-center justify-center gap-2 rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
+      >
+        <Bell className="h-4 w-4" strokeWidth={1.75} />
+        Mes rappels
       </Link>
 
       <Link
