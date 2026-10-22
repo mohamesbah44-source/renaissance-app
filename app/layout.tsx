@@ -18,7 +18,7 @@ const outfit = Outfit({
 
 // Charte Le Programme Re-Naissance™ (noir / or / ivoire), utilisée dans toute l'application
 const cinzel = Cinzel({
-  variable: "--font-rr-display",
+  variable: "--font-rr-cinzel",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -66,7 +66,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0c0b0a",
+  themeColor: "#07060d",
 };
 
 export default function RootLayout({
