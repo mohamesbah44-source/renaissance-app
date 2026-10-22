@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { LifeBuoy, Check, Moon, CalendarCheck, TrendingUp, Bell } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { LifeBuoy, Check } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { GlassCard } from "@/components/ui/GlassCard";
@@ -44,29 +43,6 @@ function ScaleInput({ name, label, low, high }: { name: string; label: string; l
         <span>{high}</span>
       </div>
     </fieldset>
-  );
-}
-
-function QuietTile({
-  href,
-  icon: Icon,
-  label,
-  ariaLabel,
-}: {
-  href: string;
-  icon: LucideIcon;
-  label: string;
-  ariaLabel?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-label={ariaLabel ?? label}
-      className="flex flex-col items-center gap-2 rounded-2xl bg-white/[0.03] px-2 py-4 text-rr-gris-clair transition-all duration-300 hover:bg-white/[0.06] hover:text-rr-ivoire active:scale-[0.97]"
-    >
-      <Icon className="h-5 w-5 text-rr-or/80" strokeWidth={1.5} />
-      <span className="text-[11px] tracking-wide">{label}</span>
-    </Link>
   );
 }
 
@@ -372,13 +348,6 @@ export default async function AujourdhuiPage() {
         <LifeBuoy className="h-4 w-4" strokeWidth={1.75} />
         J&apos;ai besoin de revenir à moi
       </Link>
-
-      <nav aria-label="Mon espace" className="mt-8 grid grid-cols-4 gap-2.5">
-        <QuietTile href="/bilan" icon={CalendarCheck} label="Bilan" ariaLabel="Le bilan de ma semaine" />
-        <QuietTile href="/progression" icon={TrendingUp} label="Progression" ariaLabel="Ma progression" />
-        <QuietTile href="/rappels" icon={Bell} label="Rappels" ariaLabel="Mes rappels" />
-        <QuietTile href="/pratique/sommeil" icon={Moon} label="Sommeil" ariaLabel="Je n'arrive pas à dormir" />
-      </nav>
     </div>
   );
 }
