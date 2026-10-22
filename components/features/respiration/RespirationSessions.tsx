@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
+import { Music, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
@@ -96,6 +96,7 @@ const AUDIO: Partial<Record<Kind, string>> = {
 };
 const SPEECH: Partial<Record<Kind, string>> = { in: "Inspire", hold: "Retiens", out: "Expire" };
 const VOICE_KEY = "rr-breath-voice";
+const MUSIC_KEY = "rr-breath-music";
 const SCALE: Record<Kind, number> = { in: 1, top: 1, hold: 1, out: 0.62 };
 
 function speak(text: string) {
@@ -140,9 +141,12 @@ function SessionRunner({ session, onClose }: { session: Session; onClose: () => 
   const [index, setIndex] = useState(0);
   const [remaining, setRemaining] = useState(segments[0].sec);
   const [voiceOn, setVoiceOn] = useState(true);
+  const [musicOn, setMusicOn] = useState(true);
   const voiceRef = useRef(true);
   const spokenRef = useRef(-1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const musicRef = useRef<HTMLAudioElement | null>(null);
+  const musicOnRef = useRef(true);
   const doneSec = useMemo(() => segments.slice(0, index).reduce((a, p) => a + p.sec, 0), [segments, index]);
 
   // Préférence de voix partagée avec la pratique du soir ; le lecteur audio est créé
@@ -153,12 +157,59 @@ function SessionRunner({ session, onClose }: { session: Session; onClose: () => 
         setVoiceOn(false);
         voiceRef.current = false;
       }
+      if (localStorage.getItem(MUSIC_KEY) === "off") {
+        setMusicOn(false);
+        musicOnRef.current = false;
+      }
     } catch {
       /* stockage indisponible */
     }
     audioRef.current = new Audio();
-    return () => stopCue(audioRef.current);
-  }, []);
+    const music = new Audio(`/audio/musique/${session.id}.mp3`);
+    music.loop = true;
+    music.volume = 0.45;
+    musicRef.current = music;
+    if (musicOnRef.current) music.play().catch(() => undefined);
+    return () => {
+      stopCue(audioRef.current);
+      music.pause();
+    };
+  }, [session.id]);
+
+  function toggleMusic() {
+    const next = !musicOn;
+    setMusicOn(next);
+    musicOnRef.current = next;
+    try {
+      localStorage.setItem(MUSIC_KEY, next ? "on" : "off");
+    } catch {
+      /* ignoré */
+    }
+    const m = musicRef.current;
+    if (!m) return;
+    if (next && status === "running") m.play().catch(() => undefined);
+    else m.pause();
+  }
+
+  // La musique suit la session : pause en pause, reprise, fondu de fin.
+  useEffect(() => {
+    const m = musicRef.current;
+    if (!m) return;
+    if (status === "running" && musicOnRef.current) m.play().catch(() => undefined);
+    else if (status === "paused") m.pause();
+    else if (status === "done") {
+      let v = m.volume;
+      const id = setInterval(() => {
+        v = Math.max(0, v - 0.03);
+        m.volume = v;
+        if (v <= 0) {
+          m.pause();
+          clearInterval(id);
+        }
+      }, 120);
+      return () => clearInterval(id);
+    }
+  }, [status]);
 
   function toggleVoice() {
     const next = !voiceOn;
@@ -222,6 +273,18 @@ function SessionRunner({ session, onClose }: { session: Session; onClose: () => 
           {session.title} · {session.rhythm}
         </p>
         <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={toggleMusic}
+            aria-label={musicOn ? "Couper la musique" : "Activer la musique"}
+            aria-pressed={musicOn}
+            className={cn(
+              "flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:text-rr-ivoire",
+              musicOn ? "text-rr-or" : "text-rr-gris"
+            )}
+          >
+            <Music className="h-5 w-5" strokeWidth={1.75} />
+          </button>
           <button
             type="button"
             onClick={toggleVoice}
