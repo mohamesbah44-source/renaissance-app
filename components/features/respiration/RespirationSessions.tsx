@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Music, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
 type Kind = "in" | "top" | "hold" | "out";
@@ -410,47 +409,9 @@ export function RespirationSessions() {
   return (
     <div>
       <section className="mt-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Pourquoi le 4 · 7 · 8</p>
-        <GlassCard className="mt-4 p-5">
-          <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">
-            Une expiration plus longue que l&apos;inspiration dit à ton corps : tu peux relâcher.
-          </p>
-          <ul className="mt-4 flex flex-col gap-2.5 text-sm leading-relaxed text-rr-gris-clair">
-            <li>
-              <span className="text-rr-ivoire">Calmer le système nerveux.</span> L&apos;expiration longue active le frein
-              naturel du corps (le parasympathique) et fait baisser la tension.
-            </li>
-            <li>
-              <span className="text-rr-ivoire">Apaiser le mental.</span> Compter occupe l&apos;attention et coupe le flot
-              des pensées.
-            </li>
-            <li>
-              <span className="text-rr-ivoire">Mieux dormir.</span> Pratiquée le soir, elle aide à relâcher la journée et à
-              s&apos;endormir plus facilement.
-            </li>
-            <li>
-              <span className="text-rr-ivoire">Rapide et partout.</span> Moins de 2 minutes, sans matériel, au bureau, en
-              voiture à l&apos;arrêt, avant un rendez-vous important.
-            </li>
-          </ul>
-          <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
-            <span className="text-rr-ivoire">Pourquoi celle-là ?</span> C&apos;est le rythme qui allonge le plus la sortie
-            du souffle (8 secondes contre 4 à l&apos;entrée), avec une courte rétention qui marque une vraie pause. C&apos;est
-            la règle à retenir pour retrouver du calme : <span className="text-rr-or-clair">la sortie doit être plus longue
-            que l&apos;entrée</span>. Une inspiration plus longue que l&apos;expiration, à l&apos;inverse, réveille et
-            dynamise.
-          </p>
-          <p className="mt-4 text-[11px] leading-relaxed text-rr-gris">
-            Pratique de bien-être, pas un acte médical. Respire par le nez, sans forcer. Si tu as des vertiges ou un
-            inconfort, reviens à une respiration normale. En cas de doute ou de problème de santé, demande conseil à ton
-            médecin.
-          </p>
-        </GlassCard>
-      </section>
-
-      <section className="mt-10">
         <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Les sessions</p>
-        <div className="mt-4 flex flex-col gap-3">
+        <p className="mt-2 text-sm text-rr-gris">Touche une session pour voir ce qu&apos;elle t&apos;apporte.</p>
+        <div className="mt-5 flex flex-col gap-3">
           {SESSIONS.map((s) => {
             const sec = s.phases.reduce((a, p) => a + p.sec, 0) * s.cycles;
             return (
@@ -473,7 +434,6 @@ export function RespirationSessions() {
                     <p className="mt-1 text-[11px] text-rr-gris">{fmt(sec)}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-rr-gris">Touche pour voir l&apos;explication et commencer</p>
                 {s.star && (
                   <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-rr-or-clair/80">La session de référence</p>
                 )}
@@ -481,6 +441,10 @@ export function RespirationSessions() {
             );
           })}
         </div>
+        <p className="mt-6 text-[11px] leading-relaxed text-rr-gris">
+          Pratique de bien-être, pas un acte médical. Respire par le nez, sans forcer. Au moindre vertige ou
+          inconfort, reviens à une respiration normale.
+        </p>
       </section>
 
       {preview && !active && (
