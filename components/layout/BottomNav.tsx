@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, Wind, BookOpen, Sparkles, User } from "lucide-react";
+import { Home, Compass, Wind, BookOpen, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Accueil", icon: Home },
+  { href: "/dashboard", label: "Aujourd'hui", icon: Home },
   { href: "/parcours", label: "Parcours", icon: Compass },
   { href: "/respiration", label: "Respirer", icon: Wind },
   { href: "/journal", label: "Journal", icon: BookOpen },
-  { href: "/ressources", label: "Ressources", icon: Sparkles },
   { href: "/profil", label: "Profil", icon: User },
 ];
 
