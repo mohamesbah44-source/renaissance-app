@@ -110,7 +110,9 @@ export function ReminderSwitch() {
     });
   }
 
-  const btn =
+  const primary =
+    "h-12 w-full rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90 disabled:opacity-50";
+  const secondary =
     "h-12 w-full rounded-full border border-rr-or/40 text-sm text-rr-or transition-colors hover:bg-rr-or/10 disabled:opacity-50";
 
   return (
@@ -137,15 +139,33 @@ export function ReminderSwitch() {
       )}
 
       {status === "off" && (
-        <button type="button" onClick={enable} className={btn}>
-          Activer les rappels sur cet appareil
-        </button>
+        <>
+          <div>
+            <p className="font-rr-serif text-[22px] italic leading-tight text-rr-ivoire">Notifications</p>
+            <p className="mt-1 text-xs text-rr-gris-clair">Désactivées sur cet appareil</p>
+          </div>
+          <button type="button" onClick={enable} className={primary}>
+            Activer sur cet appareil
+          </button>
+        </>
       )}
 
       {status === "on" && (
         <>
-          <p className="text-sm text-rr-ivoire">Les rappels sont activés sur cet appareil.</p>
-          <button type="button" onClick={test} disabled={pending} className={btn}>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="font-rr-serif text-[22px] italic leading-tight text-rr-ivoire">Notifications</p>
+              <p className="mt-1 text-xs text-rr-gris-clair">Activées sur cet appareil</p>
+            </div>
+            <span
+              role="img"
+              aria-label="Activées"
+              className="relative h-[30px] w-[50px] shrink-0 rounded-full bg-rr-or"
+            >
+              <span className="absolute left-[23px] top-[3px] h-6 w-6 rounded-full bg-rr-noir" />
+            </span>
+          </div>
+          <button type="button" onClick={test} disabled={pending} className={secondary}>
             {pending ? "Envoi…" : "Recevoir une notification test"}
           </button>
           <button type="button" onClick={disable} className="text-sm text-rr-gris hover:text-rr-gris-clair">
