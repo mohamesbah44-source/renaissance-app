@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowRight, Wind } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { GroundingPlayer, type GroundingStep } from "@/components/features/revenir/GroundingPlayer";
 
 const ORDER = ["grounding_54321", "grounding_body", "grounding_orientation"];
+
+const BESOINS = [
+  { label: "Je suis submergé·e", href: "/sos" },
+  { label: "J'ai besoin de me calmer", href: "/respiration" },
+  { label: "Je n'arrive pas à dormir", href: "/pratique/sommeil" },
+  { label: "Écrire à mon praticien", href: "/messages" },
+];
 
 type PracticeRow = { key: string; title: string; description: string | null; config: unknown };
 
@@ -54,42 +60,60 @@ export default async function RevenirAMoiPage({
   }
 
   return (
-    <div className="mx-auto max-w-2xl pb-8">
-      <header className="pt-1">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">Quand tu en as besoin</p>
-        <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">Revenir à moi</h1>
-        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
-          Quelques minutes pour retrouver ton souffle et ton corps. Choisis ce qui te parle maintenant.
+    <div className="rr-enter mx-auto max-w-2xl pb-8">
+      <Link
+        href="/aujourdhui"
+        aria-label="Retour"
+        className="-ml-3 flex h-11 w-11 items-center justify-center rounded-full text-rr-gris-clair transition-colors hover:text-rr-ivoire"
+      >
+        <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
+      </Link>
+
+      <header className="mt-3">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-rr-or">Quand tu en as besoin</p>
+        <h1 className="mt-4 font-rr-display text-rr-ivoire">Revenir à moi.</h1>
+        <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
+          Choisis ce qui est là maintenant. Une seule chose suffit.
         </p>
       </header>
 
-      <div className="mt-8 flex flex-col gap-3">
-        {practices.map((x) => (
-          <Link key={x.key} href={`/revenir-a-moi?p=${x.key}`} className="block">
-            <GlassCard className="flex items-center justify-between gap-4 p-5 transition-colors hover:border-rr-or/30">
-              <div>
-                <p className="font-rr-serif text-lg italic text-rr-ivoire">{x.title}</p>
-                {x.description && <p className="mt-1.5 text-sm text-rr-gris-clair">{x.description}</p>}
-              </div>
-              <ArrowRight className="h-4 w-4 shrink-0 text-rr-or" strokeWidth={1.75} />
-            </GlassCard>
+      <div className="mt-10 flex flex-col gap-3.5">
+        {BESOINS.map((b) => (
+          <Link
+            key={b.href}
+            href={b.href}
+            className="flex h-[84px] items-center justify-between rounded-3xl border border-white/[0.09] bg-white/[0.04] px-[22px] transition-colors duration-300 hover:border-rr-or/30"
+          >
+            <span className="font-rr-serif text-[23px] italic text-rr-ivoire">{b.label}</span>
+            <ChevronRight className="h-[18px] w-[18px] shrink-0 text-rr-or" strokeWidth={1.6} />
           </Link>
         ))}
-
-        <Link href="/pratique/soir" className="block">
-          <GlassCard className="flex items-center justify-between gap-4 p-5 transition-colors hover:border-rr-or/30">
-            <div className="flex items-center gap-3">
-              <Wind className="h-4 w-4 text-rr-or" strokeWidth={1.75} />
-              <p className="font-rr-serif text-lg italic text-rr-ivoire">Respirer lentement</p>
-            </div>
-            <ArrowRight className="h-4 w-4 shrink-0 text-rr-or" strokeWidth={1.75} />
-          </GlassCard>
-        </Link>
       </div>
 
-      <p className="mt-10 text-xs leading-relaxed text-rr-gris">
-        Ces outils sont des repères de bien-être, pas des soins. Si tu es en danger ou en grande détresse,
-        appelle le 15, ou le 3114 (prévention du suicide, France, 24 h/24).
+      {practices.length > 0 && (
+        <section className="mt-12">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-rr-gris-clair">Revenir au corps</p>
+          <div className="mt-2">
+            {practices.map((x) => (
+              <Link
+                key={x.key}
+                href={`/revenir-a-moi?p=${x.key}`}
+                className="flex items-center justify-between gap-4 border-b border-white/[0.08] py-4 last:border-b-0"
+              >
+                <div className="min-w-0">
+                  <p className="font-rr-serif text-xl italic text-rr-ivoire">{x.title}</p>
+                  {x.description && <p className="mt-1 text-xs text-rr-gris-clair">{x.description}</p>}
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-rr-or" strokeWidth={1.6} />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <p className="mt-10 text-center text-[11.5px] leading-relaxed text-rr-gris">
+        Cette application accompagne ton bien-être. Elle ne remplace pas un avis médical. Si tu es en danger ou en
+        grande détresse, appelle le 15, ou le 3114 (prévention du suicide, France, 24 h/24).
       </p>
     </div>
   );
