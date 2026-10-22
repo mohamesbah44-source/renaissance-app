@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { ReminderSwitch } from "@/components/features/reminders/ReminderSwitch";
 import { ReminderTimesForm } from "@/components/features/reminders/ReminderTimesForm";
 
@@ -44,40 +44,41 @@ export default async function RappelsPage() {
     : DEFAULTS;
 
   return (
-    <div className="mx-auto max-w-2xl pb-8">
-      <header className="pt-1">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">En douceur</p>
-        <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">Mes rappels</h1>
-        <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
-          Deux petits rappels par jour, jamais plus. Pas de pression : juste une invitation à revenir à toi.
+    <div className="rr-enter mx-auto max-w-2xl pb-8">
+      <Link
+        href="/profil"
+        aria-label="Retour au profil"
+        className="-ml-3 flex h-11 w-11 items-center justify-center rounded-full text-rr-gris-clair transition-colors hover:text-rr-ivoire"
+      >
+        <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
+      </Link>
+
+      <header className="mt-3">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-rr-or">En douceur</p>
+        <h1 className="mt-4 font-rr-display text-rr-ivoire">Mes rappels.</h1>
+        <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
+          Deux petits rappels par jour, jamais plus. Pas de pression.
         </p>
       </header>
 
-      <section className="mt-10">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Cet appareil</p>
-        <GlassCard className="mt-4 p-5">
+      <section className="mt-12">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-rr-gris-clair">Cet appareil</p>
+        <div className="mt-4 rounded-3xl border border-rr-or/20 bg-white/[0.05] p-5">
           <ReminderSwitch />
-        </GlassCard>
+        </div>
       </section>
 
       <section className="mt-10">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Mes horaires</p>
-        <GlassCard className="mt-4 p-5">
+        <p className="text-[11px] uppercase tracking-[0.28em] text-rr-gris-clair">Mes horaires</p>
+        <div className="mt-4">
           <ReminderTimesForm
             morningEnabled={s.morning_enabled}
             morningTime={s.morning_time}
             eveningEnabled={s.evening_enabled}
             eveningTime={s.evening_time}
           />
-        </GlassCard>
+        </div>
       </section>
-
-      <Link
-        href="/aujourdhui"
-        className="mt-10 flex items-center justify-center rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
-      >
-        Retour à aujourd&apos;hui
-      </Link>
     </div>
   );
 }
