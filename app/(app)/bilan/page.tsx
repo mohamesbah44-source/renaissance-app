@@ -1,199 +1,326 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { completeOnboarding } from "@/lib/onboarding/actions";
-import { ReminderSwitch } from "@/components/features/reminders/ReminderSwitch";
-import WelcomeVideo from "@/components/features/bienvenue/WelcomeVideo";
+import { redirect } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabase/server";
+import { RadarExpressForm } from "@/components/features/radar/RadarExpressForm";
+import { RadarExpressSummary } from "@/components/features/radar/RadarExpressSummary";
+import { levelsFromPillarScores, type Levels } from "@/lib/radar/express";
+import { todayISODate } from "@/lib/habits/streak";
 import { cn } from "@/lib/utils";
+import { saveWeeklySynthesis } from "@/lib/today/synthesis-actions";
 
-const STEPS = 5;
+type Checkin = { checkin_date: string; energy: number | null; tension: number | null };
+type Progress = { log_date: string; mission_done: boolean; journaling_done: boolean };
+type Entry = { id: string; entry_date: string; content: string };
+type ExpressRow = { week_number: number; levels: Levels | null };
 
-function ScaleInput({ name, label, low, high }: { name: string; label: string; low: string; high: string }) {
+const CARD = "rounded-3xl border border-rr-or/20 bg-white/[0.05]";
+
+function addDays(iso: string, n: number): string {
+  const d = new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate() + n);
+  return d.toLocaleDateString("sv-SE");
+}
+
+function longDate(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+function average(values: (number | null)[]): number | null {
+  const nums = values.filter((v): v is number => typeof v === "number");
+  if (nums.length === 0) return null;
+  return nums.reduce((s, v) => s + v, 0) / nums.length;
+}
+
+function fr(n: number): string {
+  return n.toFixed(1).replace(".", ",");
+}
+
+function RecapBar({ label, ratio, text }: { label: string; ratio: number | null; text: string }) {
   return (
-    <fieldset>
-      <legend className="font-rr-serif text-[22px] italic leading-tight text-rr-ivoire">{label}</legend>
-      <div className="mt-4 flex gap-2">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <label key={n} className="flex-1">
-            <input type="radio" name={name} value={n} className="peer sr-only" />
-            <span className="flex h-12 cursor-pointer items-center justify-center rounded-full border border-white/[0.12] text-sm text-rr-gris-clair transition-all duration-300 peer-checked:border-rr-or peer-checked:bg-rr-or/10 peer-checked:text-rr-or peer-focus-visible:ring-2 peer-focus-visible:ring-rr-or/50">
-              {n}
-            </span>
-          </label>
-        ))}
+    <div className="flex items-center gap-3.5">
+      <span className="w-[68px] shrink-0 text-xs text-rr-gris-clair">{label}</span>
+      <div className="h-1 flex-1 rounded-full bg-white/10">
+        {ratio !== null && (
+          <div className="h-1 rounded-full bg-rr-or" style={{ width: `${Math.round(ratio * 100)}%` }} />
+        )}
       </div>
-      <div className="mt-2 flex justify-between px-1 text-[11px] text-rr-gris">
-        <span>{low}</span>
-        <span>{high}</span>
-      </div>
-    </fieldset>
+      <span className="w-9 shrink-0 text-right text-xs text-rr-creme">{text}</span>
+    </div>
   );
 }
 
-function Bullet({ children }: { children: React.ReactNode }) {
+export default async function BilanPage({ searchParams }: { searchParams: Promise<{ semaine?: string }> }) {
+  const { semaine } = await searchParams;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  // Client non typé : les tables du Lot 1 ne sont pas encore dans les types générés.
+  const db = supabase as unknown as SupabaseClient;
+  const today = todayISODate();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("program_start_date, current_week")
+    .eq("id", user.id)
+    .single();
+
+  // Semaine en cours
+  let currentWeek = profile?.current_week ?? 1;
+  const startDate = profile?.program_start_date ? String(profile.program_start_date).slice(0, 10) : null;
+  if (startDate) {
+    const diff = Math.max(
+      0,
+      Math.round((new Date(`${today}T12:00:00`).getTime() - new Date(`${startDate}T12:00:00`).getTime()) / 86400000)
+    );
+    currentWeek = Math.min(8, Math.floor(diff / 7) + 1);
+  }
+
+  // Semaine affichée (jamais une semaine à venir)
+  const requested = Number(semaine);
+  const weekNumber =
+    Number.isInteger(requested) && requested >= 1 && requested <= currentWeek ? requested : currentWeek;
+
+  const rangeStart = startDate ? addDays(startDate, (weekNumber - 1) * 7) : addDays(today, -6);
+  const rangeEnd = addDays(rangeStart, 6);
+  const days = Array.from({ length: 7 }, (_, i) => addDays(rangeStart, i));
+
+  const { data: week } = await db
+    .from("weeks")
+    .select("id, title, intention, synthesis_question")
+    .eq("week_number", weekNumber)
+    .maybeSingle();
+
+  const [
+    { data: checkinsRaw },
+    { data: progressRaw },
+    { data: entriesRaw },
+    { data: synthesis },
+    { data: expressRaw },
+    { data: baselineBilan },
+  ] = await Promise.all([
+    db
+      .from("daily_checkins")
+      .select("checkin_date, energy, tension")
+      .eq("user_id", user.id)
+      .gte("checkin_date", rangeStart)
+      .lte("checkin_date", rangeEnd),
+    db
+      .from("daily_progress")
+      .select("log_date, mission_done, journaling_done")
+      .eq("user_id", user.id)
+      .gte("log_date", rangeStart)
+      .lte("log_date", rangeEnd),
+    week
+      ? db
+          .from("journal_entries")
+          .select("id, entry_date, content")
+          .eq("user_id", user.id)
+          .eq("week_id", week.id)
+          .order("entry_date", { ascending: true })
+      : Promise.resolve({ data: [] }),
+    week
+      ? db
+          .from("weekly_syntheses")
+          .select("response")
+          .eq("user_id", user.id)
+          .eq("week_id", week.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    db
+      .from("radar_express")
+      .select("week_number, levels")
+      .eq("user_id", user.id)
+      .in("week_number", [weekNumber, weekNumber - 1]),
+    db
+      .from("radar_bilans")
+      .select("pillar_scores")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  const checkins = (checkinsRaw ?? []) as Checkin[];
+  const progress = (progressRaw ?? []) as Progress[];
+  const entries = (entriesRaw ?? []) as Entry[];
+
+  const energyAvg = average(checkins.map((c) => c.energy));
+  const tensionAvg = average(checkins.map((c) => c.tension));
+
+  const activeDays = new Set<string>();
+  for (const p of progress) {
+    if (p.mission_done || p.journaling_done) activeDays.add(String(p.log_date).slice(0, 10));
+  }
+  for (const c of checkins) activeDays.add(String(c.checkin_date).slice(0, 10));
+  const regularity = days.filter((d) => activeDays.has(d)).length;
+
+  const question: string =
+    week?.synthesis_question || "Qu'as-tu compris cette semaine, et qu'as-tu envie de garder ?";
+  const savedResponse: string = synthesis?.response ?? "";
+
+  // Radar express : niveaux de la semaine, et repère de comparaison
+  const expressRows = (expressRaw ?? []) as ExpressRow[];
+  const currentExpress = expressRows.find((r) => r.week_number === weekNumber)?.levels ?? null;
+  const previousExpress = expressRows.find((r) => r.week_number === weekNumber - 1)?.levels ?? null;
+  const baseline = levelsFromPillarScores(baselineBilan?.pillar_scores);
+  const previousLevels: Levels | null = previousExpress ?? baseline;
+  const previousLabel = previousExpress ? "la semaine dernière" : "ton point de départ";
+  const showRadar = weekNumber === currentWeek || currentExpress !== null;
+
   return (
-    <li className="flex gap-3 text-[14px] leading-relaxed text-rr-gris-clair">
-      <i className="mt-[9px] block h-[5px] w-[5px] shrink-0 rounded-full bg-rr-or" />
-      <span>{children}</span>
-    </li>
-  );
-}
+    <div className="rr-enter mx-auto max-w-2xl pb-8">
+      <Link
+        href={week ? `/parcours/semaine/${week.id}` : "/parcours"}
+        aria-label="Retour à la semaine"
+        className="-ml-3 flex h-11 w-11 items-center justify-center rounded-full text-rr-gris-clair transition-colors hover:text-rr-ivoire"
+      >
+        <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
+      </Link>
 
-const primary =
-  "flex h-14 w-full items-center justify-center rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90";
+      <header className="mt-3">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-rr-or">
+          Semaine {weekNumber}
+          {week?.title ? ` · ${week.title}` : ""}
+        </p>
+        <h1 className="mt-4 font-rr-display text-[42px] leading-[1.02] text-rr-ivoire">Ton bilan.</h1>
+        {week?.intention && (
+          <p className="mt-4 font-rr-serif text-lg italic leading-snug text-rr-gris-clair">{week.intention}</p>
+        )}
+      </header>
 
-export function WelcomeFlow({
-  firstName,
-  hasRadar,
-  initialStep,
-}: {
-  firstName: string;
-  hasRadar: boolean;
-  initialStep: number;
-}) {
-  const [step, setStep] = useState(Math.min(Math.max(initialStep, 0), STEPS - 1));
-  const next = () => setStep((s) => Math.min(s + 1, STEPS - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
-
-  return (
-    <div className="mx-auto flex min-h-dvh max-w-md flex-col px-7 pb-10 pt-12">
-      <div className="flex items-center justify-between">
-        <p className="font-rr-label text-[10px] uppercase tracking-[0.32em] text-rr-or">Bienvenue</p>
-        <div className="flex gap-1.5" role="img" aria-label={`Étape ${step + 1} sur ${STEPS}`}>
-          {Array.from({ length: STEPS }, (_, i) => (
-            <span key={i} className={cn("h-[3px] w-[18px] rounded-full", i <= step ? "bg-rr-or" : "bg-white/15")} />
+      {currentWeek > 1 && (
+        <nav className="mt-6 flex flex-wrap gap-2" aria-label="Choisir une semaine">
+          {Array.from({ length: currentWeek }, (_, i) => i + 1).map((n) => (
+            <Link
+              key={n}
+              href={`/bilan?semaine=${n}`}
+              className={cn(
+                "rounded-full border px-4 py-1.5 text-xs transition-colors",
+                n === weekNumber
+                  ? "border-rr-or bg-rr-or/10 text-rr-or"
+                  : "border-white/[0.12] text-rr-gris-clair hover:border-rr-or/40"
+              )}
+            >
+              Semaine {n}
+            </Link>
           ))}
-        </div>
+        </nav>
+      )}
+
+      <div className={cn(CARD, "mt-8 flex flex-col gap-3.5 px-5 py-[18px]")}>
+        <RecapBar
+          label="Énergie"
+          ratio={energyAvg !== null ? energyAvg / 5 : null}
+          text={energyAvg !== null ? fr(energyAvg) : "·"}
+        />
+        <RecapBar
+          label="Tension"
+          ratio={tensionAvg !== null ? tensionAvg / 5 : null}
+          text={tensionAvg !== null ? fr(tensionAvg) : "·"}
+        />
+        <RecapBar label="Régularité" ratio={regularity / 7} text={`${regularity}/7`} />
       </div>
 
-      <div key={step} className="rr-enter flex flex-1 flex-col justify-center py-10">
-        {step === 0 && (
-          <div className="flex flex-col items-center text-center">
-            <span
-              aria-hidden
-              className="animate-breathe block h-[100px] w-[100px] rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle at 35% 30%, #ddd6fe 0%, #a78bfa 24%, #7c3aed 54%, #4c1d95 84%, #2e1065 100%)",
-                boxShadow: "0 0 70px 10px rgba(139,92,246,0.5), inset 0 0 26px rgba(255,255,255,0.14)",
-              }}
+      <section className="mt-10">
+        <p className="font-rr-label text-[9px] uppercase tracking-[0.3em] text-rr-gris-clair">Pour clore la semaine</p>
+        <p className="mt-3 font-rr-serif text-[26px] italic leading-[1.22] text-rr-ivoire">{question}</p>
+
+        {week ? (
+          <form action={saveWeeklySynthesis} className="mt-6 flex flex-col gap-4">
+            <input type="hidden" name="weekId" value={week.id} />
+            <textarea
+              name="response"
+              required
+              rows={6}
+              defaultValue={savedResponse}
+              aria-label="Ta synthèse de la semaine"
+              placeholder="Écris ce qui vient, sans te corriger."
+              className="w-full resize-none rounded-3xl border border-rr-or/[0.22] bg-white/[0.05] px-5 py-[18px] font-rr-serif text-xl italic leading-[1.35] text-rr-creme placeholder:text-rr-gris focus:border-rr-or/50 focus:outline-none"
             />
-            <h1 className="mt-12 font-rr-display text-[42px] leading-[1.04] text-rr-ivoire">Bienvenue, {firstName}.</h1>
-            <p className="mt-6 font-rr-serif text-xl italic leading-relaxed text-rr-gris-clair">
-              Pendant 8 semaines, tu reviens à toi. Pas à pas, sans pression, à ton rythme.
-            </p>
-            <p className="mt-4 text-sm text-rr-gris">Cet espace est le tien.</p>
-          </div>
-        )}
-
-        {step === 1 && (
-          <div>
-            <h1 className="font-rr-display text-[40px] leading-[1.04] text-rr-ivoire">Ton point de départ.</h1>
-            <p className="mt-5 font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
-              Avant de te présenter l&apos;application, un premier temps pour toi : le Renaissance Radar™.
-            </p>
-            <ul className="mt-8 flex flex-col gap-4">
-              <Bullet>
-                <span className="text-rr-ivoire">60 questions, une à la fois.</span> Compte une dizaine de minutes,
-                dans le calme.
-              </Bullet>
-              <Bullet>
-                <span className="text-rr-ivoire">Il n&apos;y a pas de bonne réponse.</span> Seulement la tienne, à
-                cet instant.
-              </Bullet>
-              <Bullet>
-                <span className="text-rr-ivoire">Il dessine ta carte intérieure :</span> 3 cercles, 12 piliers.
-                Ce n&apos;est pas une note, c&apos;est un miroir.
-              </Bullet>
-            </ul>
-            <div className="mt-8 rounded-3xl border border-rr-or/20 bg-white/[0.05] p-5">
-              <p className="text-sm leading-relaxed text-rr-ivoire">
-                Chaque semaine, tu le refais en <span className="text-rr-or">1 minute</span>, pour voir ce qui
-                bouge en toi.
-              </p>
-            </div>
-            {hasRadar && (
-              <p className="mt-6 font-rr-serif text-base italic text-rr-or-clair">
-                Ton Radar est déjà enregistré. Merci.
-              </p>
-            )}
-          </div>
-        )}
-
-        {step === 2 && (
-          <div>
-            <h1 className="font-rr-display text-[40px] leading-[1.04] text-rr-ivoire">
-              Ton espace,
-              <br />
-              en 1 min 30.
-            </h1>
-            <div className="mx-auto mt-8 w-full max-w-[230px]">
-              <WelcomeVideo />
-            </div>
-            <ul className="mt-9 flex flex-col gap-3.5">
-              <Bullet>Une journée, un seul geste à la fois.</Bullet>
-              <Bullet>
-                Chaque semaine, ton Radar express : 1 minute pour voir ton évolution se dessiner.
-              </Bullet>
-              <Bullet>La régularité compte plus que la perfection. Un jour manqué n&apos;efface rien.</Bullet>
-              <Bullet>
-                Quand c&apos;est lourd, un bouton « J&apos;ai besoin de revenir à moi » t&apos;attend, toujours.
-              </Bullet>
-            </ul>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <h1 className="font-rr-display text-[40px] leading-[1.04] text-rr-ivoire">Un rappel, en douceur.</h1>
-            <p className="mt-5 text-[15px] leading-relaxed text-rr-gris-clair">
-              Deux invitations par jour, jamais plus : le matin et le soir. Tu pourras choisir les heures plus tard.
-            </p>
-            <div className="mt-8 rounded-3xl border border-rr-or/20 bg-white/[0.05] p-5">
-              <ReminderSwitch />
-            </div>
-          </div>
-        )}
-
-        {step === 4 && (
-          <form action={completeOnboarding} id="welcome-form" className="flex flex-col gap-9">
-            <div>
-              <h1 className="font-rr-display text-[40px] leading-[1.04] text-rr-ivoire">Comment tu arrives ?</h1>
-              <p className="mt-5 text-[15px] leading-relaxed text-rr-gris-clair">
-                30 secondes pour poser ton point de départ du jour. Tu peux aussi passer cette étape.
-              </p>
-            </div>
-            <ScaleInput name="energy" label="Mon niveau d'énergie" low="Très bas" high="Très haut" />
-            <ScaleInput name="tension" label="Ma tension intérieure" low="Détendu·e" high="Très tendu·e" />
+            <button
+              type="submit"
+              className={cn(
+                "h-14 rounded-full text-[15px] font-medium transition-opacity duration-300 hover:opacity-90",
+                savedResponse ? "border border-rr-or/40 text-rr-or" : "bg-rr-or text-rr-noir"
+              )}
+            >
+              {savedResponse ? "Mettre à jour ma synthèse" : "Enregistrer ma synthèse"}
+            </button>
           </form>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-3">
-        {step === STEPS - 1 ? (
-          <button type="submit" form="welcome-form" className={primary}>
-            Entrer dans mon espace
-          </button>
-        ) : step === 1 && !hasRadar ? (
-          <Link href="/bienvenue/radar" className={primary}>
-            Faire mon Radar
-          </Link>
         ) : (
-          <button type="button" onClick={next} className={primary}>
-            {step === 0 ? "Commencer" : "Continuer"}
-          </button>
+          <p className="mt-4 text-sm text-rr-gris-clair">Cette semaine n&apos;est pas encore disponible.</p>
         )}
-        {step > 0 && (
-          <button
-            type="button"
-            onClick={back}
-            className="h-9 text-sm text-rr-gris transition-colors duration-300 hover:text-rr-gris-clair"
+
+        {savedResponse && (
+          <Link
+            href={`/ceremonie/${weekNumber}`}
+            className="mt-3 flex h-14 w-full items-center justify-center rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90"
           >
-            Retour
-          </button>
+            Terminer la semaine
+          </Link>
         )}
-      </div>
+      </section>
+
+      {showRadar && (
+        <section id="radar" className="mt-14">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-rr-gris-clair">Ton Radar de la semaine</p>
+          {currentExpress ? (
+            <div className={cn(CARD, "mt-4 p-6")}>
+              <p className="font-rr-serif text-xl italic leading-snug text-rr-ivoire">
+                Voici où tu en es cette semaine.
+              </p>
+              <RadarExpressSummary levels={currentExpress} previous={previousLevels} previousLabel={previousLabel} />
+              {weekNumber === currentWeek && (
+                <details className="mt-5 border-t border-white/5 pt-4">
+                  <summary className="cursor-pointer list-none text-sm text-rr-gris-clair">
+                    Refaire mon Radar de la semaine
+                  </summary>
+                  <RadarExpressForm defaults={currentExpress} previous={previousLevels} submitLabel="Mettre à jour mon Radar" />
+                </details>
+              )}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-3xl border border-rr-or/40 bg-rr-or/[0.06] p-6">
+              <p className="font-rr-serif text-xl italic leading-snug text-rr-ivoire">
+                1 minute pour sentir où tu en es.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-rr-gris-clair">
+                Pour chaque pilier, comment ça va cette semaine ? Réponds sans réfléchir : c&apos;est ton ressenti
+                du moment.
+              </p>
+              <RadarExpressForm previous={previousLevels} submitLabel="Enregistrer mon Radar" />
+            </div>
+          )}
+        </section>
+      )}
+
+      {entries.length > 0 && (
+        <details className="group mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-5">
+          <summary className="cursor-pointer list-none text-sm text-rr-ivoire">
+            Relire mes réponses de la semaine <span className="text-rr-gris">({entries.length})</span>
+          </summary>
+          <div className="mt-5 flex flex-col gap-5">
+            {entries.map((e) => (
+              <div key={e.id}>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-rr-or">{longDate(e.entry_date)}</p>
+                <p className="mt-2 whitespace-pre-wrap font-rr-serif text-base leading-relaxed text-rr-gris-clair">
+                  {e.content}
+                </p>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
     </div>
   );
 }
