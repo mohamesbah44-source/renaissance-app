@@ -18,6 +18,9 @@ interface Session {
   why: string;
   guide?: string[];
   star?: boolean;
+  benefits: string[];
+  when: string;
+  how: string;
 }
 
 const SESSIONS: Session[] = [
@@ -34,6 +37,13 @@ const SESSIONS: Session[] = [
     cycles: 6,
     star: true,
     why: "Ton souffle sort deux fois plus longtemps qu'il n'entre. C'est la sortie lente qui envoie à ton corps le signal de redescendre.",
+    benefits: [
+      "Fait redescendre le stress et la tension en quelques cycles.",
+      "Aide à lâcher les pensées en boucle : compter occupe l'attention.",
+      "Favorise l'endormissement quand tu la pratiques le soir.",
+    ],
+    when: "Avant un rendez-vous important, après une journée chargée, quand tu sens la tension monter, ou avant de dormir.",
+    how: "Assis ou allongé, dos soutenu. Inspire par le nez sur 4, retiens sur 7, expire doucement par la bouche sur 8. 6 cycles, environ 2 minutes. Tu suis le cercle et la voix.",
   },
   {
     id: "46",
@@ -46,6 +56,13 @@ const SESSIONS: Session[] = [
     ],
     cycles: 18,
     why: "Idéal si la rétention te met mal à l'aise. L'expiration reste plus longue que l'inspiration.",
+    benefits: [
+      "Le plus doux pour commencer : aucune rétention, aucun effort.",
+      "Installe un rythme lent et régulier qui apaise le corps.",
+      "Convient à tous les moments de la journée.",
+    ],
+    when: "Pour une pause de calme au milieu de la journée, ou si la rétention du souffle te met mal à l'aise.",
+    how: "Inspire par le nez sur 4, expire lentement sur 6. 18 cycles, environ 3 minutes. Laisse tes épaules descendre à chaque expiration.",
   },
   {
     id: "soupir",
@@ -59,6 +76,13 @@ const SESSIONS: Session[] = [
     ],
     cycles: 10,
     why: "Une double inspiration par le nez, puis un long soupir par la bouche : très efficace pour relâcher une tension qui monte.",
+    benefits: [
+      "Relâche une tension d'un coup, surtout dans la poitrine et les épaules.",
+      "Très rapide : une minute et demie suffit.",
+      "Aide à sortir d'un moment de stress ou d'énervement.",
+    ],
+    when: "Quand quelque chose te serre, après une discussion tendue ou une longue période devant l'écran.",
+    how: "Inspire par le nez en deux temps : une grande inspiration, puis un petit complément. Puis expire longuement, comme un soupir. 10 cycles, environ 1 minute 40.",
   },
   {
     id: "meditation",
@@ -71,6 +95,13 @@ const SESSIONS: Session[] = [
     ],
     cycles: 30,
     why: "Un rythme régulier et lent, avec des consignes douces pour ancrer ton attention dans le moment présent.",
+    benefits: [
+      "Ancre ton attention dans le moment présent.",
+      "Rythme lent et régulier, avec des consignes douces à lire.",
+      "Installe une vraie pause pour revenir à toi.",
+    ],
+    when: "Quand tu as 5 minutes pour toi : le matin avant de démarrer, ou le soir pour déposer la journée.",
+    how: "Installe-toi confortablement, yeux ouverts ou fermés. Inspire sur 5, expire sur 5, pendant 5 minutes. Laisse les pensées passer et reviens à ton souffle.",
     guide: [
       "Installe-toi. Laisse tes épaules descendre.",
       "Sens l'air entrer, puis sortir. Rien d'autre à faire.",
@@ -374,6 +405,7 @@ function SessionRunner({ session, onClose }: { session: Session; onClose: () => 
 
 export function RespirationSessions() {
   const [active, setActive] = useState<Session | null>(null);
+  const [preview, setPreview] = useState<Session | null>(null);
 
   return (
     <div>
@@ -425,7 +457,7 @@ export function RespirationSessions() {
               <button
                 key={s.id}
                 type="button"
-                onClick={() => setActive(s)}
+                onClick={() => setPreview(s)}
                 className={cn(
                   "w-full rounded-2xl border p-5 text-left transition-colors hover:bg-white/[0.05]",
                   s.star ? "border-rr-or/30 bg-rr-or/[0.05]" : "border-white/10 bg-white/[0.02]"
@@ -441,7 +473,7 @@ export function RespirationSessions() {
                     <p className="mt-1 text-[11px] text-rr-gris">{fmt(sec)}</p>
                   </div>
                 </div>
-                <p className="mt-3 text-xs leading-relaxed text-rr-gris">{s.why}</p>
+                <p className="mt-3 text-xs text-rr-gris">Touche pour voir l&apos;explication et commencer</p>
                 {s.star && (
                   <p className="mt-3 text-[11px] uppercase tracking-[0.2em] text-rr-or-clair/80">La session de référence</p>
                 )}
@@ -450,6 +482,61 @@ export function RespirationSessions() {
           })}
         </div>
       </section>
+
+      {preview && !active && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center" onClick={() => setPreview(null)}>
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={preview.title}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[88dvh] w-full max-w-md overflow-y-auto rounded-t-3xl border border-rr-or/20 bg-rr-noir px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 sm:rounded-3xl"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">{preview.rhythm}</p>
+                <h2 className="mt-2 font-rr-display text-2xl text-rr-ivoire">{preview.title}</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setPreview(null)}
+                aria-label="Fermer"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-rr-gris hover:text-rr-ivoire"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="mt-3 font-rr-serif text-base italic leading-relaxed text-rr-gris-clair">{preview.why}</p>
+
+            <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">Ce que ça t&apos;apporte</p>
+            <ul className="mt-3 flex flex-col gap-2 text-sm leading-relaxed text-rr-gris-clair">
+              {preview.benefits.map((b) => (
+                <li key={b} className="flex gap-3">
+                  <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-rr-or" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">Quand la faire</p>
+            <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">{preview.when}</p>
+
+            <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">Comment faire</p>
+            <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">{preview.how}</p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setActive(preview);
+                setPreview(null);
+              }}
+              className="mt-8 h-14 w-full rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90"
+            >
+              Commencer · {fmt(preview.phases.reduce((a, p) => a + p.sec, 0) * preview.cycles)}
+            </button>
+          </div>
+        </div>
+      )}
 
       {active && <SessionRunner session={active} onClose={() => setActive(null)} />}
     </div>
