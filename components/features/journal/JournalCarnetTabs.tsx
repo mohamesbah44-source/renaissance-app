@@ -1,4 +1,4 @@
-w"use client";
+"use client";
 
 import { useCallback, useState } from "react";
 import { PenLine, X, BookOpen, Feather } from "lucide-react";
