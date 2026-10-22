@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
+import { Music, Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import { completePractice, type PracticeMode } from "@/lib/today/practice-actions";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +27,10 @@ const AUDIO: Partial<Record<Kind, string>> = {
 };
 
 const VOICE_KEY = "rr-breath-voice";
+const MUSIC_KEY = "rr-breath-music";
+/** Musique d'ambiance douce, jouée en boucle pendant les pratiques du soir et du sommeil. */
+const MUSIC_SRC = "/audio/sommeil.mp3";
+const MUSIC_VOLUME = 0.3;
 
 const RING_R = 140;
 const RING_C = 2 * Math.PI * RING_R;
@@ -171,6 +175,11 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
   const [index, setIndex] = useState(0);
   const [remaining, setRemaining] = useState(0);
   const [voiceOn, setVoiceOn] = useState(true);
+  const [musicOn, setMusicOn] = useState(true);
+  const musicRef = useRef<HTMLAudioElement | null>(null);
+  const musicOnRef = useRef(true);
+  const fadeRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const hasMusic = mode !== "morning";
   const savedRef = useRef(false);
   const voiceRef = useRef(true);
   const spokenRef = useRef(-1);
@@ -201,6 +210,61 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
     }
   }, []);
 
+  // Préférence de musique mémorisée sur l'appareil.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(MUSIC_KEY) === "off") {
+        setMusicOn(false);
+        musicOnRef.current = false;
+      }
+    } catch {
+      /* stockage indisponible : on garde la musique activée */
+    }
+  }, []);
+
+  /** Fait varier le volume de la musique en douceur ; coupe la lecture si le volume cible est 0. */
+  function fadeMusic(to: number, ms: number) {
+    const audio = musicRef.current;
+    if (!audio) return;
+    if (fadeRef.current) clearInterval(fadeRef.current);
+    const from = audio.volume;
+    const startedAt = Date.now();
+    fadeRef.current = setInterval(() => {
+      const k = Math.min(1, (Date.now() - startedAt) / ms);
+      audio.volume = Math.min(1, Math.max(0, from + (to - from) * k));
+      if (k >= 1) {
+        if (fadeRef.current) clearInterval(fadeRef.current);
+        fadeRef.current = null;
+        if (to === 0) audio.pause();
+      }
+    }, 100);
+  }
+
+  function playMusic() {
+    const audio = musicRef.current;
+    if (!audio || !musicOnRef.current) return;
+    audio.play().catch(() => {
+      /* lecture refusée par le navigateur : la pratique continue sans musique */
+    });
+    fadeMusic(MUSIC_VOLUME, 4000);
+  }
+
+  function toggleMusic() {
+    const next = !musicOn;
+    setMusicOn(next);
+    musicOnRef.current = next;
+    try {
+      localStorage.setItem(MUSIC_KEY, next ? "on" : "off");
+    } catch {
+      /* ignoré */
+    }
+    if (next) {
+      if (status === "running") playMusic();
+    } else {
+      fadeMusic(0, 600);
+    }
+  }
+
   function toggleVoice() {
     const next = !voiceOn;
     setVoiceOn(next);
@@ -221,6 +285,17 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
     // puis réutilisé pour toutes les phases.
     if (!audioRef.current) audioRef.current = new Audio();
     spokenRef.current = 0;
+    if (hasMusic) {
+      // Même principe que la voix : le lecteur est créé pendant le geste de l'utilisateur.
+      if (!musicRef.current) {
+        const m = new Audio(MUSIC_SRC);
+        m.loop = true;
+        m.volume = 0;
+        musicRef.current = m;
+      }
+      musicRef.current.currentTime = 0;
+      playMusic();
+    }
     cue(segments[0].kind, voiceRef.current, audioRef.current);
     setStatus("running");
   }
@@ -265,6 +340,26 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
     return () => stopCue(audioRef.current);
   }, []);
 
+  // La musique : pause avec la pratique, reprise en douceur, fondu de sortie à la fin.
+  useEffect(() => {
+    if (!musicRef.current) return;
+    if (status === "paused") fadeMusic(0, 800);
+    if (status === "done") fadeMusic(0, 5000);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+  const prevStatus = useRef(status);
+  useEffect(() => {
+    if (prevStatus.current === "paused" && status === "running") playMusic();
+    prevStatus.current = status;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+  useEffect(() => {
+    return () => {
+      if (fadeRef.current) clearInterval(fadeRef.current);
+      musicRef.current?.pause();
+    };
+  }, []);
+
   // Enregistrement automatique à la fin.
   useEffect(() => {
     if (status !== "done" || savedRef.current) return;
@@ -289,6 +384,21 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
           {mode === "morning" ? "Routine du matin" : mode === "sleep" ? "Pour t'endormir" : "Routine du soir"}
         </p>
         <div className="flex items-center gap-1">
+          {hasMusic && (
+            <button
+              type="button"
+              onClick={toggleMusic}
+              aria-label={musicOn ? "Couper la musique" : "Activer la musique"}
+              aria-pressed={musicOn}
+              className={cn(
+                "relative flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:text-rr-ivoire",
+                musicOn ? "text-rr-or" : "text-rr-gris"
+              )}
+            >
+              <Music className="h-5 w-5" strokeWidth={1.75} />
+              {!musicOn && <span className="absolute h-px w-6 rotate-45 bg-current" aria-hidden="true" />}
+            </button>
+          )}
           <button
             type="button"
             onClick={toggleVoice}
@@ -357,6 +467,7 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
             )}
 
             <p className="mt-8 text-xs text-rr-gris">
+              {hasMusic ? (musicOn ? "Une musique douce t'accompagne. " : "La musique est coupée. ") : ""}
               {voiceOn
                 ? "La voix te guide : « Inspire », « Retiens », « Expire ». Tu peux la couper en haut à droite."
                 : "La voix est coupée. Tu peux la réactiver en haut à droite."}
