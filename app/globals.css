@@ -24,20 +24,21 @@
   --animate-breathe: breathe 8s ease-in-out infinite;
 
   /* Le Programme Re-Naissance™ — charte principale (noir / or / ivoire), utilisée dans toute l'application */
-  --color-rr-noir: #0c0b0a;
-  --color-rr-encre: #161310;
-  --color-rr-encre2: #1e1a16;
-  --color-rr-or: #c9a96e;
-  --color-rr-or-clair: #e8d5a3;
-  --color-rr-ivoire: #f5f0e8;
-  --color-rr-creme: #ede6d6;
-  --color-rr-gris: #8a8278;
-  --color-rr-gris-clair: #b0a898;
+  --color-rr-noir: #07060d;
+  --color-rr-encre: #120d22;
+  --color-rr-encre2: #1a1330;
+  --color-rr-or: #d4af6a;
+  --color-rr-or-clair: #e9dec6;
+  --color-rr-ivoire: #f4eee2;
+  --color-rr-creme: #e9dec6;
+  --color-rr-gris: #8f8aa3;
+  --color-rr-gris-clair: #b9b4c8;
   --color-rr-rouge: #8b3a2a;
   --color-rr-orange: #9b6b3a;
   --color-rr-vert: #5a8a6e;
 
-  --font-rr-display: var(--font-rr-display);
+  --font-rr-display: var(--font-rr-serif), Georgia, serif;
+  --font-rr-label: var(--font-rr-cinzel), Georgia, serif;
   --font-rr-serif: var(--font-rr-serif);
   --font-rr-sans: var(--font-rr-sans);
 }
@@ -85,8 +86,8 @@
 }
 
 :root {
-  --background: var(--color-night-950);
-  --foreground: #f3f1f8;
+  --background: #07060d;
+  --foreground: #f4eee2;
 }
 
 html {
@@ -272,4 +273,23 @@ main button:not(:disabled):active {
   .rr-shimmer::after {
     animation: none !important;
   }
+}
+
+/* ───────────────────────────────────────────────
+   Typographie premium : titres en Cormorant Garamond,
+   petits libellés en capitales espacées en Cinzel
+   ─────────────────────────────────────────────── */
+.font-rr-display {
+  font-weight: 500;
+}
+
+h1.font-rr-display {
+  font-size: 2.75rem;
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+}
+
+[class*="uppercase"][class*="tracking-[0.2"],
+[class*="uppercase"][class*="tracking-[0.3"] {
+  font-family: var(--font-rr-label);
 }
