@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Compass, BookOpen, Sparkles, User } from "lucide-react";
+import { Home, Compass, Wind, BookOpen, Sparkles, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Accueil", icon: Home },
   { href: "/parcours", label: "Parcours", icon: Compass },
+  { href: "/respiration", label: "Respirer", icon: Wind },
   { href: "/journal", label: "Journal", icon: BookOpen },
   { href: "/ressources", label: "Ressources", icon: Sparkles },
   { href: "/profil", label: "Profil", icon: User },
@@ -28,7 +29,7 @@ export function BottomNav() {
                 href={href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group flex flex-col items-center gap-1.5 px-2 py-2.5 text-[11px] tracking-[0.02em] transition-colors duration-300",
+                  "group flex flex-col items-center gap-1.5 px-1 py-2.5 text-[11px] tracking-[0.02em] transition-colors duration-300",
                   isActive ? "text-rr-or" : "text-rr-gris hover:text-rr-gris-clair"
                 )}
               >
