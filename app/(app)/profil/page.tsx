@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ChevronDown, Shield } from "lucide-react";
+import { ChevronDown, ChevronRight, Shield, TrendingUp, Flame, Sparkles, Bell } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/queries";
 import { signOut } from "@/lib/auth/actions";
@@ -10,6 +10,13 @@ import WelcomeVideo from "@/components/features/bienvenue/WelcomeVideo";
 import { programWeek } from "@/lib/radar/express";
 import { todayISODate } from "@/lib/habits/streak";
 import { formatDate } from "@/lib/utils";
+
+const SPACE_LINKS = [
+  { href: "/progression", label: "Ma progression", hint: "Radar, bilans, régularité", icon: TrendingUp },
+  { href: "/habitudes", label: "Mes habitudes", hint: "Ton ancrage quotidien", icon: Flame },
+  { href: "/ressources", label: "Mes ressources", hint: "Méditations, replays, fiches", icon: Sparkles },
+  { href: "/rappels", label: "Mes rappels", hint: "Matin et soir, en douceur", icon: Bell },
+];
 
 function WeekRing({ week }: { week: number }) {
   const r = 28;
@@ -89,6 +96,28 @@ export default async function ProfilPage() {
           <WeekRing week={week} />
         </div>
       </GlassCard>
+
+      <nav aria-label="Mon espace" className="rounded-[28px] border border-rr-or/[0.14] bg-white/[0.03] px-6">
+        {SPACE_LINKS.map(({ href, label, hint, icon: Icon }, i) => (
+          <Link
+            key={href}
+            href={href}
+            className={`group flex items-center gap-4 py-5 ${i > 0 ? "border-t border-white/[0.07]" : ""}`}
+          >
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-rr-or/25 bg-rr-or/[0.08] transition-all duration-300 group-hover:bg-rr-or/[0.18]">
+              <Icon className="h-[18px] w-[18px] text-rr-or-clair" strokeWidth={1.5} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-rr-serif text-xl italic leading-tight text-rr-ivoire">{label}</span>
+              <span className="mt-0.5 block text-xs text-rr-gris">{hint}</span>
+            </span>
+            <ChevronRight
+              className="h-4 w-4 text-rr-gris transition-colors duration-300 group-hover:text-rr-or-clair"
+              strokeWidth={1.75}
+            />
+          </Link>
+        ))}
+      </nav>
 
       <details className="group rounded-[28px] border border-rr-or/[0.14] bg-white/[0.03] transition-colors duration-300 open:border-rr-or/25 open:bg-white/[0.04]">
         <summary className="flex cursor-pointer list-none items-center justify-between p-6 [&::-webkit-details-marker]:hidden">
