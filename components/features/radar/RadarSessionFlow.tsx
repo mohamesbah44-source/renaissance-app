@@ -2,12 +2,13 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { saveRadarBilan } from "@/lib/radar/actions";
-import { ALL_QUESTIONS, TOTAL_QUESTIONS, questionFieldName } from "@/lib/radar/constants";
+import { ALL_QUESTIONS, CERCLES, TOTAL_QUESTIONS, cercleOf, questionFieldName } from "@/lib/radar/constants";
 import { RadarProgressBar } from "@/components/features/radar/RadarProgressBar";
 import { RadarQuestion } from "@/components/features/radar/RadarQuestion";
 import { RadarScale } from "@/components/features/radar/RadarScale";
+import { cn } from "@/lib/utils";
 
 const STORAGE_KEY = "rr_session_v2";
 const AUTO_ADVANCE_DELAY_MS = 350;
@@ -71,6 +72,7 @@ export function RadarSessionFlow({ doneHref }: { doneHref?: string }) {
   const question = ALL_QUESTIONS[index];
   const isLast = index === ALL_QUESTIONS.length - 1;
   const currentValue = answers[question.id];
+  const currentCercle = cercleOf(question.pilierId).id;
 
   const goToIndex = (next: number) => {
     clearAdvanceTimer();
@@ -91,12 +93,28 @@ export function RadarSessionFlow({ doneHref }: { doneHref?: string }) {
   };
 
   return (
-    <form action={formAction} className="flex min-h-[70dvh] flex-col pt-2">
+    <form action={formAction} className="flex min-h-[78dvh] flex-col">
       {ALL_QUESTIONS.map((q) => (
         <input key={q.id} type="hidden" name={questionFieldName(q)} value={answers[q.id] ?? ""} readOnly />
       ))}
 
       <RadarProgressBar current={index + 1} total={TOTAL_QUESTIONS} />
+
+      <div className="mt-6 flex gap-2" role="img" aria-label={`Cercle ${CERCLES.find((c) => c.id === currentCercle)?.nom}`}>
+        {CERCLES.map((cercle) => (
+          <span
+            key={cercle.id}
+            className={cn(
+              "flex h-[34px] flex-1 items-center justify-center rounded-full border font-rr-label text-[10px] uppercase tracking-[0.22em]",
+              cercle.id === currentCercle
+                ? "border-rr-or/50 bg-rr-or/[0.16] text-rr-or"
+                : "border-white/[0.12] text-rr-gris-clair"
+            )}
+          >
+            {cercle.nom}
+          </span>
+        ))}
+      </div>
 
       <RadarQuestion pilierNom={question.pilierNom} text={question.t} />
 
@@ -110,16 +128,16 @@ export function RadarSessionFlow({ doneHref }: { doneHref?: string }) {
           onClick={() => goToIndex(Math.max(0, index - 1))}
           disabled={index === 0}
           aria-label="Question précédente"
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-rr-or/30 text-rr-creme transition-all duration-300 hover:border-rr-or/60 disabled:opacity-30"
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-rr-ivoire/20 text-rr-gris-clair transition-colors duration-300 hover:text-rr-ivoire disabled:opacity-30"
         >
-          <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
+          <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
         </button>
 
         {isLast ? (
           <button
             type="submit"
             disabled={currentValue === undefined || isPending}
-            className="h-12 flex-1 rounded-full bg-rr-or text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:bg-rr-or-clair disabled:opacity-40"
+            className="h-14 flex-1 rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90 disabled:opacity-40"
           >
             {isPending ? "Un instant…" : "Voir mes résultats"}
           </button>
@@ -128,7 +146,7 @@ export function RadarSessionFlow({ doneHref }: { doneHref?: string }) {
             type="button"
             onClick={() => goToIndex(Math.min(ALL_QUESTIONS.length - 1, index + 1))}
             disabled={currentValue === undefined}
-            className="h-12 flex-1 rounded-full bg-rr-or text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:bg-rr-or-clair disabled:opacity-40"
+            className="h-14 flex-1 rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90 disabled:opacity-40"
           >
             Suivant
           </button>
