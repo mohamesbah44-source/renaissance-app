@@ -1,5 +1,15 @@
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Shield, TrendingUp, Flame, Sparkles, Bell } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  Shield,
+  TrendingUp,
+  Flame,
+  Sparkles,
+  Bell,
+  ClipboardCheck,
+  Moon,
+} from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/queries";
 import { signOut } from "@/lib/auth/actions";
@@ -12,8 +22,10 @@ import { todayISODate } from "@/lib/habits/streak";
 import { formatDate } from "@/lib/utils";
 
 const SPACE_LINKS = [
+  { href: "/bilan", label: "Mon bilan", hint: "Faire le point sur ma semaine", icon: ClipboardCheck },
   { href: "/progression", label: "Ma progression", hint: "Radar, bilans, régularité", icon: TrendingUp },
   { href: "/habitudes", label: "Mes habitudes", hint: "Ton ancrage quotidien", icon: Flame },
+  { href: "/pratique/sommeil", label: "Mon sommeil", hint: "La pratique pour t'endormir", icon: Moon },
   { href: "/ressources", label: "Mes ressources", hint: "Méditations, replays, fiches", icon: Sparkles },
   { href: "/rappels", label: "Mes rappels", hint: "Matin et soir, en douceur", icon: Bell },
 ];
