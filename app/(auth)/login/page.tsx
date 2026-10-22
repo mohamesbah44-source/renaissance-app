@@ -3,24 +3,21 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { signIn } from "@/lib/auth/actions";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
+const PILL = "h-[52px] rounded-full px-5";
+
 export default function LoginPage() {
   const [state, formAction] = useActionState(signIn, undefined);
 
   return (
-    <GlassCard className="p-6 sm:p-8">
-      <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Re-Naissance™</p>
-      <h1 className="mt-3 font-rr-display text-3xl leading-tight text-rr-ivoire">Te revoilà.</h1>
-      <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
-        Reviens te poser dans ton espace Renaissance.
-      </p>
+    <div className="rr-enter">
+      <h1 className="text-center font-rr-display text-[46px] leading-none text-rr-ivoire">Te revoilà.</h1>
 
-      <form action={formAction} className="mt-8 flex flex-col gap-5">
+      <form action={formAction} className="mt-10 flex flex-col gap-4">
         <Field label="Email" htmlFor="email">
           <Input
             id="email"
@@ -29,6 +26,7 @@ export default function LoginPage() {
             autoComplete="email"
             required
             placeholder="toi@exemple.com"
+            className={PILL}
           />
         </Field>
         <Field label="Mot de passe" htmlFor="password">
@@ -38,19 +36,22 @@ export default function LoginPage() {
             autoComplete="current-password"
             required
             placeholder="••••••••"
+            className={`${PILL} pr-12`}
           />
         </Field>
 
-        {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+        {state?.error && <p className="px-2 text-sm text-rr-rouge">{state.error}</p>}
 
-        <SubmitButton>Entrer dans mon espace</SubmitButton>
+        <SubmitButton size="lg" className="mt-3">
+          Entrer
+        </SubmitButton>
       </form>
 
-      <div className="mt-6 flex flex-col items-center gap-1 text-sm text-rr-gris">
-        <Link href="/forgot-password" className="px-2 py-2 transition-colors duration-300 hover:text-rr-gris-clair">
-          Mot de passe oublié ?
+      <div className="mt-4 flex flex-col items-center gap-1 text-sm text-rr-gris-clair">
+        <Link href="/forgot-password" className="px-2 py-2 transition-colors duration-300 hover:text-rr-ivoire">
+          Mot de passe oublié
         </Link>
-        <p>
+        <p className="text-rr-gris">
           Pas encore de compte ?{" "}
           <Link
             href="/register"
@@ -60,6 +61,6 @@ export default function LoginPage() {
           </Link>
         </p>
       </div>
-    </GlassCard>
+    </div>
   );
 }
