@@ -1,15 +1,19 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getProfile } from "@/lib/supabase/queries";
-import { WelcomeHeader } from "@/components/features/dashboard/WelcomeHeader";
-import { ProgressOverview } from "@/components/features/dashboard/ProgressOverview";
 import { CurrentStateCard } from "@/components/features/dashboard/CurrentStateCard";
 import { RadarLinkCard } from "@/components/features/dashboard/RadarLinkCard";
 import { NextAppointmentCard } from "@/components/features/dashboard/NextAppointmentCard";
-import { ContinueButton } from "@/components/features/dashboard/ContinueButton";
 import { OfferCard } from "@/components/features/dashboard/OfferCard";
 import { HabitsLinkCard } from "@/components/features/dashboard/HabitsLinkCard";
 import { todayISODate } from "@/lib/habits/streak";
+
+function greeting(): string {
+  const hour = Number(
+    new Intl.DateTimeFormat("fr-FR", { hour: "numeric", hour12: false, timeZone: "Europe/Paris" }).format(new Date())
+  );
+  return hour >= 18 || hour < 5 ? "Bonsoir" : "Bonjour";
+}
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -26,10 +30,9 @@ export default async function DashboardPage() {
 
   const today = todayISODate();
 
-  const [{ data: currentWeek }, { data: progressRows }, { data: journalEntries }, { data: appointments }, { data: offer }, { data: activeHabits }, { data: todayLogs }] =
+  const [{ data: currentWeek }, { data: journalEntries }, { data: appointments }, { data: offer }, { data: activeHabits }, { data: todayLogs }] =
     await Promise.all([
       supabase.from("weeks").select("*").eq("week_number", currentWeekNumber).single(),
-      supabase.from("user_progress").select("*").eq("user_id", user.id),
       supabase
         .from("journal_entries")
         .select("*")
@@ -55,25 +58,33 @@ export default async function DashboardPage() {
       supabase.from("habit_logs").select("habit_id").eq("user_id", user.id).eq("log_date", today),
     ]);
 
-  const completedCount = progressRows?.filter((p) => p.status === "completed").length ?? 0;
-  const currentProgress = progressRows?.find((p) => p.week_id === currentWeek?.id) ?? null;
+  const progressPct = Math.min(100, Math.max(0, (currentWeekNumber / 8) * 100));
 
   return (
     <div className="mx-auto max-w-2xl">
-      <WelcomeHeader firstName={profile?.first_name ?? null} />
+      <header className="pt-1">
+        <h1 className="animate-fade-up font-rr-display text-4xl leading-tight text-rr-ivoire">
+          {greeting()}
+          {profile?.first_name ? ` ${profile.first_name}` : ""}.
+        </h1>
+        <p className="mt-3 text-sm text-rr-gris-clair">
+          Semaine {currentWeekNumber} sur 8{currentWeek?.title ? ` · ${currentWeek.title}` : ""}
+        </p>
+        <div
+          className="mt-5 h-[3px] rounded-full bg-white/10"
+          role="img"
+          aria-label={`Semaine ${currentWeekNumber} sur 8`}
+        >
+          <div className="h-[3px] rounded-full bg-rr-or" style={{ width: `${progressPct}%` }} />
+        </div>
+      </header>
 
-      <ProgressOverview
-        currentWeek={currentWeekNumber}
-        weekTitle={currentWeek?.title ?? null}
-        completedCount={completedCount}
-      />
       <Link
         href="/aujourdhui"
-        className="mt-4 flex w-full items-center justify-center rounded-full bg-rr-or px-6 py-4 text-[15px] font-medium text-rr-noir transition-opacity hover:opacity-90"
+        className="rr-shimmer mt-9 flex w-full items-center justify-center rounded-full bg-rr-or px-6 py-4 text-[16px] font-medium text-rr-noir shadow-[0_10px_40px_-12px_rgba(201,169,110,0.6)] transition-opacity hover:opacity-90"
       >
         Ma journée
       </Link>
-      {currentWeek && <ContinueButton weekId={currentWeek.id} status={currentProgress?.status} />}
 
       <div className="mt-4 grid grid-cols-2 gap-3">
         <NextAppointmentCard appointment={appointments?.[0] ?? null} />
