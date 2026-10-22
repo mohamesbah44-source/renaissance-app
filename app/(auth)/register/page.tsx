@@ -3,40 +3,40 @@
 import Link from "next/link";
 import { useActionState } from "react";
 import { signUp } from "@/lib/auth/actions";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { Field } from "@/components/ui/Field";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+
+const PILL = "h-[52px] rounded-full px-5";
 
 export default function RegisterPage() {
   const [state, formAction] = useActionState(signUp, undefined);
 
   if (state?.success) {
     return (
-      <GlassCard className="p-6 text-center sm:p-8">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Re-Naissance™</p>
-        <h1 className="mt-3 font-rr-display text-3xl leading-tight text-rr-ivoire">Presque prêt(e).</h1>
-        <p className="mt-4 font-rr-serif text-base italic leading-relaxed text-rr-creme">{state.success}</p>
+      <div className="rr-enter text-center">
+        <h1 className="font-rr-display text-[46px] leading-none text-rr-ivoire">Presque prêt·e.</h1>
+        <p className="mt-6 font-rr-serif text-xl italic leading-relaxed text-rr-creme">{state.success}</p>
         <Link
           href="/login"
-          className="mt-8 flex h-12 items-center justify-center rounded-full border border-rr-or/30 text-xs uppercase tracking-[0.25em] text-rr-or-clair transition-all duration-300 hover:bg-white/[0.05]"
+          className="mt-10 flex h-14 items-center justify-center rounded-full border border-rr-ivoire/20 text-[15px] text-rr-ivoire transition-colors duration-300 hover:bg-white/[0.05]"
         >
           Retour à la connexion
         </Link>
-      </GlassCard>
+      </div>
     );
   }
 
   return (
-    <GlassCard className="p-6 sm:p-8">
-      <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Re-Naissance™</p>
-      <h1 className="mt-3 font-rr-display text-3xl leading-tight text-rr-ivoire">Bienvenue.</h1>
-      <p className="mt-3 text-sm leading-relaxed text-rr-gris-clair">
-        Crée ton espace Renaissance. Le chemin commence ici, à ton rythme.
+    <div className="rr-enter">
+      <h1 className="text-center font-rr-display text-[46px] leading-none text-rr-ivoire">Bienvenue.</h1>
+      <p className="mt-4 text-center text-sm leading-relaxed text-rr-gris-clair">
+        Crée ton espace. Le chemin commence ici, à ton rythme.
       </p>
 
-      <form action={formAction} className="mt-8 flex flex-col gap-5">
-        <div className="grid grid-cols-2 gap-4">
+      <form action={formAction} className="mt-9 flex flex-col gap-4">
+        <div className="grid grid-cols-2 gap-3">
           <Field label="Prénom" htmlFor="firstName">
             <Input
               id="firstName"
@@ -44,10 +44,17 @@ export default function RegisterPage() {
               autoComplete="given-name"
               required
               placeholder="Ton prénom"
+              className={PILL}
             />
           </Field>
           <Field label="Nom" htmlFor="lastName">
-            <Input id="lastName" name="lastName" autoComplete="family-name" placeholder="Ton nom" />
+            <Input
+              id="lastName"
+              name="lastName"
+              autoComplete="family-name"
+              placeholder="Ton nom"
+              className={PILL}
+            />
           </Field>
         </div>
         <Field label="Email" htmlFor="email">
@@ -58,35 +65,38 @@ export default function RegisterPage() {
             autoComplete="email"
             required
             placeholder="toi@exemple.com"
+            className={PILL}
           />
         </Field>
         <Field label="Mot de passe" htmlFor="password">
-          <Input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="new-password"
             required
             placeholder="8 caractères minimum"
+            className={`${PILL} pr-12`}
           />
         </Field>
         <Field label="Confirmer le mot de passe" htmlFor="passwordConfirm">
-          <Input
+          <PasswordInput
             id="passwordConfirm"
             name="passwordConfirm"
-            type="password"
             autoComplete="new-password"
             required
             placeholder="••••••••"
+            className={`${PILL} pr-12`}
           />
         </Field>
 
-        {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+        {state?.error && <p className="px-2 text-sm text-rr-rouge">{state.error}</p>}
 
-        <SubmitButton>Créer mon espace</SubmitButton>
+        <SubmitButton size="lg" className="mt-3">
+          Créer mon espace
+        </SubmitButton>
       </form>
 
-      <p className="mt-6 text-center text-sm text-rr-gris">
+      <p className="mt-4 text-center text-sm text-rr-gris">
         Déjà un compte ?{" "}
         <Link
           href="/login"
@@ -95,6 +105,6 @@ export default function RegisterPage() {
           Te connecter
         </Link>
       </p>
-    </GlassCard>
+    </div>
   );
 }
