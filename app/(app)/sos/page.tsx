@@ -1,65 +1,92 @@
 import Link from "next/link";
-import { GlassCard } from "@/components/ui/GlassCard";
+import { ChevronLeft } from "lucide-react";
 
 const ETAPES = [
   {
-    titre: "1. Reviens à ton souffle",
-    texte:
-      "Inspire doucement par le nez sur 4 temps, retiens l'air 4 temps, expire longuement par la bouche sur 6 à 8 temps. Répète ce cycle cinq à six fois, sans forcer.",
+    titre: "Reviens à ton souffle",
+    texte: "Inspire sur 4 temps, expire longuement sur 6 à 8. Cinq à six fois, sans forcer.",
   },
   {
-    titre: "2. Ancre ton corps ici",
+    titre: "Ancre ton corps ici",
     texte:
-      "Nomme, dans ta tête ou à voix basse : 5 choses que tu vois, 4 choses que tu entends, 3 choses que tu touches, 2 choses que tu sens, 1 chose que tu goûtes. Reviens au concret, à l'instant présent.",
+      "5 choses que tu vois, 4 que tu entends, 3 que tu touches, 2 que tu sens, 1 que tu goûtes.",
   },
   {
-    titre: "3. Nomme ce qui traverse",
-    texte:
-      "\"En ce moment, je ressens ___.\" Tu n'as pas besoin de comprendre ou de justifier ce qui se passe pour le traverser. Ce que tu ressens est légitime, même si c'est inconfortable.",
+    titre: "Nomme ce qui traverse",
+    texte: "« En ce moment, je ressens… » Ce que tu ressens est légitime.",
   },
   {
-    titre: "4. Relie-toi si tu en as besoin",
-    texte:
-      "Tu n'as pas à traverser cela seul·e. Écris un message à ton praticien si tu sens que tu as besoin d'être accompagné·e maintenant.",
+    titre: "Relie-toi",
+    texte: "Écris à ton praticien si tu as besoin d'être accompagné maintenant.",
   },
 ];
 
 /** Protocole SOS Re-Naissance™ — accessible à tout moment, sans dépendre de l'avancée dans le parcours. */
 export default function SosPage() {
   return (
-    <div className="mx-auto max-w-2xl pb-8">
-      <header className="pt-2">
-        <p className="text-xs uppercase tracking-[0.3em] text-rr-or">Le Programme Re-Naissance™</p>
-        <h1 className="mt-2 font-rr-display text-3xl uppercase tracking-[0.06em] text-rr-ivoire">
-          Protocole SOS Re-Naissance™
-        </h1>
-        <p className="mt-3 font-rr-serif text-lg italic leading-relaxed text-rr-creme">
-          Pour les moments où tout s&apos;accélère ou se referme. Prends ce qui t&apos;aide, dans l&apos;ordre
-          qui te convient.
-        </p>
-      </header>
+    <div className="relative mx-auto max-w-2xl pb-8">
+      {/* Halo chaud : l'écran SOS se distingue par une lumière plus douce, ni froide ni alarmante */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-24 left-1/2 h-[520px] w-[140%] -translate-x-1/2"
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(150,60,70,0.30) 0%, rgba(70,24,50,0.16) 55%, transparent 100%)",
+        }}
+      />
 
-      <div className="mt-8 flex flex-col gap-4">
-        {ETAPES.map((etape) => (
-          <GlassCard key={etape.titre} className="p-6">
-            <p className="font-rr-display text-base uppercase tracking-[0.08em] text-rr-or-clair">{etape.titre}</p>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">{etape.texte}</p>
-          </GlassCard>
-        ))}
-      </div>
+      <div className="rr-enter relative">
+        <Link
+          href="/profil"
+          aria-label="Retour"
+          className="-ml-3 flex h-11 w-11 items-center justify-center rounded-full text-rr-gris-clair transition-colors hover:text-rr-ivoire"
+        >
+          <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
+        </Link>
 
-      <GlassCard className="mt-6 p-6 text-center">
-        <p className="text-sm leading-relaxed text-white/60">
-          Ce protocole est un outil d&apos;auto-régulation, il ne remplace pas une aide médicale ou d&apos;urgence.
-          Si tu es en danger immédiat, contacte les secours de ton pays ou rends-toi aux urgences les plus proches.
-        </p>
+        <header className="mt-3">
+          <p className="text-[10px] uppercase tracking-[0.3em] text-[#E0925A]">Protocole SOS</p>
+          <h1 className="mt-4 font-rr-display text-[38px] leading-[1.05] text-rr-ivoire">
+            Quand tout s&apos;accélère.
+          </h1>
+          <p className="mt-4 text-sm leading-relaxed text-rr-gris-clair">
+            Prends ce qui t&apos;aide, dans l&apos;ordre qui te convient.
+          </p>
+        </header>
+
+        <ol className="mt-10 flex flex-col">
+          {ETAPES.map((etape, i) => (
+            <li key={etape.titre} className="flex gap-4 border-b border-white/[0.08] py-5 last:border-b-0">
+              <span className="flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-full border border-[#E0925A]/60 font-rr-label text-[13px] text-[#E0925A]">
+                {i + 1}
+              </span>
+              <div>
+                <p className="font-rr-serif text-[22px] italic leading-tight text-rr-ivoire">{etape.titre}</p>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-rr-gris-clair">{etape.texte}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <Link
+          href="/respiration"
+          className="mt-10 flex h-14 w-full items-center justify-center rounded-full bg-[#E0925A] text-[15px] font-medium text-[#1a0d08] transition-opacity duration-300 hover:opacity-90"
+        >
+          Respirer avec le cercle
+        </Link>
+
         <Link
           href="/messages"
-          className="mt-5 inline-flex items-center justify-center rounded-full bg-rr-or px-8 py-3 text-xs uppercase tracking-[0.25em] text-rr-noir transition-all duration-300 hover:-translate-y-0.5 hover:bg-rr-or-clair"
+          className="mt-3 flex h-14 w-full items-center justify-center rounded-full border border-rr-ivoire/20 text-[15px] text-rr-ivoire transition-colors duration-300 hover:bg-white/[0.05]"
         >
           Écrire à mon praticien
         </Link>
-      </GlassCard>
+
+        <p className="mt-8 text-center text-xs leading-relaxed text-rr-gris">
+          Ce protocole est un outil d&apos;auto-régulation, il ne remplace pas une aide médicale ou d&apos;urgence. Si
+          tu es en danger immédiat, contacte les secours de ton pays ou rends-toi aux urgences les plus proches.
+        </p>
+      </div>
     </div>
   );
 }
