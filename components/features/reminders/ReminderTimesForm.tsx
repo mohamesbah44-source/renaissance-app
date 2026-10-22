@@ -10,12 +10,47 @@ type Props = {
   eveningTime: string;
 };
 
+function Row({
+  title,
+  hint,
+  name,
+  enabled,
+  time,
+}: {
+  title: string;
+  hint: string;
+  name: "morning" | "evening";
+  enabled: boolean;
+  time: string;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-3xl border border-rr-or/20 bg-white/[0.05] px-5 py-4">
+      <div>
+        <p className="font-rr-serif text-[22px] italic leading-tight text-rr-ivoire">{title}</p>
+        <p className="mt-1 text-xs text-rr-gris-clair">{hint}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <input
+          type="time"
+          name={`${name}_time`}
+          defaultValue={time}
+          required
+          aria-label={`Heure du rappel : ${title}`}
+          className="h-10 rounded-full border border-rr-ivoire/20 bg-transparent px-4 font-rr-label text-[15px] tracking-[0.08em] text-rr-ivoire focus:border-rr-or/60 focus:outline-none"
+        />
+        <label className="relative inline-flex cursor-pointer items-center" aria-label={`Activer : ${title}`}>
+          <input type="checkbox" name={`${name}_enabled`} defaultChecked={enabled} className="peer sr-only" />
+          <span className="h-[30px] w-[50px] rounded-full bg-white/[0.14] transition-colors duration-300 peer-checked:bg-rr-or peer-focus-visible:ring-2 peer-focus-visible:ring-rr-or/60" />
+          <span className="pointer-events-none absolute left-[3px] top-[3px] h-6 w-6 rounded-full bg-rr-ivoire transition-all duration-300 peer-checked:left-[23px] peer-checked:bg-rr-noir" />
+        </label>
+      </div>
+    </div>
+  );
+}
+
 export function ReminderTimesForm({ morningEnabled, morningTime, eveningEnabled, eveningTime }: Props) {
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
-
-  const timeInput =
-    "h-11 rounded-xl border border-white/10 bg-white/[0.03] px-3 text-sm text-rr-ivoire focus:border-rr-or/50 focus:outline-none";
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -28,31 +63,21 @@ export function ReminderTimesForm({ morningEnabled, morningTime, eveningEnabled,
   }
 
   return (
-    <form onSubmit={onSubmit} onChange={() => setSaved(false)} className="flex flex-col gap-6">
-      <div className="flex items-center justify-between gap-4">
-        <label className="flex items-center gap-3 text-sm text-rr-ivoire">
-          <input type="checkbox" name="morning_enabled" defaultChecked={morningEnabled} className="h-4 w-4 accent-[#c9a961]" />
-          Le matin
-        </label>
-        <input type="time" name="morning_time" defaultValue={morningTime} required className={timeInput} />
-      </div>
-      <div className="flex items-center justify-between gap-4">
-        <label className="flex items-center gap-3 text-sm text-rr-ivoire">
-          <input type="checkbox" name="evening_enabled" defaultChecked={eveningEnabled} className="h-4 w-4 accent-[#c9a961]" />
-          Le soir
-        </label>
-        <input type="time" name="evening_time" defaultValue={eveningTime} required className={timeInput} />
-      </div>
-      <p className="text-xs text-rr-gris">
-        Le rappel du matin ne part pas si ton check-in est déjà fait. Celui du soir ne part pas si ta journée est déjà terminée.
-        Heure de Paris.
+    <form onSubmit={onSubmit} onChange={() => setSaved(false)} className="flex flex-col gap-4">
+      <Row title="Matin" hint="Ouvrir ta journée" name="morning" enabled={morningEnabled} time={morningTime} />
+      <Row title="Soir" hint="Ralentir, écrire" name="evening" enabled={eveningEnabled} time={eveningTime} />
+
+      <p className="px-1 text-xs leading-relaxed text-rr-gris">
+        Le rappel du matin ne part pas si ton check-in est déjà fait. Celui du soir ne part pas si ta journée est déjà
+        terminée. Heure de Paris.
       </p>
+
       <button
         type="submit"
         disabled={pending}
-        className="h-12 rounded-full border border-rr-or/40 text-sm text-rr-or transition-colors hover:bg-rr-or/10 disabled:opacity-50"
+        className="mt-2 h-14 rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90 disabled:opacity-50"
       >
-        {pending ? "Enregistrement…" : "Enregistrer mes horaires"}
+        {pending ? "Enregistrement…" : "Enregistrer"}
       </button>
       {saved && <p className="text-center text-sm text-rr-or">Tes horaires sont enregistrés.</p>}
     </form>
