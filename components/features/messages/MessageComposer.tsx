@@ -1,11 +1,31 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
-import { Textarea } from "@/components/ui/Textarea";
-import { SubmitButton } from "@/components/ui/SubmitButton";
+import { useFormStatus } from "react-dom";
+import { ArrowRight } from "lucide-react";
 import { sendMessage } from "@/lib/messages/actions";
 
-export function MessageComposer({ recipientId }: { recipientId: string }) {
+function SendButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      aria-label="Envoyer"
+      className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full bg-rr-or text-rr-noir transition-opacity duration-300 hover:opacity-90 disabled:opacity-50"
+    >
+      <ArrowRight className="h-5 w-5" strokeWidth={1.8} />
+    </button>
+  );
+}
+
+export function MessageComposer({
+  recipientId,
+  recipientName,
+}: {
+  recipientId: string;
+  recipientName?: string;
+}) {
   const [state, formAction] = useActionState(sendMessage, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -16,21 +36,23 @@ export function MessageComposer({ recipientId }: { recipientId: string }) {
   }, [state]);
 
   return (
-    <form
-      ref={formRef}
-      action={formAction}
-      className="flex flex-col gap-2 rounded-[28px] border border-rr-or/[0.14] p-3"
-    >
+    <form ref={formRef} action={formAction} className="flex flex-col gap-2">
       <input type="hidden" name="recipientId" value={recipientId} />
 
-      <div className="flex items-end gap-2">
-        <div className="min-w-0 flex-1">
-          <Textarea name="content" rows={2} placeholder="Écris ton message…" required />
-        </div>
-        <SubmitButton className="w-auto shrink-0 px-6">Envoyer</SubmitButton>
+      <div className="flex items-center gap-2.5">
+        <input
+          type="text"
+          name="content"
+          required
+          autoComplete="off"
+          aria-label="Ton message"
+          placeholder={recipientName ? `Écrire à ${recipientName}` : "Écris ton message…"}
+          className="h-[50px] min-w-0 flex-1 rounded-full border border-rr-ivoire/[0.16] bg-white/[0.05] px-5 text-[15px] text-rr-ivoire placeholder:text-rr-gris focus:border-rr-or/50 focus:outline-none"
+        />
+        <SendButton />
       </div>
 
-      {state?.error && <p className="px-1 text-sm text-rr-rouge">{state.error}</p>}
+      {state?.error && <p className="px-3 text-sm text-rr-rouge">{state.error}</p>}
     </form>
   );
 }
