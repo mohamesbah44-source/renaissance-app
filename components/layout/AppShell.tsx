@@ -1,7 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
-import { LifeBuoy, MessageCircle } from "lucide-react";
+import { Bell, ClipboardCheck, LifeBuoy, MessageCircle, Moon, TrendingUp } from "lucide-react";
 import { BottomNav } from "@/components/layout/BottomNav";
+
+const QUICK_LINKS = [
+  { href: "/bilan", label: "Bilan", icon: ClipboardCheck },
+  { href: "/progression", label: "Progression", icon: TrendingUp },
+  { href: "/rappels", label: "Rappels", icon: Bell },
+  { href: "/pratique/sommeil", label: "Sommeil", icon: Moon },
+];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           className="pointer-events-none fixed inset-x-0 top-0 z-20 h-[env(safe-area-inset-top)] bg-rr-noir/80 backdrop-blur-md"
         />
 
-        <header className="flex items-center justify-between px-5 py-4">
+        <header className="flex items-center justify-between px-5 pb-1 pt-4">
           <Link href="/dashboard" className="group flex items-center gap-3" aria-label="Le Programme Re-Naissance">
             <Image
               src="/logo-icon.png"
@@ -48,6 +55,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           </div>
         </header>
+
+        {/* Raccourcis discrets : bilan, progression, rappels, sommeil */}
+        <nav aria-label="Raccourcis" className="flex items-center justify-end gap-0.5 px-5 pb-1">
+          {QUICK_LINKS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={href}
+              href={href}
+              aria-label={label}
+              title={label}
+              className="flex h-9 w-9 items-center justify-center rounded-full text-rr-gris transition-all duration-300 hover:bg-white/[0.06] hover:text-rr-or"
+            >
+              <Icon className="h-[17px] w-[17px]" strokeWidth={1.6} />
+            </Link>
+          ))}
+        </nav>
 
         <main className="flex-1 px-5 pb-36 pt-2">{children}</main>
 
