@@ -354,9 +354,19 @@ export default async function AujourdhuiPage() {
 
       <div className="mt-12">
         {closed ? (
-          <p className="text-center font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
-            Ta journée est terminée. Repose-toi bien.
-          </p>
+          <div className="flex flex-col items-center gap-5">
+            <p className="text-center font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
+              Ta journée est terminée. Repose-toi bien.
+            </p>
+            {dayNumber === 7 && (
+              <Link
+                href={`/ceremonie/${weekNumber}`}
+                className="rr-shimmer flex h-14 w-full items-center justify-center rounded-full bg-rr-or text-[15px] font-medium text-rr-noir shadow-[0_10px_40px_-12px_rgba(201,169,110,0.6)] transition-opacity hover:opacity-90"
+              >
+                Vivre la cérémonie de la semaine {weekNumber}
+              </Link>
+            )}
+          </div>
         ) : (
           <form action={closeDay}>
             <button
