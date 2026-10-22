@@ -27,8 +27,8 @@ export default function WelcomeVideo({ onEnded, className = "" }: Props) {
     >
       <video
         ref={ref}
-        src="/video/presentation.mp4"
-        poster="/video/presentation-poster.jpg"
+        src="/video/presentation%20(2).mp4"
+        poster="/video/presentation-poster%20(2).jpg"
         playsInline
         preload="metadata"
         onEnded={() => {
