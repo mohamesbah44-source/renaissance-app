@@ -6,7 +6,7 @@ import { Home, Compass, Wind, BookOpen, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Aujourd'hui", icon: Home },
+  { href: "/aujourdhui", label: "Aujourd'hui", icon: Home },
   { href: "/parcours", label: "Parcours", icon: Compass },
   { href: "/respiration", label: "Respirer", icon: Wind },
   { href: "/journal", label: "Journal", icon: BookOpen },
@@ -20,7 +20,10 @@ export function BottomNav() {
     <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-rr-or/[0.12] bg-rr-noir/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl">
       <ul className="mx-auto flex max-w-2xl items-stretch justify-between px-2 py-1">
         {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-          const isActive = pathname === href || pathname.startsWith(`${href}/`);
+          const isActive =
+            pathname === href ||
+            pathname.startsWith(`${href}/`) ||
+            (href === "/aujourdhui" && pathname === "/dashboard");
 
           return (
             <li key={href} className="flex-1">
