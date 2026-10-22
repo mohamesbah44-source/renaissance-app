@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
-import { GlassCard } from "@/components/ui/GlassCard";
 import { RadarExpressForm } from "@/components/features/radar/RadarExpressForm";
 import { RadarExpressSummary } from "@/components/features/radar/RadarExpressSummary";
 import { levelsFromPillarScores, type Levels } from "@/lib/radar/express";
@@ -15,7 +15,7 @@ type Progress = { log_date: string; mission_done: boolean; journaling_done: bool
 type Entry = { id: string; entry_date: string; content: string };
 type ExpressRow = { week_number: number; levels: Levels | null };
 
-const DAY_LETTERS = ["D", "L", "M", "M", "J", "V", "S"];
+const CARD = "rounded-3xl border border-rr-or/20 bg-white/[0.05]";
 
 function addDays(iso: string, n: number): string {
   const d = new Date(`${iso}T12:00:00`);
@@ -31,28 +31,26 @@ function longDate(iso: string): string {
   });
 }
 
-function Bars({ label, values, letters }: { label: string; values: (number | null)[]; letters: string[] }) {
+function average(values: (number | null)[]): number | null {
+  const nums = values.filter((v): v is number => typeof v === "number");
+  if (nums.length === 0) return null;
+  return nums.reduce((s, v) => s + v, 0) / nums.length;
+}
+
+function fr(n: number): string {
+  return n.toFixed(1).replace(".", ",");
+}
+
+function RecapBar({ label, ratio, text }: { label: string; ratio: number | null; text: string }) {
   return (
-    <div>
-      <p className="text-xs text-rr-gris-clair">{label}</p>
-      <div className="mt-3 flex h-16 items-end gap-2">
-        {values.map((v, i) => (
-          <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
-            <div
-              className={cn("w-full rounded-t-md", v ? "bg-rr-or/70" : "bg-white/10")}
-              style={{ height: v ? `${(v / 5) * 100}%` : "4px" }}
-              title={v ? `${v}/5` : "Pas de check-in"}
-            />
-          </div>
-        ))}
+    <div className="flex items-center gap-3.5">
+      <span className="w-[68px] shrink-0 text-xs text-rr-gris-clair">{label}</span>
+      <div className="h-1 flex-1 rounded-full bg-white/10">
+        {ratio !== null && (
+          <div className="h-1 rounded-full bg-rr-or" style={{ width: `${Math.round(ratio * 100)}%` }} />
+        )}
       </div>
-      <div className="mt-1.5 flex gap-2">
-        {letters.map((l, i) => (
-          <span key={i} className="flex-1 text-center text-[10px] text-rr-gris">
-            {l}
-          </span>
-        ))}
-      </div>
+      <span className="w-9 shrink-0 text-right text-xs text-rr-creme">{text}</span>
     </div>
   );
 }
@@ -95,7 +93,6 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
   const rangeStart = startDate ? addDays(startDate, (weekNumber - 1) * 7) : addDays(today, -6);
   const rangeEnd = addDays(rangeStart, 6);
   const days = Array.from({ length: 7 }, (_, i) => addDays(rangeStart, i));
-  const letters = days.map((d) => DAY_LETTERS[new Date(`${d}T12:00:00`).getDay()]);
 
   const { data: week } = await db
     .from("weeks")
@@ -157,12 +154,15 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
   const progress = (progressRaw ?? []) as Progress[];
   const entries = (entriesRaw ?? []) as Entry[];
 
-  const energyByDay = days.map((d) => checkins.find((c) => c.checkin_date === d)?.energy ?? null);
-  const tensionByDay = days.map((d) => checkins.find((c) => c.checkin_date === d)?.tension ?? null);
+  const energyAvg = average(checkins.map((c) => c.energy));
+  const tensionAvg = average(checkins.map((c) => c.tension));
 
-  const journalDays = progress.filter((p) => p.journaling_done).length;
-  const missionDays = progress.filter((p) => p.mission_done).length;
-  const checkinDays = checkins.length;
+  const activeDays = new Set<string>();
+  for (const p of progress) {
+    if (p.mission_done || p.journaling_done) activeDays.add(String(p.log_date).slice(0, 10));
+  }
+  for (const c of checkins) activeDays.add(String(c.checkin_date).slice(0, 10));
+  const regularity = days.filter((d) => activeDays.has(d)).length;
 
   const question: string =
     week?.synthesis_question || "Qu'as-tu compris cette semaine, et qu'as-tu envie de garder ?";
@@ -178,149 +178,10 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
   const showRadar = weekNumber === currentWeek || currentExpress !== null;
 
   return (
-    <div className="mx-auto max-w-2xl pb-8">
-      <header className="pt-1">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">Bilan de la semaine {weekNumber}</p>
-        <h1 className="mt-3 font-rr-display text-4xl leading-tight text-rr-ivoire">{week?.title ?? "Ma semaine"}</h1>
-        {week?.intention && (
-          <p className="mt-3 font-rr-serif text-lg italic leading-snug text-rr-gris-clair">{week.intention}</p>
-        )}
-      </header>
-
-      {currentWeek > 1 && (
-        <nav className="mt-6 flex flex-wrap gap-2" aria-label="Choisir une semaine">
-          {Array.from({ length: currentWeek }, (_, i) => i + 1).map((n) => (
-            <Link
-              key={n}
-              href={`/bilan?semaine=${n}`}
-              className={cn(
-                "rounded-full border px-4 py-1.5 text-xs transition-colors",
-                n === weekNumber
-                  ? "border-rr-or bg-rr-or/15 text-rr-or"
-                  : "border-white/10 text-rr-gris-clair hover:border-rr-or/40"
-              )}
-            >
-              Semaine {n}
-            </Link>
-          ))}
-        </nav>
-      )}
-
-      <GlassCard className="mt-8 p-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Ce que tu as traversé</p>
-        <div className="mt-5 grid grid-cols-3 gap-4 text-center">
-          <div>
-            <p className="font-rr-display text-3xl text-rr-ivoire">{journalDays}</p>
-            <p className="mt-1 text-xs text-rr-gris-clair">{journalDays > 1 ? "jours d'écriture" : "jour d'écriture"}</p>
-          </div>
-          <div>
-            <p className="font-rr-display text-3xl text-rr-ivoire">{missionDays}</p>
-            <p className="mt-1 text-xs text-rr-gris-clair">{missionDays > 1 ? "missions explorées" : "mission explorée"}</p>
-          </div>
-          <div>
-            <p className="font-rr-display text-3xl text-rr-ivoire">{checkinDays}</p>
-            <p className="mt-1 text-xs text-rr-gris-clair">{checkinDays > 1 ? "check-ins" : "check-in"}</p>
-          </div>
-        </div>
-        <p className="mt-5 text-sm text-rr-gris-clair">
-          La régularité compte plus que la perfection. Observe simplement, sans te juger.
-        </p>
-      </GlassCard>
-
-      <GlassCard className="mt-6 p-6">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">Ton énergie et ta tension</p>
-        <div className="mt-5 flex flex-col gap-6">
-          <Bars label="Énergie" values={energyByDay} letters={letters} />
-          <Bars label="Tension intérieure" values={tensionByDay} letters={letters} />
-        </div>
-      </GlassCard>
-
-      {showRadar && (
-        <section id="radar" className="mt-10">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ton Radar de la semaine</p>
-          {currentExpress ? (
-            <GlassCard className="mt-4 p-6">
-              <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">
-                Voici où tu en es cette semaine.
-              </p>
-              <RadarExpressSummary levels={currentExpress} previous={previousLevels} previousLabel={previousLabel} />
-              {weekNumber === currentWeek && (
-                <details className="mt-5 border-t border-white/5 pt-4">
-                  <summary className="cursor-pointer list-none text-sm text-rr-gris-clair">
-                    Refaire mon Radar de la semaine
-                  </summary>
-                  <RadarExpressForm defaults={currentExpress} previous={previousLevels} submitLabel="Mettre à jour mon Radar" />
-                </details>
-              )}
-            </GlassCard>
-          ) : (
-            <GlassCard variant="gold" className="mt-4 p-6">
-              <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">
-                1 minute pour sentir où tu en es.
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-rr-gris-clair">
-                Pour chaque pilier, comment ça va cette semaine ? Réponds sans réfléchir : c&apos;est ton ressenti
-                du moment.
-              </p>
-              <RadarExpressForm previous={previousLevels} submitLabel="Enregistrer mon Radar" />
-            </GlassCard>
-          )}
-        </section>
-      )}
-
-      {entries.length > 0 && (
-        <details className="group mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-          <summary className="cursor-pointer list-none text-sm text-rr-ivoire">
-            Relire mes réponses de la semaine <span className="text-rr-gris">({entries.length})</span>
-          </summary>
-          <div className="mt-5 flex flex-col gap-5">
-            {entries.map((e) => (
-              <div key={e.id}>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-rr-or">{longDate(e.entry_date)}</p>
-                <p className="mt-2 whitespace-pre-wrap font-rr-serif text-base leading-relaxed text-rr-gris-clair">
-                  {e.content}
-                </p>
-              </div>
-            ))}
-          </div>
-        </details>
-      )}
-
-      <section className="mt-10">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or">Ma synthèse</p>
-        <GlassCard className="mt-4 p-5">
-          <p className="font-rr-serif text-lg italic leading-snug text-rr-ivoire">{question}</p>
-          {week ? (
-            <form action={saveWeeklySynthesis} className="mt-4 flex flex-col gap-4">
-              <input type="hidden" name="weekId" value={week.id} />
-              <textarea
-                name="response"
-                required
-                rows={7}
-                defaultValue={savedResponse}
-                placeholder="Écris ce qui vient, sans te corriger."
-                className="w-full resize-none rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-[15px] leading-relaxed text-rr-ivoire placeholder:text-rr-gris focus:border-rr-or/50 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="h-12 rounded-full border border-rr-or/40 text-sm text-rr-or transition-colors hover:bg-rr-or/10"
-              >
-                {savedResponse ? "Mettre à jour ma synthèse" : "Enregistrer ma synthèse"}
-              </button>
-              {savedResponse && <p className="text-center text-xs text-rr-gris">Ta synthèse est enregistrée.</p>}
-            </form>
-          ) : (
-            <p className="mt-4 text-sm text-rr-gris-clair">Cette semaine n&apos;est pas encore disponible.</p>
-          )}
-        </GlassCard>
-      </section>
-
+    <div className="rr-enter mx-auto max-w-2xl pb-8">
       <Link
-        href="/aujourdhui"
-        className="mt-8 flex items-center justify-center rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
+        href={week ? `/parcours/semaine/${week.id}` : "/parcours"}
+        aria-label="Retour à la semaine"
+        className="-ml-3 flex h-11 w-11 items-center justify-center rounded-full text-rr-gris-clair transition-colors hover:text-rr-ivoire"
       >
-        Retour à ma journée
-      </Link>
-    </div>
-  );
-}
+        <ChevronLeft className="h-5 w-5"
