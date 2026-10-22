@@ -184,4 +184,143 @@ export default async function BilanPage({ searchParams }: { searchParams: Promis
         aria-label="Retour à la semaine"
         className="-ml-3 flex h-11 w-11 items-center justify-center rounded-full text-rr-gris-clair transition-colors hover:text-rr-ivoire"
       >
-        <ChevronLeft className="h-5 w-5"
+        <ChevronLeft className="h-5 w-5" strokeWidth={1.6} />
+      </Link>
+
+      <header className="mt-3">
+        <p className="text-[10px] uppercase tracking-[0.3em] text-rr-or">
+          Semaine {weekNumber}
+          {week?.title ? ` · ${week.title}` : ""}
+        </p>
+        <h1 className="mt-4 font-rr-display text-[42px] leading-[1.02] text-rr-ivoire">Ton bilan.</h1>
+        {week?.intention && (
+          <p className="mt-4 font-rr-serif text-lg italic leading-snug text-rr-gris-clair">{week.intention}</p>
+        )}
+      </header>
+
+      {currentWeek > 1 && (
+        <nav className="mt-6 flex flex-wrap gap-2" aria-label="Choisir une semaine">
+          {Array.from({ length: currentWeek }, (_, i) => i + 1).map((n) => (
+            <Link
+              key={n}
+              href={`/bilan?semaine=${n}`}
+              className={cn(
+                "rounded-full border px-4 py-1.5 text-xs transition-colors",
+                n === weekNumber
+                  ? "border-rr-or bg-rr-or/10 text-rr-or"
+                  : "border-white/[0.12] text-rr-gris-clair hover:border-rr-or/40"
+              )}
+            >
+              Semaine {n}
+            </Link>
+          ))}
+        </nav>
+      )}
+
+      <div className={cn(CARD, "mt-8 flex flex-col gap-3.5 px-5 py-[18px]")}>
+        <RecapBar
+          label="Énergie"
+          ratio={energyAvg !== null ? energyAvg / 5 : null}
+          text={energyAvg !== null ? fr(energyAvg) : "·"}
+        />
+        <RecapBar
+          label="Tension"
+          ratio={tensionAvg !== null ? tensionAvg / 5 : null}
+          text={tensionAvg !== null ? fr(tensionAvg) : "·"}
+        />
+        <RecapBar label="Régularité" ratio={regularity / 7} text={`${regularity}/7`} />
+      </div>
+
+      <section className="mt-10">
+        <p className="font-rr-label text-[9px] uppercase tracking-[0.3em] text-rr-gris-clair">Pour clore la semaine</p>
+        <p className="mt-3 font-rr-serif text-[26px] italic leading-[1.22] text-rr-ivoire">{question}</p>
+
+        {week ? (
+          <form action={saveWeeklySynthesis} className="mt-6 flex flex-col gap-4">
+            <input type="hidden" name="weekId" value={week.id} />
+            <textarea
+              name="response"
+              required
+              rows={6}
+              defaultValue={savedResponse}
+              aria-label="Ta synthèse de la semaine"
+              placeholder="Écris ce qui vient, sans te corriger."
+              className="w-full resize-none rounded-3xl border border-rr-or/[0.22] bg-white/[0.05] px-5 py-[18px] font-rr-serif text-xl italic leading-[1.35] text-rr-creme placeholder:text-rr-gris focus:border-rr-or/50 focus:outline-none"
+            />
+            <button
+              type="submit"
+              className={cn(
+                "h-14 rounded-full text-[15px] font-medium transition-opacity duration-300 hover:opacity-90",
+                savedResponse ? "border border-rr-or/40 text-rr-or" : "bg-rr-or text-rr-noir"
+              )}
+            >
+              {savedResponse ? "Mettre à jour ma synthèse" : "Enregistrer ma synthèse"}
+            </button>
+          </form>
+        ) : (
+          <p className="mt-4 text-sm text-rr-gris-clair">Cette semaine n&apos;est pas encore disponible.</p>
+        )}
+
+        {savedResponse && (
+          <Link
+            href={`/ceremonie/${weekNumber}`}
+            className="mt-3 flex h-14 w-full items-center justify-center rounded-full bg-rr-or text-[15px] font-medium text-rr-noir transition-opacity duration-300 hover:opacity-90"
+          >
+            Terminer la semaine
+          </Link>
+        )}
+      </section>
+
+      {showRadar && (
+        <section id="radar" className="mt-14">
+          <p className="text-[11px] uppercase tracking-[0.28em] text-rr-gris-clair">Ton Radar de la semaine</p>
+          {currentExpress ? (
+            <div className={cn(CARD, "mt-4 p-6")}>
+              <p className="font-rr-serif text-xl italic leading-snug text-rr-ivoire">
+                Voici où tu en es cette semaine.
+              </p>
+              <RadarExpressSummary levels={currentExpress} previous={previousLevels} previousLabel={previousLabel} />
+              {weekNumber === currentWeek && (
+                <details className="mt-5 border-t border-white/5 pt-4">
+                  <summary className="cursor-pointer list-none text-sm text-rr-gris-clair">
+                    Refaire mon Radar de la semaine
+                  </summary>
+                  <RadarExpressForm defaults={currentExpress} previous={previousLevels} submitLabel="Mettre à jour mon Radar" />
+                </details>
+              )}
+            </div>
+          ) : (
+            <div className="mt-4 rounded-3xl border border-rr-or/40 bg-rr-or/[0.06] p-6">
+              <p className="font-rr-serif text-xl italic leading-snug text-rr-ivoire">
+                1 minute pour sentir où tu en es.
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-rr-gris-clair">
+                Pour chaque pilier, comment ça va cette semaine ? Réponds sans réfléchir : c&apos;est ton ressenti
+                du moment.
+              </p>
+              <RadarExpressForm previous={previousLevels} submitLabel="Enregistrer mon Radar" />
+            </div>
+          )}
+        </section>
+      )}
+
+      {entries.length > 0 && (
+        <details className="group mt-8 rounded-3xl border border-white/10 bg-white/[0.02] p-5">
+          <summary className="cursor-pointer list-none text-sm text-rr-ivoire">
+            Relire mes réponses de la semaine <span className="text-rr-gris">({entries.length})</span>
+          </summary>
+          <div className="mt-5 flex flex-col gap-5">
+            {entries.map((e) => (
+              <div key={e.id}>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-rr-or">{longDate(e.entry_date)}</p>
+                <p className="mt-2 whitespace-pre-wrap font-rr-serif text-base leading-relaxed text-rr-gris-clair">
+                  {e.content}
+                </p>
+              </div>
+            ))}
+          </div>
+        </details>
+      )}
+    </div>
+  );
+}
