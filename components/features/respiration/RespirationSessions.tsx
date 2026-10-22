@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Pause, Play, Volume2, VolumeX, X } from "lucide-react";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 
-type Phase = { label: string; sec: number; kind: "in" | "hold" | "out" };
+type Kind = "in" | "top" | "hold" | "out";
+type Phase = { label: string; sec: number; kind: Kind };
 
 interface Session {
   id: string;
@@ -52,7 +54,7 @@ const SESSIONS: Session[] = [
     tagline: "Relâcher la tension d'un coup.",
     phases: [
       { label: "Inspire", sec: 2, kind: "in" },
-      { label: "Petit complément", sec: 1, kind: "in" },
+      { label: "Encore un peu", sec: 1, kind: "top" },
       { label: "Expire longuement", sec: 6, kind: "out" },
     ],
     cycles: 10,
@@ -86,118 +88,222 @@ function fmt(total: number) {
   return m > 0 ? `${m} min${s ? ` ${s} s` : ""}` : `${s} s`;
 }
 
+/** Voix enregistrées (les mêmes que la pratique du soir). */
+const AUDIO: Partial<Record<Kind, string>> = {
+  in: "/audio/inspire.mp3",
+  hold: "/audio/retiens.mp3",
+  out: "/audio/expire.mp3",
+};
+const SPEECH: Partial<Record<Kind, string>> = { in: "Inspire", hold: "Retiens", out: "Expire" };
+const VOICE_KEY = "rr-breath-voice";
+const SCALE: Record<Kind, number> = { in: 1, top: 1, hold: 1, out: 0.62 };
+
+function speak(text: string) {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  const synth = window.speechSynthesis;
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = "fr-FR";
+  const fr = synth.getVoices().find((v) => v.lang.toLowerCase().startsWith("fr"));
+  if (fr) u.voice = fr;
+  u.rate = 0.85;
+  u.pitch = 0.95;
+  synth.speak(u);
+}
+
+function stopCue(audio: HTMLAudioElement | null) {
+  if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+  audio?.pause();
+}
+
+function cue(kind: Kind, enabled: boolean, audio: HTMLAudioElement | null) {
+  if (!enabled) return;
+  stopCue(audio);
+  const src = AUDIO[kind];
+  if (src && audio) {
+    audio.src = src;
+    audio.currentTime = 0;
+    audio.play().catch(() => {
+      const w = SPEECH[kind];
+      if (w) speak(w);
+    });
+  }
+}
+
 function SessionRunner({ session, onClose }: { session: Session; onClose: () => void }) {
-  const { phases, cycles } = session;
-  const cycleLen = useMemo(() => phases.reduce((a, p) => a + p.sec, 0), [phases]);
-  const total = cycleLen * cycles;
-  const [elapsed, setElapsed] = useState(0);
-  const [running, setRunning] = useState(true);
-  const startRef = useRef<number>(Date.now());
-  const baseRef = useRef(0);
+  const segments = useMemo(
+    () => Array.from({ length: session.cycles }, () => session.phases).flat(),
+    [session]
+  );
+  const total = useMemo(() => segments.reduce((a, p) => a + p.sec, 0), [segments]);
+  const [status, setStatus] = useState<"running" | "paused" | "done">("running");
+  const [index, setIndex] = useState(0);
+  const [remaining, setRemaining] = useState(segments[0].sec);
+  const [voiceOn, setVoiceOn] = useState(true);
+  const voiceRef = useRef(true);
+  const spokenRef = useRef(-1);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const doneSec = useMemo(() => segments.slice(0, index).reduce((a, p) => a + p.sec, 0), [segments, index]);
+
+  // Préférence de voix partagée avec la pratique du soir ; le lecteur audio est créé
+  // dans le geste de l'utilisateur (clic sur la session), nécessaire sur iPhone.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(VOICE_KEY) === "off") {
+        setVoiceOn(false);
+        voiceRef.current = false;
+      }
+    } catch {
+      /* stockage indisponible */
+    }
+    audioRef.current = new Audio();
+    return () => stopCue(audioRef.current);
+  }, []);
+
+  function toggleVoice() {
+    const next = !voiceOn;
+    setVoiceOn(next);
+    voiceRef.current = next;
+    try {
+      localStorage.setItem(VOICE_KEY, next ? "on" : "off");
+    } catch {
+      /* ignoré */
+    }
+    if (!next) stopCue(audioRef.current);
+  }
 
   useEffect(() => {
-    if (!running) return;
-    startRef.current = Date.now();
+    if (status !== "running") return;
+    let last = Date.now();
     const id = setInterval(() => {
-      const e = baseRef.current + (Date.now() - startRef.current) / 1000;
-      if (e >= total) {
-        baseRef.current = total;
-        setElapsed(total);
-        setRunning(false);
-        clearInterval(id);
-      } else {
-        setElapsed(e);
-      }
+      const now = Date.now();
+      const dt = (now - last) / 1000;
+      last = now;
+      setRemaining((r) => r - dt);
     }, 100);
-    return () => {
-      baseRef.current = Math.min(total, baseRef.current + (Date.now() - startRef.current) / 1000);
-      clearInterval(id);
-    };
-  }, [running, total]);
+    return () => clearInterval(id);
+  }, [status]);
 
-  const done = elapsed >= total;
-  const inCycle = elapsed % cycleLen;
-  let acc = 0;
-  let current = phases[0];
-  let phaseStart = 0;
-  for (const p of phases) {
-    if (inCycle < acc + p.sec) {
-      current = p;
-      phaseStart = acc;
-      break;
+  useEffect(() => {
+    if (status !== "running" || remaining > 0) return;
+    if (index + 1 < segments.length) {
+      setIndex(index + 1);
+      setRemaining(segments[index + 1].sec);
+    } else {
+      setStatus("done");
     }
-    acc += p.sec;
-    current = p;
-    phaseStart = acc - p.sec;
-  }
-  const remain = Math.max(1, Math.ceil(current.sec - (inCycle - phaseStart)));
-  const cycleNo = Math.min(cycles, Math.floor(elapsed / cycleLen) + 1);
+  }, [remaining, status, index, segments]);
 
-  // Échelle du cercle : monte à l'inspiration, reste en haut à la rétention, descend à l'expiration.
-  const target = current.kind === "out" ? 0.55 : 1;
+  useEffect(() => {
+    if (status !== "running" || spokenRef.current === index) return;
+    spokenRef.current = index;
+    cue(segments[index].kind, voiceRef.current, audioRef.current);
+  }, [status, index, segments]);
+
+  useEffect(() => {
+    if (status !== "running") stopCue(audioRef.current);
+  }, [status]);
+
+  const current = segments[Math.min(index, segments.length - 1)];
+  const done = status === "done";
+  const scale = done ? 0.62 : SCALE[current.kind];
+  const dur = done ? 1 : current.kind === "hold" ? 0.5 : current.sec;
+  const cycleLen = session.phases.reduce((a, p) => a + p.sec, 0);
+  const cycleNo = Math.min(session.cycles, Math.floor(doneSec / cycleLen) + 1);
   const guide = session.guide
-    ? session.guide[Math.min(session.guide.length - 1, Math.floor((elapsed / total) * session.guide.length))]
+    ? session.guide[Math.min(session.guide.length - 1, Math.floor((doneSec / total) * session.guide.length))]
     : null;
+  const progress = done ? 1 : (doneSec + (current.sec - Math.max(0, remaining))) / total;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-rr-noir/95 px-6 pb-10 pt-14 backdrop-blur-md">
-      <div className="text-center">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-or-clair/70">{session.rhythm}</p>
-        <h2 className="mt-2 font-rr-display text-3xl text-rr-ivoire">{session.title}</h2>
-      </div>
-
-      <div className="flex flex-col items-center">
-        <div className="relative flex h-72 w-72 items-center justify-center">
-          <div
-            className="absolute h-full w-full rounded-full bg-rr-or/10 blur-2xl"
-            style={{
-              transform: `scale(${done ? 0.8 : target})`,
-              transition: `transform ${done ? 1 : current.sec}s ease-in-out`,
-            }}
-          />
-          <div
-            className="absolute h-full w-full rounded-full border border-rr-or/50 bg-gradient-to-br from-rr-or/30 to-rr-or/5"
-            style={{
-              transform: `scale(${done ? 0.8 : target})`,
-              transition: `transform ${done ? 1 : current.sec}s ease-in-out`,
-            }}
-          />
-          <div className="relative text-center">
-            {done ? (
-              <p className="font-rr-serif text-2xl italic text-rr-ivoire">Terminé</p>
-            ) : (
-              <>
-                <p className="font-rr-serif text-2xl italic text-rr-ivoire">{current.label}</p>
-                <p className="mt-1 font-rr-display text-5xl text-rr-or">{remain}</p>
-              </>
-            )}
-          </div>
-        </div>
-        <p className="mt-8 min-h-[3rem] max-w-xs text-center font-rr-serif text-base italic leading-snug text-rr-gris-clair">
-          {done ? "Prends un instant pour sentir ce qui a changé." : guide ?? `Cycle ${cycleNo} sur ${cycles}`}
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-between overflow-y-auto bg-[#07060a] px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))] text-rr-gris-clair">
+      <div className="flex w-full max-w-md items-center justify-between">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-rr-gris">
+          {session.title} · {session.rhythm}
         </p>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={toggleVoice}
+            aria-label={voiceOn ? "Couper la voix" : "Activer la voix"}
+            aria-pressed={voiceOn}
+            className="flex h-10 w-10 items-center justify-center rounded-full text-rr-gris transition-colors hover:text-rr-ivoire"
+          >
+            {voiceOn ? <Volume2 className="h-5 w-5" strokeWidth={1.75} /> : <VolumeX className="h-5 w-5" strokeWidth={1.75} />}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Quitter la session"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-rr-gris transition-colors hover:text-rr-ivoire"
+          >
+            <X className="h-5 w-5" strokeWidth={1.75} />
+          </button>
+        </div>
       </div>
 
-      <div className="flex w-full max-w-sm flex-col gap-3">
-        <div className="h-1 w-full rounded-full bg-white/10">
-          <div className="h-1 rounded-full bg-rr-or transition-all" style={{ width: `${(elapsed / total) * 100}%` }} />
+      <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center py-8 text-center">
+        <div className="relative flex h-72 w-72 max-w-full items-center justify-center" aria-hidden="true">
+          <span
+            className="absolute inset-[-22%] rounded-full opacity-[0.82] blur-3xl transition-transform ease-in-out motion-reduce:transition-none"
+            style={{
+              background:
+                "radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(109,40,217,0.28) 45%, rgba(46,16,101,0) 72%)",
+              transform: `scale(${scale})`,
+              transitionDuration: `${dur}s`,
+            }}
+          />
+          <span
+            className="absolute inset-0 rounded-full opacity-[0.82] transition-transform ease-in-out motion-reduce:transition-none"
+            style={{
+              background:
+                "radial-gradient(circle at 35% 30%, #ddd6fe 0%, #a78bfa 22%, #7c3aed 52%, #4c1d95 82%, #2e1065 100%)",
+              boxShadow:
+                "0 0 70px 10px rgba(139,92,246,0.45), inset 0 0 50px rgba(255,255,255,0.14), inset 0 -20px 50px rgba(30,10,70,0.55)",
+              transform: `scale(${scale})`,
+              transitionDuration: `${dur}s`,
+            }}
+          />
+          <span
+            className="absolute left-[24%] top-[18%] h-[22%] w-[30%] rounded-full bg-white/25 blur-xl opacity-[0.82] transition-transform ease-in-out motion-reduce:transition-none"
+            style={{ transform: `scale(${scale})`, transitionDuration: `${dur}s` }}
+          />
         </div>
+
+        <p className="mt-6 text-[11px] uppercase tracking-[0.3em] text-rr-gris">
+          {done ? "Session terminée" : `Cycle ${cycleNo} sur ${session.cycles}`}
+        </p>
+        <p aria-live="polite" className="mt-3 font-rr-display text-3xl text-rr-ivoire">
+          {done ? "Merci pour ce temps" : status === "paused" ? "En pause" : current.label}
+        </p>
+        {!done && status === "running" && <p className="mt-2 text-sm text-rr-gris">{Math.max(1, Math.ceil(remaining))}</p>}
+        <p className="mt-5 min-h-[3rem] max-w-xs font-rr-serif text-base italic leading-snug text-rr-gris-clair">
+          {done ? "Prends un instant pour sentir ce qui a changé." : guide}
+        </p>
+
         {!done && (
           <button
             type="button"
-            onClick={() => setRunning((r) => !r)}
-            className="rounded-full border border-rr-or/40 px-5 py-3.5 text-sm text-rr-ivoire transition-colors hover:bg-rr-or/10"
+            onClick={() => setStatus(status === "paused" ? "running" : "paused")}
+            className="mt-6 flex h-12 items-center gap-2 rounded-full border border-white/15 px-6 text-sm text-rr-gris-clair transition-colors hover:text-rr-ivoire"
           >
-            {running ? "Pause" : "Reprendre"}
+            {status === "paused" ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
+            {status === "paused" ? "Reprendre" : "Pause"}
           </button>
         )}
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-full border border-white/10 px-5 py-3.5 text-sm text-rr-gris-clair transition-colors hover:bg-white/[0.05]"
-        >
-          {done ? "Fermer" : "Arrêter"}
-        </button>
+        {done && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-8 flex h-12 items-center rounded-full border border-white/15 px-8 text-sm text-rr-gris-clair transition-colors hover:text-rr-ivoire"
+          >
+            Fermer
+          </button>
+        )}
+      </div>
+
+      <div className="h-1 w-full max-w-md rounded-full bg-white/10">
+        <div className="h-1 rounded-full bg-rr-or transition-all" style={{ width: `${Math.min(100, progress * 100)}%` }} />
       </div>
     </div>
   );
