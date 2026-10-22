@@ -9,38 +9,35 @@ interface RadarScaleProps {
 /** Échelle de réponse de 1 (Jamais) à 5 (Toujours). */
 export function RadarScale({ value, onChange }: RadarScaleProps) {
   return (
-    <div className="mt-10 grid grid-cols-5 gap-2">
-      {ANSWER_LABELS.map((label, i) => {
-        const n = i + 1;
-        const selected = value === n;
+    <div className="mt-12">
+      <div className="flex justify-between">
+        {ANSWER_LABELS.map((label, i) => {
+          const n = i + 1;
+          const selected = value === n;
 
-        return (
-          <div key={n} className="flex flex-col items-center gap-2.5">
+          return (
             <button
+              key={n}
               type="button"
               onClick={() => onChange(n)}
               aria-label={label}
               aria-pressed={selected}
               className={cn(
-                "flex aspect-square w-full max-w-14 items-center justify-center rounded-full border font-rr-display text-lg transition-all duration-300",
+                "flex h-11 w-11 items-center justify-center rounded-full border text-[15px] transition-all duration-300",
                 selected
-                  ? "border-rr-or bg-rr-or text-rr-noir shadow-[0_0_22px_-4px_rgba(201,169,110,0.7)]"
-                  : "border-rr-or/25 text-rr-creme hover:border-rr-or/60"
+                  ? "border-rr-or bg-rr-or font-medium text-rr-noir shadow-[0_0_22px_-4px_rgba(201,169,110,0.7)]"
+                  : "border-rr-ivoire/20 bg-white/[0.04] text-rr-gris-clair hover:border-rr-or/60"
               )}
             >
               {n}
             </button>
-            <span
-              className={cn(
-                "text-center text-[10px] uppercase leading-tight tracking-[0.08em] transition-colors duration-300",
-                selected ? "text-rr-or-clair" : "text-rr-gris"
-              )}
-            >
-              {label}
-            </span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
+      <div className="mt-3 flex justify-between text-[11px] text-rr-gris-clair">
+        <span>{ANSWER_LABELS[0]}</span>
+        <span>{ANSWER_LABELS[4]}</span>
+      </div>
     </div>
   );
 }
