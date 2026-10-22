@@ -1,4 +1,4 @@
-"use client";
+w"use client";
 
 import { useCallback, useState } from "react";
 import { PenLine, X, BookOpen, Feather } from "lucide-react";
@@ -63,11 +63,7 @@ export function JournalCarnetTabs({
 
   return (
     <div>
-      <div
-        role="tablist"
-        aria-label="Journal et Carnet"
-        className="grid grid-cols-2 gap-1 rounded-full border border-rr-or/15 bg-white/[0.03] p-1"
-      >
+      <div role="tablist" aria-label="Journal et Carnet" className="flex gap-9 border-b border-white/10">
         {TABS.map(({ id, label }) => {
           const active = tab === id;
           return (
@@ -78,10 +74,8 @@ export function JournalCarnetTabs({
               aria-selected={active}
               onClick={() => setTab(id)}
               className={cn(
-                "h-11 rounded-full text-xs uppercase tracking-[0.25em] transition-all duration-300",
-                active
-                  ? "bg-rr-or/[0.16] text-rr-or-clair shadow-[inset_0_0_0_1px_rgba(201,169,110,0.3),0_0_18px_-6px_rgba(201,169,110,0.5)]"
-                  : "text-rr-gris hover:text-rr-gris-clair"
+                "-mb-px border-b pb-3 text-xs uppercase tracking-[0.25em] transition-colors duration-300",
+                active ? "border-rr-or text-rr-or" : "border-transparent text-rr-gris hover:text-rr-gris-clair"
               )}
             >
               {label}
@@ -91,7 +85,7 @@ export function JournalCarnetTabs({
       </div>
 
       {tab === "journal" ? (
-        <div className="mt-10">
+        <div className="mt-9">
           {writing ? (
             <GlassCard variant="gold" className="p-7">
               <div className="flex items-center justify-between">
@@ -113,19 +107,17 @@ export function JournalCarnetTabs({
             <button
               type="button"
               onClick={() => setWriting(true)}
-              className="rr-shimmer flex h-14 w-full items-center justify-center gap-3 rounded-full bg-rr-or text-xs font-medium uppercase tracking-[0.25em] text-rr-noir shadow-[0_10px_40px_-12px_rgba(201,169,110,0.6)] transition-all duration-300 hover:bg-rr-or-clair"
+              className="rr-shimmer flex h-14 w-full items-center justify-center gap-3 rounded-full bg-rr-or text-[15px] font-medium text-rr-noir shadow-[0_10px_40px_-12px_rgba(212,175,106,0.6)] transition-opacity duration-300 hover:opacity-90"
             >
               <PenLine className="h-4 w-4" strokeWidth={2} />
               Écrire une entrée
             </button>
           )}
 
-          <div className="mt-14">
+          <div className="mt-12">
             {entries.length > 0 ? (
               <>
-                <SectionLabel>
-                  Tes écrits · {entries.length}
-                </SectionLabel>
+                <SectionLabel>Tes écrits · {entries.length}</SectionLabel>
                 <div className="mt-5 flex flex-col gap-4">
                   {entries.map((entry) => (
                     <JournalEntryCard
@@ -148,12 +140,12 @@ export function JournalCarnetTabs({
           </div>
         </div>
       ) : (
-        <div className="mt-10">
+        <div className="mt-9">
           <p className="font-rr-serif text-lg italic leading-relaxed text-rr-creme">
             Les synthèses que ton praticien te partage, issues du Re-Naissance Analyzer™ ou de vos
             échanges, atterrissent ici.
           </p>
-          <div className="mt-10 flex flex-col gap-4">
+          <div className="mt-9 flex flex-col gap-4">
             {carnetEntries.length > 0 ? (
               carnetEntries.map((entry) => <CarnetEntryCard key={entry.id} entry={entry} />)
             ) : (
