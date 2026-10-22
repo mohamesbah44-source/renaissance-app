@@ -28,6 +28,9 @@ const AUDIO: Partial<Record<Kind, string>> = {
 
 const VOICE_KEY = "rr-breath-voice";
 
+const RING_R = 140;
+const RING_C = 2 * Math.PI * RING_R;
+
 /** Prononce un mot en français, d'une voix lente et posée (synthèse vocale du navigateur). */
 function speak(text: string) {
   if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
@@ -95,6 +98,66 @@ function buildSegments(mode: PracticeMode, retention: boolean, eveningSeconds: n
   return [...p1, ...p2, ...p3];
 }
 
+/** Anneau doré qui se remplit autour de l'orbe pendant la pratique. */
+function ProgressRing({ progress }: { progress: number }) {
+  const p = Math.min(1, Math.max(0, progress));
+  return (
+    <svg viewBox="0 0 296 296" className="absolute inset-0 h-full w-full -rotate-90" aria-hidden="true">
+      <circle cx="148" cy="148" r={RING_R} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="2" />
+      <circle
+        cx="148"
+        cy="148"
+        r={RING_R}
+        fill="none"
+        stroke="#c9a96e"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeDasharray={RING_C}
+        strokeDashoffset={RING_C * (1 - p)}
+        style={{ filter: "drop-shadow(0 0 6px rgba(201,169,110,0.55))", transition: "stroke-dashoffset 0.3s linear" }}
+      />
+    </svg>
+  );
+}
+
+/** Orbe violette au repos (écrans de départ et de fin). */
+function RestingOrb({ full }: { full?: boolean }) {
+  return (
+    <div className="relative mx-auto h-44 w-44" aria-hidden="true">
+      <span
+        className="absolute inset-[-24%] rounded-full blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(139,92,246,0.5) 0%, rgba(109,40,217,0.24) 45%, rgba(46,16,101,0) 72%)",
+        }}
+      />
+      <span
+        className="absolute inset-[14px] rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle at 35% 30%, #ddd6fe 0%, #a78bfa 22%, #7c3aed 52%, #4c1d95 82%, #2e1065 100%)",
+          boxShadow:
+            "0 0 60px 8px rgba(139,92,246,0.4), inset 0 0 40px rgba(255,255,255,0.14), inset 0 -16px 40px rgba(30,10,70,0.55)",
+        }}
+      />
+      <svg viewBox="0 0 176 176" className="absolute inset-0 h-full w-full -rotate-90">
+        <circle cx="88" cy="88" r="84" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
+        {full && (
+          <circle
+            cx="88"
+            cy="88"
+            r="84"
+            fill="none"
+            stroke="#c9a96e"
+            strokeWidth="2"
+            style={{ filter: "drop-shadow(0 0 6px rgba(201,169,110,0.55))" }}
+          />
+        )}
+      </svg>
+    </div>
+  );
+}
+
 interface BreathingPlayerProps {
   mode: PracticeMode;
   retentionAllowed: boolean;
@@ -116,6 +179,15 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
   const segments = useMemo(() => buildSegments(mode, retention && retentionAllowed, duration), [mode, retention, retentionAllowed, duration]);
   const total = useMemo(() => segments.reduce((s, x) => s + x.seconds, 0), [segments]);
   const current = segments[Math.min(index, segments.length - 1)];
+
+  // Durée écoulée avant le segment en cours (pour l'anneau de progression).
+  const elapsedBefore = useMemo(
+    () => segments.slice(0, Math.min(index, segments.length)).reduce((s, x) => s + x.seconds, 0),
+    [segments, index]
+  );
+  const elapsed = elapsedBefore + Math.max(0, current.seconds - Math.max(0, remaining));
+  const progress = total > 0 ? elapsed / total : 0;
+  const minutesLeft = Math.max(0, Math.ceil((total - elapsed) / 60));
 
   // Préférence de voix mémorisée sur l'appareil.
   useEffect(() => {
@@ -239,7 +311,8 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
       <div className="flex w-full max-w-md flex-1 flex-col items-center justify-center py-8 text-center">
         {status === "idle" && (
           <>
-            <h1 className="font-rr-display text-3xl leading-tight">
+            <RestingOrb />
+            <h1 className="mt-10 font-rr-display text-3xl leading-tight">
               {mode === "morning" ? "Ouvrir ta journée." : mode === "sleep" ? "Laisse venir le calme." : "Ralentir, doucement."}
             </h1>
             <p className="mt-4 font-rr-serif text-lg italic leading-relaxed text-rr-gris-clair">
@@ -304,10 +377,11 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
 
         {active && (
           <>
-            <div className="relative flex h-72 w-72 max-w-full items-center justify-center" aria-hidden="true">
+            <div className="relative flex h-[296px] w-[296px] max-w-full items-center justify-center" aria-hidden="true">
+              <ProgressRing progress={progress} />
               {/* Halo violet qui respire avec l'orbe */}
               <span
-                className="absolute inset-[-22%] rounded-full blur-3xl transition-transform ease-in-out motion-reduce:transition-none"
+                className="absolute inset-[-12%] rounded-full blur-3xl transition-transform ease-in-out motion-reduce:transition-none"
                 style={{
                   background:
                     "radial-gradient(circle, rgba(139,92,246,0.55) 0%, rgba(109,40,217,0.28) 45%, rgba(46,16,101,0) 72%)",
@@ -318,7 +392,7 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
               />
               {/* L'orbe */}
               <span
-                className="absolute inset-0 rounded-full transition-transform ease-in-out motion-reduce:transition-none"
+                className="absolute inset-[22px] rounded-full transition-transform ease-in-out motion-reduce:transition-none"
                 style={{
                   background:
                     "radial-gradient(circle at 35% 30%, #ddd6fe 0%, #a78bfa 22%, #7c3aed 52%, #4c1d95 82%, #2e1065 100%)",
@@ -331,7 +405,7 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
               />
               {/* Reflet de lumière */}
               <span
-                className="absolute left-[24%] top-[18%] h-[22%] w-[30%] rounded-full bg-white/25 blur-xl transition-transform ease-in-out motion-reduce:transition-none"
+                className="absolute left-[26%] top-[20%] h-[20%] w-[28%] rounded-full bg-white/25 blur-xl transition-transform ease-in-out motion-reduce:transition-none"
                 style={{ transform: `scale(${scale})`, transitionDuration: `${dur}s`, opacity: orbOpacity }}
               />
             </div>
@@ -339,7 +413,9 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
             <p aria-live="polite" className="mt-3 font-rr-display text-3xl">
               {status === "paused" ? "En pause" : WORD[current.kind]}
             </p>
-            {!dark && <p className="mt-2 text-sm text-rr-gris">{Math.max(1, Math.ceil(remaining))}</p>}
+            <p className="mt-2 text-sm text-rr-gris">
+              {minutesLeft <= 1 ? "Moins d'une minute" : `Encore ${minutesLeft} min`}
+            </p>
             {current.kind === "contract" && (
               <p className="mt-3 text-sm text-rr-gris-clair">Une contraction légère et agréable, jamais douloureuse.</p>
             )}
@@ -356,13 +432,14 @@ export function BreathingPlayer({ mode, retentionAllowed }: BreathingPlayerProps
 
         {status === "done" && (
           <>
+            <RestingOrb full />
             {mode === "morning" ? (
               <>
-                <h1 className="font-rr-display text-3xl leading-tight">✓ Routine du matin terminée</h1>
+                <h1 className="mt-10 font-rr-display text-3xl leading-tight">Routine du matin terminée</h1>
                 <p className="mt-4 font-rr-serif text-lg italic text-rr-gris-clair">Ta journée peut commencer.</p>
               </>
             ) : (
-              <p className="font-rr-serif text-xl italic leading-relaxed text-rr-gris-clair">
+              <p className="mt-10 font-rr-serif text-xl italic leading-relaxed text-rr-gris-clair">
                 La pratique est terminée. Tu peux maintenant laisser ton corps se déposer et fermer les yeux.
               </p>
             )}
