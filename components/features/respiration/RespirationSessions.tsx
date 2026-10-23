@@ -120,9 +120,9 @@ function fmt(total: number) {
 
 /** Voix enregistrées (les mêmes que la pratique du soir). */
 const AUDIO: Partial<Record<Kind, string>> = {
-  in: "/audio/inspire.mp3",
-  hold: "/audio/retiens.mp3",
-  out: "/audio/expire.mp3",
+  in: "/audio/inspire%20(1).mp3",
+  hold: "/audio/retiens%20(1).mp3",
+  out: "/audio/expire%20(1).mp3",
 };
 const SPEECH: Partial<Record<Kind, string>> = { in: "Inspire", hold: "Retiens", out: "Expire" };
 const VOICE_KEY = "rr-breath-voice";
