@@ -126,7 +126,7 @@ export function WelcomeFlow({
             <h1 className="font-rr-display text-[40px] leading-[1.04] text-rr-ivoire">
               Ton espace,
               <br />
-              en 1 min 30.
+              en 2 minutes.
             </h1>
             <div className="mx-auto mt-8 w-full max-w-[230px]">
               <WelcomeVideo />
