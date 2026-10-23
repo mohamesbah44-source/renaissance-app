@@ -21,9 +21,9 @@ const SCALE: Record<Kind, number> = { inhale: 1, hold: 1, exhale: 0.62, contract
 
 /** Voix enregistrées. Les phases absentes de cette liste utilisent la synthèse vocale du téléphone. */
 const AUDIO: Partial<Record<Kind, string>> = {
-  inhale: "/audio/voix/inspire.mp3",
-  hold: "/audio/voix/retiens.mp3",
-  exhale: "/audio/voix/expire.mp3",
+  inhale: "/audio/voix-inspire.mp3",
+  hold: "/audio/voix-retiens.mp3",
+  exhale: "/audio/voix-expire.mp3",
 };
 
 const VOICE_KEY = "rr-breath-voice";
