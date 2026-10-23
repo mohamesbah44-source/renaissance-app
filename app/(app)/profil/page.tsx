@@ -143,7 +143,7 @@ export default async function ProfilPage() {
         </summary>
         <div className="px-6 pb-7">
           <p className="mb-5 text-center font-rr-serif text-base italic text-rr-gris-clair">
-            L&apos;application en 1 min 30.
+            L&apos;application en 2 minutes.
           </p>
           <WelcomeVideo />
         </div>
