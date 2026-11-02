@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { sendToSubscriptions, type StoredSub } from "@/lib/reminders/push";
+import { notifySessionsToday } from "@/lib/reminders/session-day";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -159,7 +160,9 @@ async function handle(request: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, checked, sent });
+  const sessions = await notifySessionsToday(db);
+
+  return NextResponse.json({ ok: true, checked, sent, sessions });
 }
 
 export async function GET(request: Request) {
