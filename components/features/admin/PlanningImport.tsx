@@ -1,74 +1,35 @@
-"use server";
+"use client";
 
-import { revalidatePath } from "next/cache";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { createClient } from "@/lib/supabase/server";
-import { parsePlanning } from "@/lib/admin/planning";
+import { useActionState } from "react";
+import { Field } from "@/components/ui/Field";
+import { Textarea } from "@/components/ui/Textarea";
+import { SubmitButton } from "@/components/ui/SubmitButton";
+import { importPlanning } from "@/lib/admin/planning-actions";
 
-export type PlanningState = { success?: boolean; error?: string; message?: string } | undefined;
+const EXAMPLE = `02/11/2026 | 10h | Breathwork 1 | 1h30 | Sécurité intérieure et relâchement
+06/11/2026 | 14h | Méditation 1 | 30 | Ancrage et stabilité intérieure`;
 
-/**
- * Importe un planning collé (une ligne par rendez-vous). Un rendez-vous déjà
- * présent à la même date et heure est mis à jour (titre, durée) au lieu
- * d'être dupliqué, donc on peut recoller un planning corrigé sans risque.
- */
-export async function importPlanning(_prev: PlanningState, formData: FormData): Promise<PlanningState> {
-  const clientId = formData.get("clientId");
-  const text = formData.get("planning");
-  if (typeof clientId !== "string" || !clientId) return { error: "Participant·e introuvable." };
-  if (typeof text !== "string" || !text.trim()) return { error: "Colle d'abord le planning." };
+export function PlanningImport({ clientId }: { clientId: string }) {
+  const [state, formAction] = useActionState(importPlanning, undefined);
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Session expirée." };
+  return (
+    <form action={formAction} className="flex flex-col gap-4">
+      <input type="hidden" name="clientId" value={clientId} />
 
-  const db = supabase as unknown as SupabaseClient;
-  const { data: me } = await db.from("profiles").select("role").eq("id", user.id).maybeSingle();
-  if (me?.role !== "admin") return { error: "Réservé à l'administrateur." };
+      <p className="text-sm leading-relaxed text-rr-gris-clair">
+        Colle le planning, une ligne par rendez-vous : date | heure | format | durée | intention. Le titre devient
+        « format · intention », l&apos;agenda du participant se met à jour, et il reçoit une notification et un e-mail le
+        matin de chaque séance.
+      </p>
 
-  const { lines, errors } = parsePlanning(text);
-  if (errors.length > 0) return { error: errors.join(" ") };
-  if (lines.length === 0) return { error: "Aucune ligne reconnue." };
+      <Field label="Planning" htmlFor="planning">
+        <Textarea id="planning" name="planning" rows={8} placeholder={EXAMPLE} required />
+      </Field>
 
-  let created = 0;
-  let updated = 0;
+      {state?.error && <p className="text-sm text-rr-rouge">{state.error}</p>}
+      {state?.success && <p className="text-sm text-rr-or-clair">{state.message}</p>}
 
-  for (const l of lines) {
-    const { data: existing } = await db
-      .from("appointments")
-      .select("id")
-      .eq("user_id", clientId)
-      .eq("scheduled_at", l.scheduledAt)
-      .maybeSingle();
-
-    const payload = {
-      user_id: clientId,
-      scheduled_at: l.scheduledAt,
-      session_type: l.sessionType,
-      title: l.title,
-      notes: l.notes,
-      duration_minutes: l.durationMinutes,
-    };
-
-    if (existing?.id) {
-      const { error } = await db.from("appointments").update({ ...payload, reminder_sent_at: null }).eq("id", existing.id);
-      if (error) return { error: `Erreur à la mise à jour de « ${l.title} ».` };
-      updated += 1;
-    } else {
-      const { error } = await db.from("appointments").insert(payload);
-      if (error) return { error: `Erreur à l'enregistrement de « ${l.title} ».` };
-      created += 1;
-    }
-  }
-
-  revalidatePath(`/admin/clients/${clientId}`);
-  revalidatePath("/calendrier");
-  revalidatePath("/aujourdhui");
-
-  return {
-    success: true,
-    message: `${created} rendez-vous créé${created > 1 ? "s" : ""}, ${updated} mis à jour.`,
-  };
+      <SubmitButton className="w-auto self-start px-8">Importer le planning</SubmitButton>
+    </form>
+  );
 }
