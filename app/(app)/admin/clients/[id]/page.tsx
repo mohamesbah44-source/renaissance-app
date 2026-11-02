@@ -18,6 +18,7 @@ import { AdminClientSongCard } from "@/components/features/admin/AdminClientSong
 import { ClientSongForm } from "@/components/features/admin/ClientSongForm";
 import { AppointmentForm } from "@/components/features/admin/AppointmentForm";
 import { AppointmentRow } from "@/components/features/admin/AppointmentRow";
+import { PlanningImport } from "@/components/features/admin/PlanningImport";
 import { DeleteClientButton } from "@/components/features/admin/DeleteClientButton";
 import { SessionProgressPanel } from "@/components/features/calendrier/SessionProgressPanel";
 import { MessageThread } from "@/components/features/messages/MessageThread";
@@ -196,6 +197,11 @@ export default async function AdminClientDetailPage({ params }: { params: Promis
           {(appointments ?? []).map((appointment) => (
             <AppointmentRow key={appointment.id} appointment={appointment} />
           ))}
+
+          <GlassCard className="p-6">
+            <p className="mb-4 text-sm text-rr-gris-clair">Importer un planning complet</p>
+            <PlanningImport clientId={id} />
+          </GlassCard>
 
           <GlassCard className="p-6">
             <p className="mb-4 text-sm text-rr-gris-clair">Planifier un nouveau rendez-vous</p>
