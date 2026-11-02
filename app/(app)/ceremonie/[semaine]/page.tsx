@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
+import { CeremonyVoice } from "@/components/features/ceremonie/CeremonyVoice";
 
 function pickQuote(content: string | null | undefined): string | null {
   if (!content) return null;
@@ -117,6 +118,8 @@ export default async function CeremoniePage({ params }: { params: Promise<{ sema
             </p>
           )
         )}
+
+        <CeremonyVoice week={weekNumber} />
       </div>
 
       <div className="flex w-full max-w-md flex-col items-center gap-4">
